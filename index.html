@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс C++ — Современное программирование</title>
+    <meta name="description" content="Интерактивный курс по языку программирования C++. Изучайте C++ с примерами кода, компиляцией онлайн и интерактивными заданиями.">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/gamification.css">
+    <link rel="stylesheet" href="css/code-highlight.css">
+    <link rel="stylesheet" href="css/effects.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body class="landing-page">
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+
+            <nav class="header-nav">
+                <a href="index.html" class="active">Главная</a>
+                <a href="pages/chapter-1/paragraph-1.html">Глава I</a>
+            </nav>
+
+            <button class="mobile-menu-btn" aria-label="Открыть меню">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="page-wrapper">
+        <main class="main-content">
+
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-bg-lines">
+                    <div class="line" style="top: 35%"></div>
+                    <div class="line" style="top: 40%"></div>
+                    <div class="line" style="top: 45%"></div>
+                    <div class="line" style="top: 50%"></div>
+                    <div class="line" style="top: 55%"></div>
+                </div>
+
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        💻 Интерактивный курс
+                    </div>
+
+                    <h1>
+                        <span class="text-gradient">Современный</span><br>
+                        C++
+                    </h1>
+
+                    <p class="hero-subtitle">
+                        Изучайте язык программирования C++ от основ до продвинутых концепций
+                        с интерактивными примерами кода, онлайн-компиляцией
+                        и практическими заданиями
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="pages/chapter-1/paragraph-1.html" class="btn btn--primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Начать обучение
+                        </a>
+                        <a href="#chapters" class="btn btn--secondary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            Содержание
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapters Grid -->
+            <section class="chapters-section" id="chapters">
+                <div class="section-header">
+                    <h2>Содержание курса</h2>
+                    <p>Глава I: Фундаментальные типы данных — основа программирования на C++</p>
+                </div>
+
+                <div class="chapters-grid">
+                    <a href="pages/chapter-1/paragraph-1.html" class="chapter-card" style="--card-color: #58a6ff">
+                        <span class="card-number">§ 1</span>
+                        <h3>Фундаментальные типы данных</h3>
+                        <p>Введение в типы данных C++. Целочисленные типы, типы с плавающей точкой, символьные типы и логический тип.</p>
+                        <div class="card-tags">
+                            <span class="tag tag--beginner">Начальный</span>
+                            <span class="tag tag--standard">C++17</span>
+                        </div>
+                        <span class="card-arrow">Изучить →</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features-section">
+                <div class="section-content">
+                    <div class="section-header">
+                        <h2>Интерактивное обучение</h2>
+                        <p>Современные инструменты для изучения C++</p>
+                    </div>
+
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">💻</div>
+                            <h3>Онлайн-компиляция</h3>
+                            <p>Запускайте код прямо в браузере с поддержкой GCC и Clang компиляторов</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3>Визуализация типов</h3>
+                            <p>Интерактивные диаграммы и схемы для понимания структуры типов данных</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🎯</div>
+                            <h3>Практические задания</h3>
+                            <p>Проверьте свои знания с помощью интерактивных квизов и заданий</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🏆</div>
+                            <h3>Система достижений</h3>
+                            <p>Отслеживайте свой прогресс и получайте награды за выполнение заданий</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+        <p style="margin-top: var(--space-2);">Современный подход к изучению программирования</p>
+    </footer>
+
+    <!-- JS -->
+    <script src="js/navigation.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/code-highlighter.js"></script>
+    <script src="js/effects.js"></script>
+    <script></script>
+        // GSAP Animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hero animations
+            gsap.from('.hero-badge', {
+                opacity: 0,
+                y: -20,
+                duration: 0.6,
+                ease: 'power2.out'
+            });
+            
+            gsap.from('.hero h1', {
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                delay: 0.2,
+                ease: 'power2.out'
+            });
+            
+            gsap.from('.hero-subtitle', {
+                opacity: 0,
+                y: 20,
+                duration: 0.8,
+                delay: 0.4,
+                ease: 'power2.out'
+            });
+            
+            gsap.from('.hero-actions .btn', {
+                opacity: 0,
+                y: 20,
+                duration: 0.6,
+                delay: 0.6,
+                stagger: 0.1,
+                ease: 'power2.out'
+            });
+            
+            // Animate chapter cards
+            gsap.utils.toArray('.chapter-card').forEach((card, index) => {
+                gsap.from(card, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8,
+                    delay: 0.8 + (index * 0.1),
+                    ease: 'power2.out'
+                });
+            });
+            
+            // Animate feature cards
+            gsap.utils.toArray('.feature-card').forEach((card, index) => {
+                gsap.from(card, {
+                    opacity: 0,
+                    scale: 0.9,
+                    duration: 0.6,
+                    delay: 1.2 + (index * 0.1),
+                    ease: 'back.out(1.7)'
+                });
+            });
+            
+            // Floating animation for hero badge
+            gsap.to('.hero-badge', {
+                y: -10,
+                duration: 2,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+        });
+    </script>
+
+</body>
+</html>

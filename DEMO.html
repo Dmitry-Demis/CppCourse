@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Демонстрация возможностей — Курс C++</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+            color: #e8eef7;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(30, 36, 51, 0.8);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #63b3ff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        h2 {
+            color: #63b3ff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .feature {
+            background: rgba(99, 179, 255, 0.1);
+            border-left: 4px solid #63b3ff;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .feature h3 {
+            color: #63b3ff;
+            margin-bottom: 8px;
+        }
+        .feature p {
+            color: #9ba3b8;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #63b3ff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 10px 10px 0;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background: #4a9aea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 179, 255, 0.4);
+        }
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .color-box {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        code {
+            background: rgba(99, 179, 255, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #22d3ee;
+            font-family: 'Courier New', monospace;
+        }
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        ul li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #34d399;
+            font-weight: bold;
+        }
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .tech-badge {
+            padding: 8px 16px;
+            background: rgba(167, 139, 250, 0.2);
+            border: 1px solid rgba(167, 139, 250, 0.4);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #a78bfa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Курс C++ — Демонстрация возможностей</h1>
+        
+        <p style="font-size: 1.1rem; color: #9ba3b8; margin-bottom: 30px;">
+            Современный интерактивный курс по языку программирования C++ с онлайн-компиляцией,
+            анимациями и системой достижений.
+        </p>
+
+        <div style="margin: 30px 0;">
+            <a href="index.html" class="btn">🏠 Открыть главную страницу</a>
+            <a href="pages/chapter-1/paragraph-1.html" class="btn">📚 Перейти к §1</a>
+        </div>
+
+        <h2>🎨 Цветовая палитра</h2>
+        <div class="color-palette">
+            <div class="color-box" style="background: #63b3ff;">
+                #63b3ff<br>Голубой
+            </div>
+            <div class="color-box" style="background: #a78bfa;">
+                #a78bfa<br>Фиолетовый
+            </div>
+            <div class="color-box" style="background: #22d3ee;">
+                #22d3ee<br>Циан
+            </div>
+            <div class="color-box" style="background: #8b5cf6;">
+                #8b5cf6<br>Violet
+            </div>
+            <div class="color-box" style="background: #6366f1;">
+                #6366f1<br>Indigo
+            </div>
+        </div>
+
+        <h2>✨ Основные возможности</h2>
+
+        <div class="feature">
+            <h3>💻 Онлайн компилятор C++</h3>
+            <p>
+                Встроенный компилятор с поддержкой GCC (13.2, 12.2, 11.4) и Clang (16.0, 15.0, 14.0).
+                Выбор архитектуры (x86-64, x86) и стандарта C++ (C++11 до C++23).
+                Использует API Compiler Explorer (godbolt.org).
+            </p>
+        </div>
+
+        <div class="feature">
+            <h3>🎬 GSAP Анимации</h3>
+            <p>
+                Плавные анимации элементов при загрузке и прокрутке страницы.
+                ScrollTrigger для анимации при появлении в viewport.
+                Elastic, back.out и другие easing функции.
+            </p>
+        </div>
+
+        <div class="feature">
+            <h3>📝 Brace-init инициализация</h3>
+            <p>
+                Все примеры кода используют современный синтаксис C++11+:
+                <code>int x{42};</code> вместо <code>int x = 42;</code>
+            </p>
+        </div>
+
+        <div class="feature">
+            <h3>🎮 Интерактивные квизы</h3>
+            <p>
+                Система тестирования знаний с прогресс-баром, обратной связью
+                и подробными объяснениями к каждому вопросу.
+            </p>
+        </div>
+
+        <div class="feature">
+            <h3>🏆 Система достижений</h3>
+            <p>
+                10 достижений для разблокировки: от "Первая программа" до "Перфекционист".
+                Векторные SVG иконки с анимацией разблокировки.
+            </p>
+        </div>
+
+        <div class="feature">
+            <h3>📊 Интерактивные диаграммы</h3>
+            <p>
+                SVG-диаграммы типов данных с древовидной структурой.
+                Цветовое кодирование для различных категорий типов.
+            </p>
+        </div>
+
+        <h2>🛠️ Технологический стек</h2>
+        <div class="tech-stack">
+            <span class="tech-badge">HTML5</span>
+            <span class="tech-badge">CSS3</span>
+            <span class="tech-badge">JavaScript ES6+</span>
+            <span class="tech-badge">GSAP 3.12</span>
+            <span class="tech-badge">Prism.js</span>
+            <span class="tech-badge">Compiler Explorer API</span>
+        </div>
+
+        <h2>📚 Содержание курса</h2>
+        <ul>
+            <li>Введение в фундаментальные типы данных</li>
+            <li>Целочисленные типы (short, int, long, long long)</li>
+            <li>Типы с плавающей точкой (float, double, long double)</li>
+            <li>Символьные типы (char, wchar_t, char16_t, char32_t)</li>
+            <li>Логический тип (bool)</li>
+            <li>Использование std::numeric_limits</li>
+            <li>ISO C++ цитаты и ссылки на стандарт</li>
+        </ul>
+
+        <h2>🎯 Особенности реализации</h2>
+        <ul>
+            <li>Адаптивный дизайн для всех устройств</li>
+            <li>Тёмная тема с голубо-фиолетовыми акцентами</li>
+            <li>Подсветка синтаксиса кода (Prism.js)</li>
+            <li>Копирование кода одним кликом</li>
+            <li>Поддержка Tab в редакторе кода</li>
+            <li>Отображение ошибок компиляции</li>
+            <li>Вывод результатов выполнения программы</li>
+            <li>Сохранение прогресса в localStorage</li>
+        </ul>
+
+        <h2>📖 Стиль кода</h2>
+        <div class="feature">
+            <h3>Современный C++</h3>
+            <p>
+                ✅ Brace-init: <code>int x{42};</code><br>
+                ✅ Без using namespace std<br>
+                ✅ std::cout вместо cout<br>
+                ✅ '\n' вместо std::endl<br>
+                ✅ Подробные комментарии на русском
+            </p>
+        </div>
+
+        <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(99, 179, 255, 0.2); text-align: center;">
+            <p style="color: #9ba3b8;">
+                Создано с ❤️ для изучения современного C++
+            </p>
+            <div style="margin-top: 20px;">
+                <a href="index.html" class="btn">🚀 Начать обучение</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

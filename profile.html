@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Game - Профиль</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/game-ui.css">
+    <link rel="stylesheet" href="css/gamification.css">
+    <link rel="stylesheet" href="css/effects.css">
+</head>
+<body class="game-body">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="player-info">
+            <div class="player-avatar">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23FF6B35'/%3E%3Ccircle cx='35' cy='40' r='8' fill='%23fff'/%3E%3Ccircle cx='65' cy='40' r='8' fill='%23fff'/%3E%3Cpath d='M30 65 Q50 75 70 65' stroke='%23fff' stroke-width='4' fill='none'/%3E%3C/svg%3E" alt="Avatar">
+            </div>
+            <div class="player-level">
+                <div class="level-badge">14</div>
+                <div class="level-progress">
+                    <div class="level-bar">
+                        <div class="level-fill" style="width: 33%"></div>
+                    </div>
+                    <div class="level-text">172/520</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-resources">
+            <div class="resource-item gems">
+                <div class="resource-icon">💎</div>
+                <div class="resource-amount">2</div>
+            </div>
+            <div class="resource-item keys">
+                <div class="resource-icon">🔑</div>
+                <div class="resource-amount">16</div>
+            </div>
+            <div class="resource-item coins">
+                <div class="resource-icon">⭐</div>
+                <div class="resource-amount">6818</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab" onclick="showTab('missions')">
+            <div class="tab-icon">🎯</div>
+            <div class="tab-label">Миссии</div>
+        </button>
+        <button class="nav-tab" onclick="showTab('achievements')">
+            <div class="tab-icon">🏆</div>
+            <div class="tab-label">Достижения</div>
+        </button>
+        <button class="nav-tab active" onclick="showTab('profile')">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">Профиль</div>
+        </button>
+        <button class="nav-tab" onclick="showTab('shop')">
+            <div class="tab-icon">🛒</div>
+            <div class="tab-label">Магазин</div>
+        </button>
+        <button class="nav-tab" onclick="showTab('learn')">
+            <div class="tab-icon">📚</div>
+            <div class="tab-label">Обучение</div>
+        </button>
+    </div>
+
+    <!-- Content Container -->
+    <div class="content-container">
+        
+        <!-- Missions Tab -->
+        <div id="missions-tab" class="tab-content">
+            <div class="season-header">
+                <div class="season-title">SEASON MISSIONS</div>
+                <div class="season-timer">⏱️ Season ends in: 15d 15h</div>
+            </div>
+
+            <div class="mission-set">
+                <div class="set-title">MISSION SET 1</div>
+                <div class="set-label">SUBWAY PASS</div>
+                
+                <div class="mission-card premium">
+                    <div class="mission-icon">🎒</div>
+                    <div class="mission-info">
+                        <div class="mission-name">Запустить код 6 раз</div>
+                        <div class="mission-progress-bar">
+                            <div class="mission-progress-fill" style="width: 100%"></div>
+                            <div class="mission-progress-text">6 / 6</div>
+                        </div>
+                    </div>
+                    <div class="mission-rewards">
+                        <div class="reward-item">
+                            <div class="reward-icon">💎</div>
+                            <div class="reward-amount">300</div>
+                        </div>
+                        <div class="reward-item">
+                            <div class="reward-icon">⭐</div>
+                            <div class="reward-amount">300</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-card premium completed">
+                    <div class="mission-icon">❤️</div>
+                    <div class="mission-info">
+                        <div class="mission-name">Прочитать 5 параграфов</div>
+                        <div class="mission-progress-bar">
+                            <div class="mission-progress-fill" style="width: 100%"></div>
+                            <div class="mission-progress-text">5 / 5</div>
+                        </div>
+                    </div>
+                    <div class="mission-rewards">
+                        <div class="reward-item">
+                            <div class="reward-icon">💎</div>
+                            <div class="reward-amount">300</div>
+                        </div>
+                        <div class="reward-item">
+                            <div class="reward-icon">⭐</div>
+                            <div class="reward-amount">300</div>
+                        </div>
+                    </div>
+                    <div class="completed-badge">✓</div>
+                </div>
+
+                <div class="mission-card">
+                    <div class="mission-icon">🔑</div>
+                    <div class="mission-info">
+                        <div class="mission-name">Использовать 50 подсказок</div>
+                        <div class="mission-progress-bar">
+                            <div class="mission-progress-fill" style="width: 34%"></div>
+                            <div class="mission-progress-text">17 / 50</div>
+                        </div>
+                    </div>
+                    <div class="mission-rewards">
+                        <div class="reward-item">
+                            <div class="reward-icon">💎</div>
+                            <div class="reward-amount">200</div>
+                        </div>
+                        <div class="reward-item">
+                            <div class="reward-icon">⭐</div>
+                            <div class="reward-amount">200</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mission-set">
+                <div class="set-title">MISSION SET 2</div>
+                <div class="set-label">SUBWAY PASS</div>
+                
+                <div class="mission-card premium">
+                    <div class="mission-icon">🏆</div>
+                    <div class="mission-info">
+                        <div class="mission-name">Набрать 18000 очков</div>
+                        <div class="mission-progress-bar">
+                            <div class="mission-progress-fill" style="width: 72%"></div>
+                            <div class="mission-progress-text">13000 / 18000</div>
+                        </div>
+                    </div>
+                    <div class="mission-rewards">
+                        <div class="reward-item">
+                            <div class="reward-icon">💎</div>
+                            <div class="reward-amount">300</div>
+                        </div>
+                        <div class="reward-item">
+                            <div class="reward-icon">⭐</div>
+                            <div class="reward-amount">300</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Tab -->
+        <div id="achievements-tab" class="tab-content" style="display: none;">
+            <div class="achievements-header">
+                <h2>🏆 ДОСТИЖЕНИЯ 🏆</h2>
+                <div class="achievements-stats">
+                    <div class="stat-box">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Получено</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">14</div>
+                        <div class="stat-label">Уровень</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">6818</div>
+                        <div class="stat-label">Монет</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="achievements-grid">
+                <div class="achievement-card-3d unlocked">
+                    <div class="achievement-glow"></div>
+                    <div class="achievement-icon-3d">🚀</div>
+                    <div class="achievement-name">Первый шаг</div>
+                    <div class="achievement-desc">Запустите первый код</div>
+                    <div class="achievement-reward">
+                        <span>⭐</span> +100
+                    </div>
+                </div>
+
+                <div class="achievement-card-3d unlocked">
+                    <div class="achievement-glow"></div>
+                    <div class="achievement-icon-3d">💻</div>
+                    <div class="achievement-name">Мастер кода</div>
+                    <div class="achievement-desc">Запустите 50 программ</div>
+                    <div class="achievement-reward">
+                        <span>⭐</span> +500
+                    </div>
+                </div>
+
+                <div class="achievement-card-3d locked">
+                    <div class="achievement-icon-3d">📚</div>
+                    <div class="achievement-name">Книжный червь</div>
+                    <div class="achievement-desc">Прочитайте 10 параграфов</div>
+                    <div class="achievement-reward">
+                        <span>⭐</span> +300
+                    </div>
+                    <div class="lock-overlay">🔒</div>
+                </div>
+
+                <div class="achievement-card-3d locked">
+                    <div class="achievement-icon-3d">⚡</div>
+                    <div class="achievement-name">Быстрый ученик</div>
+                    <div class="achievement-desc">Завершите главу за день</div>
+                    <div class="achievement-reward">
+                        <span>⭐</span> +1000
+                    </div>
+                    <div class="lock-overlay">🔒</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profile-tab" class="tab-content" style="display: block;">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar-large">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23FF6B35'/%3E%3Ccircle cx='35' cy='40' r='8' fill='%23fff'/%3E%3Ccircle cx='65' cy='40' r='8' fill='%23fff'/%3E%3Cpath d='M30 65 Q50 75 70 65' stroke='%23fff' stroke-width='4' fill='none'/%3E%3C/svg%3E" alt="Avatar">
+                        <div class="avatar-level">14</div>
+                    </div>
+                    <div class="profile-name">C++ Learner</div>
+                    <div class="profile-title">🎓 Начинающий программист</div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">💻</div>
+                        <div class="stat-info">
+                            <div class="stat-number">127</div>
+                            <div class="stat-name">Запусков кода</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-info">
+                            <div class="stat-number">23</div>
+                            <div class="stat-name">Параграфов</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-info">
+                            <div class="stat-number">8</div>
+                            <div class="stat-name">Достижений</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-info">
+                            <div class="stat-number">7</div>
+                            <div class="stat-name">Дней подряд</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-progress">
+                    <h3>Прогресс обучения</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Глава 1: Основы</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar-3d">
+                            <div class="progress-fill-3d" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Глава 2: Типы данных</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="progress-bar-3d">
+                            <div class="progress-fill-3d" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shop Tab -->
+        <div id="shop-tab" class="tab-content" style="display: none;">
+            <div class="shop-header">
+                <h2>🛒 МАГАЗИН</h2>
+            </div>
+
+            <div class="shop-grid">
+                <div class="shop-item">
+                    <div class="item-badge">ПОПУЛЯРНО</div>
+                    <div class="item-icon">💎</div>
+                    <div class="item-name">100 Гемов</div>
+                    <button class="buy-btn">
+                        <span>⭐</span> 1000
+                    </button>
+                </div>
+
+                <div class="shop-item">
+                    <div class="item-icon">🔑</div>
+                    <div class="item-name">10 Ключей</div>
+                    <button class="buy-btn">
+                        <span>⭐</span> 500
+                    </button>
+                </div>
+
+                <div class="shop-item special">
+                    <div class="item-badge special">СПЕЦИАЛЬНО</div>
+                    <div class="item-icon">🎁</div>
+                    <div class="item-name">Стартовый набор</div>
+                    <button class="buy-btn special">
+                        <span>💎</span> 15
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learn Tab -->
+        <div id="learn-tab" class="tab-content" style="display: none;">
+            <div class="learn-header">
+                <h2>📚 ОБУЧЕНИЕ C++</h2>
+            </div>
+
+            <div class="chapters-list">
+                <a href="pages/chapter-1/paragraph-1.html" class="chapter-item">
+                    <div class="chapter-icon">1️⃣</div>
+                    <div class="chapter-info">
+                        <div class="chapter-name">Глава 1: Основы C++</div>
+                        <div class="chapter-progress">
+                            <div class="chapter-bar">
+                                <div class="chapter-fill" style="width: 75%"></div>
+                            </div>
+                            <span>75%</span>
+                        </div>
+                    </div>
+                    <div class="chapter-arrow">→</div>
+                </a>
+
+                <a href="#" class="chapter-item locked">
+                    <div class="chapter-icon">2️⃣</div>
+                    <div class="chapter-info">
+                        <div class="chapter-name">Глава 2: Типы данных</div>
+                        <div class="chapter-progress">
+                            <div class="chapter-bar">
+                                <div class="chapter-fill" style="width: 45%"></div>
+                            </div>
+                            <span>45%</span>
+                        </div>
+                    </div>
+                    <div class="chapter-arrow">→</div>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="bottom-nav-btn" onclick="showTab('missions')">
+            <div class="nav-icon">🎯</div>
+            <div class="nav-label">Миссии</div>
+        </button>
+        <button class="bottom-nav-btn" onclick="window.location.href='demo-gamified.html'">
+            <div class="nav-icon">🏃</div>
+            <div class="nav-label">Играть</div>
+        </button>
+        <button class="bottom-nav-btn active">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Профиль</div>
+        </button>
+        <button class="bottom-nav-btn" onclick="showTab('achievements')">
+            <div class="nav-icon">🏆</div>
+            <div class="nav-label">Награды</div>
+        </button>
+        <button class="bottom-nav-btn" onclick="showTab('shop')">
+            <div class="nav-icon">🛒</div>
+            <div class="nav-label">Магазин</div>
+        </button>
+    </div>
+
+    <!-- JS -->
+    <script src="js/gamification.js"></script>
+    <script src="js/effects.js"></script>
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').style.display = 'block';
+            
+            // Add active class to clicked tab
+            event.target.closest('.nav-tab')?.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1. Фундаментальные типы данных — Курс C++</title>
+    <meta name="description" content="Введение в фундаментальные типы данных C++. Целочисленные типы, типы с плавающей точкой, символьные и логический типы.">
+
+    <!-- Prism.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- MathJax for mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/quiz.css">
+    <link rel="stylesheet" href="../../css/compiler.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+
+            <nav class="header-nav">
+                <a href="../../index.html">Главная</a>
+                <a href="paragraph-1.html" class="active">Глава I</a>
+            </nav>
+
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Глава I. Фундаментальные типы</div>
+                <ul class="sidebar-nav">
+                    <li><a href="paragraph-1.html" class="active"><span class="nav-number">§1</span> Типы данных</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <!-- Section Badge -->
+                <div class="section-badge section-badge--chapter">Глава I</div>
+                <h1>§ 1. Фундаментальные типы данных</h1>
+
+                <p>
+                    В программировании <span class="key-term">тип данных</span> определяет, какие значения может хранить переменная
+                    и какие операции можно с ней выполнять. C++ — это <strong>строго типизированный язык</strong>, что означает,
+                    что каждая переменная должна иметь определённый тип, который известен на этапе компиляции.
+                </p>
+
+                <h2 id="chto-takoe-tipy">Что такое фундаментальные типы</h2>
+
+                <div class="definition" data-label="Определение">
+                    <p>
+                        <strong>Фундаментальные типы данных</strong> (fundamental types) — это встроенные типы языка C++,
+                        которые представляют базовые значения: целые числа, числа с плавающей точкой, символы и логические значения.
+                        Эти типы являются основой для построения более сложных типов данных.
+                    </p>
+                </div>
+
+                <p>
+                    Фундаментальные типы делятся на несколько категорий:
+                </p>
+
+                <ul>
+                    <li><strong>Целочисленные типы</strong> (<code>int</code>, <code>short</code>, <code>long</code>, <code>long long</code>)</li>
+                    <li><strong>Типы с плавающей точкой</strong> (<code>float</code>, <code>double</code>, <code>long double</code>)</li>
+                    <li><strong>Символьные типы</strong> (<code>char</code>, <code>wchar_t</code>, <code>char16_t</code>, <code>char32_t</code>)</li>
+                    <li><strong>Логический тип</strong> (<code>bool</code>)</li>
+                    <li><strong>Тип void</strong> (отсутствие типа)</li>
+                </ul>
+
+                <h2 id="ierarkhiya-tipov">Иерархия фундаментальных типов</h2>
+
+                <!-- SVG Diagram: Type Hierarchy - Vertical Layout -->
+                <div class="diagram-block">
+                    <div class="diagram-title">Структура фундаментальных типов C++</div>
+                    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+                        <!-- Root -->
+                        <rect x="250" y="20" width="300" height="60" rx="8" fill="rgba(167, 139, 250, 0.2)" stroke="#a78bfa" stroke-width="2"/>
+                        <text x="400" y="55" text-anchor="middle" fill="#a78bfa" font-size="18" font-weight="600">Фундаментальные типы C++</text>
+
+                        <!-- Main Categories -->
+                        <line x1="400" y1="80" x2="150" y2="120" stroke="#a78bfa" stroke-width="2"/>
+                        <line x1="400" y1="80" x2="400" y2="120" stroke="#a78bfa" stroke-width="2"/>
+                        <line x1="400" y1="80" x2="650" y2="120" stroke="#a78bfa" stroke-width="2"/>
+
+                        <!-- Integer Types Column -->
+                        <rect x="50" y="120" width="200" height="50" rx="8" fill="rgba(129, 140, 248, 0.2)" stroke="#818cf8" stroke-width="2"/>
+                        <text x="150" y="150" text-anchor="middle" fill="#818cf8" font-size="16" font-weight="600">Целочисленные типы</text>
+
+                        <!-- Integer types vertical -->
+                        <rect x="75" y="190" width="150" height="45" rx="6" fill="rgba(129, 140, 248, 0.15)" stroke="#818cf8" stroke-width="1.5"/>
+                        <text x="150" y="217" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">long long</text>
+
+                        <rect x="75" y="245" width="150" height="45" rx="6" fill="rgba(129, 140, 248, 0.15)" stroke="#818cf8" stroke-width="1.5"/>
+                        <text x="150" y="272" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">long</text>
+
+                        <rect x="75" y="300" width="150" height="45" rx="6" fill="rgba(129, 140, 248, 0.15)" stroke="#818cf8" stroke-width="1.5"/>
+                        <text x="150" y="327" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">int</text>
+
+                        <rect x="75" y="355" width="150" height="45" rx="6" fill="rgba(129, 140, 248, 0.15)" stroke="#818cf8" stroke-width="1.5"/>
+                        <text x="150" y="382" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">short</text>
+
+                        <!-- Floating Point Column -->
+                        <rect x="300" y="120" width="200" height="50" rx="8" fill="rgba(34, 211, 238, 0.2)" stroke="#22d3ee" stroke-width="2"/>
+                        <text x="400" y="150" text-anchor="middle" fill="#22d3ee" font-size="16" font-weight="600">С плавающей точкой</text>
+
+                        <rect x="325" y="190" width="150" height="45" rx="6" fill="rgba(34, 211, 238, 0.15)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="400" y="217" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">long double</text>
+
+                        <rect x="325" y="245" width="150" height="45" rx="6" fill="rgba(34, 211, 238, 0.15)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="400" y="272" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">double</text>
+
+                        <rect x="325" y="300" width="150" height="45" rx="6" fill="rgba(34, 211, 238, 0.15)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="400" y="327" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">float</text>
+
+                        <!-- Other Types Column -->
+                        <rect x="550" y="120" width="200" height="50" rx="8" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="2"/>
+                        <text x="650" y="150" text-anchor="middle" fill="#10b981" font-size="16" font-weight="600">Другие типы</text>
+
+                        <rect x="575" y="190" width="150" height="45" rx="6" fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="1.5"/>
+                        <text x="650" y="217" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">char</text>
+
+                        <rect x="575" y="245" width="150" height="45" rx="6" fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="1.5"/>
+                        <text x="650" y="272" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">bool</text>
+
+                        <rect x="575" y="300" width="150" height="45" rx="6" fill="rgba(245, 158, 11, 0.15)" stroke="#f59e0b" stroke-width="1.5"/>
+                        <text x="650" y="327" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="Consolas, monospace">void</text>
+
+                        <!-- Size indicators -->
+                        <text x="150" y="430" text-anchor="middle" fill="#94a3b8" font-size="12">↑ Больший размер</text>
+                        <text x="150" y="450" text-anchor="middle" fill="#94a3b8" font-size="12">↓ Меньший размер</text>
+                    </svg>
+                </div>
+
+                <h2 id="tselochislennye-tipy">Целочисленные типы</h2>
+
+                <p>
+                    Целочисленные типы используются для хранения целых чисел (без дробной части).
+                    В C++ существует несколько целочисленных типов, различающихся размером и диапазоном значений.
+                </p>
+
+                <div class="iso-quote">
+                    [basic.fundamental] §6.7.1<br>
+                    There are five standard signed integer types: "signed char", "short int", "int", "long int", and "long long int".
+                </div>
+
+                <!-- Таблица целочисленных типов -->
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Размер (обычно)</th>
+                                <th>Диапазон (signed)</th>
+                                <th>Диапазон (unsigned)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>long long</code></td>
+                                <td>8 байт (64 бита)</td>
+                                <td>$-9'223'372'036'854'775'808$ до $9'223'372'036'854'775'807$</td>
+                                <td>$0$ до $18'446'744'073'709'551'615$</td>
+                            </tr>
+                            <tr>
+                                <td><code>long</code></td>
+                                <td>4-8 байт (32-64 бита)</td>
+                                <td>$-2'147'483'648$ до $2'147'483'647$ (32-bit)</td>
+                                <td>$0$ до $4'294'967'295$ (32-bit)</td>
+                            </tr>
+                            <tr>
+                                <td><code>int</code></td>
+                                <td>4 байта (32 бита)</td>
+                                <td>$-2'147'483'648$ до $2'147'483'647$</td>
+                                <td>$0$ до $4'294'967'295$</td>
+                            </tr>
+                            <tr>
+                                <td><code>short</code></td>
+                                <td>2 байта (16 бит)</td>
+                                <td>$-32'768$ до $32'767$</td>
+                                <td>$0$ до $65'535$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                    <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+                        <!-- Root -->
+                        <rect x="350" y="20" width="200" height="50" rx="8" fill="rgba(99, 179, 255, 0.2)" stroke="#63b3ff" stroke-width="2"/>
+                        <text x="450" y="50" text-anchor="middle" fill="#63b3ff" font-size="16" font-weight="600">Фундаментальные типы</text>
+
+                        <!-- Level 1: Main Categories -->
+                        <line x1="450" y1="70" x2="150" y2="120" stroke="#63b3ff" stroke-width="2"/>
+                        <line x1="450" y1="70" x2="350" y2="120" stroke="#63b3ff" stroke-width="2"/>
+                        <line x1="450" y1="70" x2="550" y2="120" stroke="#63b3ff" stroke-width="2"/>
+                        <line x1="450" y1="70" x2="750" y2="120" stroke="#63b3ff" stroke-width="2"/>
+
+                        <!-- Integer Types -->
+                        <rect x="50" y="120" width="200" height="50" rx="8" fill="rgba(167, 139, 250, 0.2)" stroke="#a78bfa" stroke-width="2"/>
+                        <text x="150" y="150" text-anchor="middle" fill="#a78bfa" font-size="14" font-weight="600">Целочисленные</text>
+
+                        <!-- Floating Point -->
+                        <rect x="270" y="120" width="160" height="50" rx="8" fill="rgba(34, 211, 238, 0.2)" stroke="#22d3ee" stroke-width="2"/>
+                        <text x="350" y="150" text-anchor="middle" fill="#22d3ee" font-size="14" font-weight="600">С плав. точкой</text>
+
+                        <!-- Character -->
+                        <rect x="450" y="120" width="160" height="50" rx="8" fill="rgba(52, 211, 153, 0.2)" stroke="#34d399" stroke-width="2"/>
+                        <text x="530" y="150" text-anchor="middle" fill="#34d399" font-size="14" font-weight="600">Символьные</text>
+
+                        <!-- Boolean & Void -->
+                        <rect x="630" y="120" width="240" height="50" rx="8" fill="rgba(251, 146, 60, 0.2)" stroke="#fb923c" stroke-width="2"/>
+                        <text x="750" y="150" text-anchor="middle" fill="#fb923c" font-size="14" font-weight="600">Логический / Void</text>
+
+                        <!-- Level 2: Specific Types -->
+                        <!-- Integer subtypes -->
+                        <line x1="150" y1="170" x2="80" y2="220" stroke="#a78bfa" stroke-width="1.5"/>
+                        <line x1="150" y1="170" x2="150" y2="220" stroke="#a78bfa" stroke-width="1.5"/>
+                        <line x1="150" y1="170" x2="220" y2="220" stroke="#a78bfa" stroke-width="1.5"/>
+
+                        <rect x="30" y="220" width="100" height="40" rx="6" fill="rgba(167, 139, 250, 0.1)" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="80" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">short</text>
+
+                        <rect x="100" y="220" width="100" height="40" rx="6" fill="rgba(167, 139, 250, 0.1)" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="150" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">int</text>
+
+                        <rect x="170" y="220" width="100" height="40" rx="6" fill="rgba(167, 139, 250, 0.1)" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="220" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">long</text>
+
+                        <!-- Floating point subtypes -->
+                        <line x1="350" y1="170" x2="290" y2="220" stroke="#22d3ee" stroke-width="1.5"/>
+                        <line x1="350" y1="170" x2="350" y2="220" stroke="#22d3ee" stroke-width="1.5"/>
+                        <line x1="350" y1="170" x2="410" y2="220" stroke="#22d3ee" stroke-width="1.5"/>
+
+                        <rect x="240" y="220" width="100" height="40" rx="6" fill="rgba(34, 211, 238, 0.1)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="290" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">float</text>
+
+                        <rect x="300" y="220" width="100" height="40" rx="6" fill="rgba(34, 211, 238, 0.1)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="350" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">double</text>
+
+                        <rect x="360" y="220" width="100" height="40" rx="6" fill="rgba(34, 211, 238, 0.1)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="410" y="240" text-anchor="middle" fill="#e8eef7" font-size="11">long</text>
+                        <text x="410" y="252" text-anchor="middle" fill="#e8eef7" font-size="11">double</text>
+
+                        <!-- Character subtypes -->
+                        <line x1="530" y1="170" x2="480" y2="220" stroke="#34d399" stroke-width="1.5"/>
+                        <line x1="530" y1="170" x2="530" y2="220" stroke="#34d399" stroke-width="1.5"/>
+                        <line x1="530" y1="170" x2="580" y2="220" stroke="#34d399" stroke-width="1.5"/>
+
+                        <rect x="430" y="220" width="100" height="40" rx="6" fill="rgba(52, 211, 153, 0.1)" stroke="#34d399" stroke-width="1.5"/>
+                        <text x="480" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">char</text>
+
+                        <rect x="480" y="220" width="100" height="40" rx="6" fill="rgba(52, 211, 153, 0.1)" stroke="#34d399" stroke-width="1.5"/>
+                        <text x="530" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">wchar_t</text>
+
+                        <rect x="530" y="220" width="100" height="40" rx="6" fill="rgba(52, 211, 153, 0.1)" stroke="#34d399" stroke-width="1.5"/>
+                        <text x="580" y="240" text-anchor="middle" fill="#e8eef7" font-size="11">char16_t</text>
+                        <text x="580" y="252" text-anchor="middle" fill="#e8eef7" font-size="11">char32_t</text>
+
+                        <!-- Boolean & Void -->
+                        <line x1="750" y1="170" x2="700" y2="220" stroke="#fb923c" stroke-width="1.5"/>
+                        <line x1="750" y1="170" x2="800" y2="220" stroke="#fb923c" stroke-width="1.5"/>
+
+                        <rect x="650" y="220" width="100" height="40" rx="6" fill="rgba(251, 146, 60, 0.1)" stroke="#fb923c" stroke-width="1.5"/>
+                        <text x="700" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">bool</text>
+
+                        <rect x="750" y="220" width="100" height="40" rx="6" fill="rgba(251, 146, 60, 0.1)" stroke="#fb923c" stroke-width="1.5"/>
+                        <text x="800" y="245" text-anchor="middle" fill="#e8eef7" font-size="12">void</text>
+                    </svg>
+                </div>
+
+                <h2 id="tselochislennye-tipy">Целочисленные типы</h2>
+
+                <p>
+                    Целочисленные типы используются для хранения целых чисел (без дробной части).
+                    В C++ существует несколько целочисленных типов, различающихся размером и диапазоном значений.
+                </p>
+
+                <div class="iso-quote">
+                    [basic.fundamental] §6.7.1<br>
+                    There are five standard signed integer types: "signed char", "short int", "int", "long int", and "long long int".
+                </div>
+
+                <!-- Таблица целочисленных типов -->
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Размер (обычно)</th>
+                                <th>Диапазон (signed)</th>
+                                <th>Диапазон (unsigned)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>long long</code></td>
+                                <td>8 байт (64 бита)</td>
+                                <td>-9,223,372,036,854,775,808 до 9,223,372,036,854,775,807</td>
+                                <td>0 до 18,446,744,073,709,551,615</td>
+                            </tr>
+                            <tr>
+                                <td><code>long</code></td>
+                                <td>4-8 байт (32-64 бита)</td>
+                                <td>-2,147,483,648 до 2,147,483,647 (32-bit)</td>
+                                <td>0 до 4,294,967,295 (32-bit)</td>
+                            </tr>
+                            <tr>
+                                <td><code>int</code></td>
+                                <td>4 байта (32 бита)</td>
+                                <td>-2,147,483,648 до 2,147,483,647</td>
+                                <td>0 до 4,294,967,295</td>
+                            </tr>
+                            <tr>
+                                <td><code>short</code></td>
+                                <td>2 байта (16 бит)</td>
+                                <td>$-32'768$ до $32'767$</td>
+                                <td>$0$ до $65'535$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- long long -->
+                <div class="type-section">
+                    <h3><code>long long</code> — Длинное длинное целое</h3>
+                    <p class="type-description">
+                        Тип <code>long long</code> (введён в <span class="tag tag--standard">C++11</span>) предназначен для хранения очень больших целых чисел.
+                        Гарантированно имеет размер минимум 64 бита, что позволяет работать с числами до 9 квинтиллионов.
+                    </p>
+                    <div class="type-specs">
+                        <div class="type-spec">
+                            <span class="type-spec-label">Размер</span>
+                            <span class="type-spec-value">8 байт (64 бита)</span>
+                        </div>
+                        <div class="type-spec">
+                            <span class="type-spec-label">Диапазон (signed)</span>
+                            <span class="type-spec-value">$-9.2 \times 10^{18}$ до $9.2 \times 10^{18}$</span>
+                        </div>
+                        <div class="type-spec">
+                            <span class="type-spec-label">Применение</span>
+                            <span class="type-spec-value">Большие числа, ID, время</span>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">C++</span>
+                            <div class="code-actions">
+                                <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                            </div>
+                        </div>
+                        <div class="code-content">
+                            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    long long bigNumber{9223372036854775807LL};
+    unsigned long long evenBigger{18446744073709551615ULL};
+    
+    std::cout &lt;&lt; "long long: " &lt;&lt; bigNumber &lt;&lt; '\n';
+    std::cout &lt;&lt; "unsigned long long: " &lt;&lt; evenBigger &lt;&lt; '\n';
+    
+    std::cout &lt;&lt; "\nХарактеристики long long:\n";
+    std::cout &lt;&lt; "Размер: " &lt;&lt; sizeof(long long) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "Минимум: " &lt;&lt; std::numeric_limits&lt;long long&gt;::min() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Максимум: " &lt;&lt; std::numeric_limits&lt;long long&gt;::max() &lt;&lt; '\n';
+    
+    return 0;
+}
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- long -->
+                <div class="type-section">
+                    <h3><code>long</code> — Длинное целое</h3>
+                    <p class="type-description">
+                        Тип <code>long</code> предназначен для хранения больших целых чисел. На 32-битных системах обычно 32 бита,
+                        на 64-битных может быть 64 бита (зависит от платформы).
+                    </p>
+                    <div class="type-specs">
+                        <div class="type-spec">
+                            <span class="type-spec-label">Размер</span>
+                            <span class="type-spec-value">4-8 байт (32-64 бита)</span>
+                        </div>
+                        <div class="type-spec">
+                            <span class="type-spec-label">Диапазон (32-bit)</span>
+                            <span class="type-spec-value">$-2.1 \times 10^9$ до $2.1 \times 10^9$</span>
+                        </div>
+                        <div class="type-spec">
+                            <span class="type-spec-label">Применение</span>
+                            <span class="type-spec-value">Большие счётчики, индексы</span>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">C++</span>
+                            <div class="code-actions">
+                                <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                            </div>
+                        </div>
+                        <div class="code-content">
+                            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    long distance{2147483647L};
+    unsigned long population{4294967295UL};
+    
+    std::cout &lt;&lt; "long: " &lt;&lt; distance &lt;&lt; '\n';
+    std::cout &lt;&lt; "unsigned long: " &lt;&lt; population &lt;&lt; '\n';
+    
+    std::cout &lt;&lt; "\nХарактеристики long:\n";
+    std::cout &lt;&lt; "Размер: " &lt;&lt; sizeof(long) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "Минимум: " &lt;&lt; std::numeric_limits&lt;long&gt;::min() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Максимум: " &lt;&lt; std::numeric_limits&lt;long&gt;::max() &lt;&lt; '\n';
+    
+    return 0;
+}
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- int -->
+                <div class="type-section">
+                    <h3><code>int</code> — Целое число</h3>
+                    <p class="type-description">
+                        Тип <code>int</code> — это наиболее часто используемый целочисленный тип. Обычно имеет размер 32 бита
+                        и является оптимальным выбором для большинства целочисленных вычислений.
+                    </p>
+                    <div class="type-specs">
+                        <div class="type-spec">
+                            <span class="type-spec-label">Размер</span>
+                            <span class="type-spec-value">4 байта (32 бита)</span>
+                        </div>
+                        <div class="type-spec">
+                            <span class="type-spec-label">Диапазон</span>
+                            <span class="type-spec-value">$-2.1 \times 10^9$ до $2.1 \times 10^9$</span>
+                        </div>
+                        <div class="type-spec">
+                            <span class="type-spec-label">Применение</span>
+                            <span class="type-spec-value">Общие вычисления, счётчики</span>
+                        </div>
+                    </div>
+
+                    <div class="code-block" id="code-block-int">
+                        <div class="code-header">
+                            <span class="code-lang">C++</span>
+                            <div class="code-actions">
+                                <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                            </div>
+                        </div>
+                        <div class="code-content">
+                            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    int age{25};
+    int temperature{-15};
+    unsigned int count{1000};
+    
+    std::cout &lt;&lt; "Возраст: " &lt;&lt; age &lt;&lt; '\n';
+    std::cout &lt;&lt; "Температура: " &lt;&lt; temperature &lt;&lt; '\n';
+    std::cout &lt;&lt; "Счётчик: " &lt;&lt; count &lt;&lt; '\n';
+    
+    std::cout &lt;&lt; "\nХарактеристики int:\n";
+    std::cout &lt;&lt; "Размер: " &lt;&lt; sizeof(int) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "Минимум: " &lt;&lt; std::numeric_limits&lt;int&gt;::min() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Максимум: " &lt;&lt; std::numeric_limits&lt;int&gt;::max() &lt;&lt; '\n';
+    
+    return 0;
+}
+</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Online Compiler -->
+                    <div id="compiler-int"></div>
+                </div>
+
+                <!-- short -->
+                <div class="type-section">
+                    <h3><code>short</code> — Короткое целое</h3>
+                    <p class="type-description">
+                        Тип <code>short</code> используется для экономии памяти при работе с небольшими целыми числами.
+                        Имеет размер 16 бит и может хранить значения от -32,768 до 32,767.
+                    </p>
+                    <div class="type-specs">
+                        <div class="type-spec">
+                            <span class="type-spec-label">Размер</span>
+                            <span class="type-spec-value">2 байта (16 бит)</span>
+                        </div>
+                        <div class="type-spec">
+                            <span class="type-spec-label">Диапазон</span>
+                            <span class="type-spec-value">$-32'768$ до $32'767$</span>
+                        </div>
+                        <div class="type-spec">
+                            <span class="type-spec-label">Применение</span>
+                            <span class="type-spec-value">Экономия памяти, малые числа</span>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">C++</span>
+                            <div class="code-actions">
+                                <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                            </div>
+                        </div>
+                        <div class="code-content">
+                            <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    short year{2024};
+    short score{-100};
+    unsigned short port{8080};
+    
+    std::cout &lt;&lt; "Год: " &lt;&lt; year &lt;&lt; '\n';
+    std::cout &lt;&lt; "Счёт: " &lt;&lt; score &lt;&lt; '\n';
+    std::cout &lt;&lt; "Порт: " &lt;&lt; port &lt;&lt; '\n';
+    
+    std::cout &lt;&lt; "\nХарактеристики short:\n";
+    std::cout &lt;&lt; "Размер: " &lt;&lt; sizeof(short) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "Минимум: " &lt;&lt; std::numeric_limits&lt;short&gt;::min() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Максимум: " &lt;&lt; std::numeric_limits&lt;short&gt;::max() &lt;&lt; '\n';
+    
+    return 0;
+}
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="definition definition--note" data-label="Важно">
+                    <p>
+                        Модификаторы <code>signed</code> и <code>unsigned</code> изменяют диапазон значений.
+                        <code>unsigned int</code> хранит только положительные числа ($0$ до $4'294'967'295$),
+                        удваивая положительный диапазон за счёт отсутствия отрицательных значений.
+                    </p>
+                </div>
+
+                <!-- Info Grid: Integer Types -->
+                <div class="info-grid">
+                    <div class="info-item" style="border-top: 3px solid var(--accent-purple);">
+                        <div class="info-icon">🔢</div>
+                        <div class="info-text">
+                            <h4>short (short int)</h4>
+                            <p>
+                                Минимум 16 бит. Диапазон: от $-32'768$ до $32'767$.
+                                Используется для экономии памяти при работе с небольшими числами.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="info-item" style="border-top: 3px solid var(--accent-purple);">
+                        <div class="info-icon">🔢</div>
+                        <div class="info-text">
+                            <h4>int</h4>
+                            <p>
+                                Обычно 32 бита. Диапазон: от $-2'147'483'648$ до $2'147'483'647$.
+                                Наиболее часто используемый целочисленный тип.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="info-item" style="border-top: 3px solid var(--accent-purple);">
+                        <div class="info-icon">🔢</div>
+                        <div class="info-text">
+                            <h4>long (long int)</h4>
+                            <p>
+                                Минимум 32 бита. На 64-битных системах часто 64 бита.
+                                Для больших целых чисел.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="info-item" style="border-top: 3px solid var(--accent-purple);">
+                        <div class="info-icon">🔢</div>
+                        <div class="info-text">
+                            <h4>long long</h4>
+                            <p>
+                                Минимум 64 бита. Диапазон: от $-9'223'372'036'854'775'808$ до $9'223'372'036'854'775'807$.
+                                Для очень больших чисел (C++11).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 id="tipy-s-plavayushchey-tochkoy">Типы с плавающей точкой</h2>
+
+                <p>
+                    Типы с плавающей точкой используются для хранения вещественных чисел (с дробной частью).
+                    Они представляют числа в формате с плавающей точкой согласно стандарту IEEE 754.
+                </p>
+
+                <!-- Info Grid: Floating Point Types -->
+                <div class="info-grid">
+                    <div class="info-item" style="border-top: 3px solid var(--accent-cyan);">
+                        <div class="info-icon">📊</div>
+                        <div class="info-text">
+                            <h4>float</h4>
+                            <p>
+                                Одинарная точность, обычно 32 бита. Точность: ~7 десятичных цифр.
+                                Диапазон: $\pm 3.4 \times 10^{38}$.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="info-item" style="border-top: 3px solid var(--accent-cyan);">
+                        <div class="info-icon">📊</div>
+                        <div class="info-text">
+                            <h4>double</h4>
+                            <p>
+                                Двойная точность, обычно 64 бита. Точность: ~15 десятичных цифр.
+                                Диапазон: $\pm 1.7 \times 10^{308}$. Стандартный выбор для вещественных чисел.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="info-item" style="border-top: 3px solid var(--accent-cyan);">
+                        <div class="info-icon">📊</div>
+                        <div class="info-text">
+                            <h4>long double</h4>
+                            <p>
+                                Расширенная точность, минимум 64 бита (часто 80 или 128 бит).
+                                Максимальная точность для вещественных вычислений.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 id="primer-float">Пример: Типы с плавающей точкой</h3>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;iomanip&gt;
+
+int main() {
+    float f{3.14159f};
+    double d{3.141592653589793};
+    long double ld{3.141592653589793238L};
+    
+    std::cout &lt;&lt; std::setprecision(15);
+    std::cout &lt;&lt; "float: " &lt;&lt; f &lt;&lt; '\n';
+    std::cout &lt;&lt; "double: " &lt;&lt; d &lt;&lt; '\n';
+    std::cout &lt;&lt; "long double: " &lt;&lt; ld &lt;&lt; '\n';
+    
+    // Информация о типах
+    std::cout &lt;&lt; "\nХарактеристики типов:\n";
+    std::cout &lt;&lt; "float размер: " &lt;&lt; sizeof(float) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "float точность: " &lt;&lt; std::numeric_limits&lt;float&gt;::digits10 &lt;&lt; " цифр\n";
+    std::cout &lt;&lt; "double размер: " &lt;&lt; sizeof(double) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "double точность: " &lt;&lt; std::numeric_limits&lt;double&gt;::digits10 &lt;&lt; " цифр\n";
+    
+    return 0;
+}
+</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="simvolnye-tipy">Символьные типы</h2>
+
+                <p>
+                    Символьные типы используются для хранения символов. Тип <code>char</code> обычно занимает 1 байт
+                    и может хранить символы ASCII. Для Unicode существуют специальные типы.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    char c{'A'};
+    wchar_t wc{L'Я'};
+    char16_t c16{u'€'};
+    char32_t c32{U'🔥'};
+    
+    std::cout &lt;&lt; "char: " &lt;&lt; c &lt;&lt; '\n';
+    std::cout &lt;&lt; "char размер: " &lt;&lt; sizeof(char) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "wchar_t размер: " &lt;&lt; sizeof(wchar_t) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "char16_t размер: " &lt;&lt; sizeof(char16_t) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "char32_t размер: " &lt;&lt; sizeof(char32_t) &lt;&lt; " байт\n";
+    
+    return 0;
+}
+</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="logicheskiy-tip">Логический тип bool</h2>
+
+                <p>
+                    Тип <code>bool</code> используется для хранения логических значений: <code>true</code> (истина)
+                    или <code>false</code> (ложь). Это фундаментальный тип для условных выражений и логических операций.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    bool isActive{true};
+    bool isComplete{false};
+    
+    std::cout &lt;&lt; "isActive: " &lt;&lt; isActive &lt;&lt; '\n';
+    std::cout &lt;&lt; "isComplete: " &lt;&lt; isComplete &lt;&lt; '\n';
+    std::cout &lt;&lt; std::boolalpha;  // Вывод true/false вместо 1/0
+    std::cout &lt;&lt; "isActive: " &lt;&lt; isActive &lt;&lt; '\n';
+    std::cout &lt;&lt; "bool размер: " &lt;&lt; sizeof(bool) &lt;&lt; " байт\n";
+    
+    return 0;
+}
+</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="numeric-limits">Использование std::numeric_limits</h2>
+
+                <p>
+                    Шаблон класса <code>std::numeric_limits</code> из заголовка <code>&lt;limits&gt;</code>
+                    предоставляет информацию о свойствах арифметических типов.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    std::cout &lt;&lt; "Информация о типе int:\n";
+    std::cout &lt;&lt; "Минимум: " &lt;&lt; std::numeric_limits&lt;int&gt;::min() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Максимум: " &lt;&lt; std::numeric_limits&lt;int&gt;::max() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Знаковый: " &lt;&lt; std::numeric_limits&lt;int&gt;::is_signed &lt;&lt; '\n';
+    std::cout &lt;&lt; "Целочисленный: " &lt;&lt; std::numeric_limits&lt;int&gt;::is_integer &lt;&lt; '\n';
+    
+    std::cout &lt;&lt; "\nИнформация о типе double:\n";
+    std::cout &lt;&lt; "Минимум: " &lt;&lt; std::numeric_limits&lt;double&gt;::min() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Максимум: " &lt;&lt; std::numeric_limits&lt;double&gt;::max() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Точность (цифр): " &lt;&lt; std::numeric_limits&lt;double&gt;::digits10 &lt;&lt; '\n';
+    std::cout &lt;&lt; "Эпсилон: " &lt;&lt; std::numeric_limits&lt;double&gt;::epsilon() &lt;&lt; '\n';
+    
+    return 0;
+}
+</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="itogi">Итоги параграфа</h2>
+
+                <div class="theory-card">
+                    <h4>Что мы узнали:</h4>
+                    <ul>
+                        <li>
+                            <strong>Фундаментальные типы</strong> — это встроенные типы C++, представляющие базовые значения.
+                        </li>
+                        <li>
+                            <strong>Целочисленные типы</strong> (short, int, long, long long) используются для целых чисел.
+                        </li>
+                        <li>
+                            <strong>Типы с плавающей точкой</strong> (float, double, long double) для вещественных чисел.
+                        </li>
+                        <li>
+                            <strong>Символьные типы</strong> (char, wchar_t, char16_t, char32_t) для символов и текста.
+                        </li>
+                        <li>
+                            <strong>Логический тип bool</strong> для хранения true/false.
+                        </li>
+                        <li>
+                            <code>std::numeric_limits</code> предоставляет информацию о свойствах типов.
+                        </li>
+                    </ul>
+                </div>
+
+                <h2 id="quiz">🎮 Проверьте свои знания</h2>
+                <p>Пройдите интерактивный квиз и проверьте, как хорошо вы усвоили материал!</p>
+                <div id="quiz-fundamental-types"></div>
+
+                <!-- Page navigation -->
+                <nav class="page-nav">
+                    <a href="../../index.html" class="page-nav-link">
+                        <span class="page-nav-label">&larr; Назад</span>
+                        <span class="page-nav-title">Главная</span>
+                    </a>
+                </nav>
+
+            </div>
+        </main>
+
+        <!-- Right Sidebar: Table of Contents -->
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <h3 class="toc-title">📑 Содержание</h3>
+                <nav class="toc-nav">
+                    <!-- Генерируется автоматически через JS -->
+                </nav>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+        <p style="margin-top: var(--space-2);">Современный подход к изучению программирования</p>
+    </footer>
+
+    <!-- JS -->
+    <script src="../../js/navigation.js"></script>
+    <script src="../../js/quiz.js"></script>
+    <script src="../../js/compiler.js"></script>
+    <script src="../../js/toc.js"></script>
+    <script>
+        // Initialize GSAP animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate section badges
+            gsap.from('.section-badge', {
+                opacity: 0,
+                x: -30,
+                duration: 0.6,
+                ease: 'power2.out'
+            });
+            
+            // Animate h1
+            gsap.from('h1', {
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                delay: 0.2,
+                ease: 'power2.out'
+            });
+            
+            // Animate info items on scroll
+            gsap.utils.toArray('.info-item').forEach((item, index) => {
+                gsap.from(item, {
+                    scrollTrigger: {
+                        trigger: item,
+                        start: 'top 85%',
+                        toggleActions: 'play none none reverse'
+                    },
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    ease: 'power2.out'
+                });
+            });
+            
+            // Animate diagram
+            gsap.from('.diagram-block svg', {
+                scrollTrigger: {
+                    trigger: '.diagram-block',
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                },
+                opacity: 0,
+                scale: 0.9,
+                duration: 1,
+                ease: 'elastic.out(1, 0.5)'
+            });
+            
+            // Initialize quiz
+            new Quiz('quiz-fundamental-types', fundamentalTypesQuestions);
+            
+            // Initialize compiler
+            createCompilerFromCodeBlock('code-block-int', 'compiler-int');
+        });
+        
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('code').textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Скопировано!';
+                setTimeout(() => {
+                    button.textContent = 'Копировать';
+                }, 2000);
+            });
+        }
+    </script>
+
+</body>
+</html>

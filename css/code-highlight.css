@@ -1,0 +1,276 @@
+/* ============================================
+   CODE SYNTAX HIGHLIGHTING - Vibrant Colors
+   ============================================ */
+
+/* Яркая цветовая схема для кода */
+:root {
+    --code-bg: #1e1e2e;
+    --code-keyword: #FF6B9D;
+    --code-function: #FFD93D;
+    --code-string: #6BCF7F;
+    --code-number: #C792EA;
+    --code-comment: #7F8C98;
+    --code-type: #82AAFF;
+    --code-operator: #89DDFF;
+    --code-preprocessor: #FF9E64;
+}
+
+/* Контейнер кода */
+.code-block {
+    background: var(--code-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.1);
+}
+
+.code-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(90deg, #FF6B9D, #FFD93D, #6BCF7F, #82AAFF);
+    opacity: 0.1;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.code-language {
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFD93D;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.code-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.code-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.code-btn.copy {
+    background: linear-gradient(135deg, #6BCF7F, #4CAF50);
+    color: #fff;
+}
+
+.code-btn.run {
+    background: linear-gradient(135deg, #FFD93D, #FFA500);
+    color: #000;
+}
+
+.code-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,255,255,0.2);
+}
+
+/* Код с подсветкой */
+pre {
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+code {
+    font-family: 'Fira Code', 'Consolas', monospace;
+    color: #E0E0E0;
+}
+
+/* Номера строк */
+.line-numbers {
+    display: flex;
+    gap: 20px;
+}
+
+.line-numbers-rows {
+    user-select: none;
+    color: rgba(255,255,255,0.3);
+    text-align: right;
+    padding-right: 20px;
+    border-right: 2px solid rgba(255,255,255,0.1);
+}
+
+.line-numbers-rows span {
+    display: block;
+    counter-increment: linenumber;
+}
+
+.line-numbers-rows span::before {
+    content: counter(linenumber);
+}
+
+/* Синтаксис C++ */
+.token.keyword {
+    color: var(--code-keyword);
+    font-weight: 600;
+}
+
+.token.function {
+    color: var(--code-function);
+    font-weight: 600;
+}
+
+.token.string {
+    color: var(--code-string);
+}
+
+.token.number {
+    color: var(--code-number);
+}
+
+.token.comment {
+    color: var(--code-comment);
+    font-style: italic;
+}
+
+.token.type {
+    color: var(--code-type);
+    font-weight: 600;
+}
+
+.token.operator {
+    color: var(--code-operator);
+}
+
+.token.preprocessor {
+    color: var(--code-preprocessor);
+}
+
+.token.punctuation {
+    color: #89DDFF;
+}
+
+/* Подсветка важных строк */
+.code-line.highlight {
+    background: rgba(255, 215, 0, 0.1);
+    border-left: 3px solid #FFD700;
+    padding-left: 10px;
+    margin-left: -10px;
+}
+
+.code-line.error {
+    background: rgba(255, 0, 0, 0.1);
+    border-left: 3px solid #FF0000;
+    padding-left: 10px;
+    margin-left: -10px;
+}
+
+/* Интерактивный код */
+.code-interactive {
+    position: relative;
+}
+
+.code-interactive:hover {
+    background: rgba(255,255,255,0.02);
+}
+
+.code-tooltip {
+    position: absolute;
+    background: linear-gradient(135deg, #8338EC, #3A86FF);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 4px 12px rgba(131, 56, 236, 0.4);
+}
+
+.code-interactive:hover .code-tooltip {
+    opacity: 1;
+}
+
+/* Вывод компилятора */
+.compiler-output {
+    background: #0d1117;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 15px;
+    border: 2px solid rgba(6, 255, 165, 0.3);
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 14px;
+    color: #06FFA5;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.compiler-output.error {
+    border-color: rgba(255, 0, 0, 0.3);
+    color: #FF6B6B;
+}
+
+.output-line {
+    padding: 4px 0;
+    border-left: 3px solid transparent;
+    padding-left: 10px;
+}
+
+.output-line.success {
+    border-left-color: #06FFA5;
+}
+
+.output-line.error {
+    border-left-color: #FF6B6B;
+}
+
+/* Анимация при запуске кода */
+@keyframes codeRun {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 0 20px rgba(255, 215, 0, 0);
+    }
+}
+
+.code-block.running {
+    animation: codeRun 0.6s ease-out;
+}
+
+/* Копирование кода */
+@keyframes copied {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.code-btn.copied {
+    animation: copied 0.4s ease;
+    background: linear-gradient(135deg, #06FFA5, #00D084) !important;
+}
