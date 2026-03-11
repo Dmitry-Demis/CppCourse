@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1.2 Целочисленные типы — Курс C++</title>
+    <meta name="description" content="Целочисленные типы C++: int, short, long, long long, unsigned. Диапазоны, размеры, переполнение, fixed-width типы из &lt;cstdint&gt;.">
+
+    <!-- Prism.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = { tex: { inlineMath:[['$','$'],['\\(','\\)']] }, svg:{fontCache:'global'} };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+
+    <style>
+        /* ── Per-type cards ── */
+        .int-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0 2rem;
+        }
+
+        .int-type-card {
+            background: var(--surface, #1e1e2e);
+            border: 1px solid var(--border, #313244);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .int-type-card__header {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            padding: .75rem 1rem;
+            background: var(--surface-2, #181825);
+            border-bottom: 1px solid var(--border, #313244);
+        }
+
+        .int-type-card__name {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--accent-blue, #89b4fa);
+        }
+
+        .int-type-card__body {
+            padding: .9rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
+
+        .int-type-card__row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: .5rem;
+            font-size: .875rem;
+        }
+
+        .int-type-card__row-label {
+            color: var(--text-muted, #6c7086);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .int-type-card__row-value {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text, #cdd6f4);
+            text-align: right;
+        }
+
+        .int-type-card__use {
+            margin-top: .4rem;
+            padding-top: .6rem;
+            border-top: 1px solid var(--border, #313244);
+            font-size: .8rem;
+            color: var(--text-muted, #6c7086);
+            line-height: 1.5;
+        }
+
+        /* Colour accents per card category */
+        .int-type-card--short  .int-type-card__header { border-left: 4px solid #a6e3a1; }
+        .int-type-card--int    .int-type-card__header { border-left: 4px solid #89b4fa; }
+        .int-type-card--long   .int-type-card__header { border-left: 4px solid #cba6f7; }
+        .int-type-card--ll     .int-type-card__header { border-left: 4px solid #f9e2af; }
+        .int-type-card--uint   .int-type-card__header { border-left: 4px solid #94e2d5; }
+
+        /* std-badge variants already in theory.css; add missing ones */
+        .std-badge--14  { background: #4a3f1a; color: #f9e2af; }
+        .std-badge--17  { background: #1e3a4f; color: #89dceb; }
+        .std-badge--20  { background: #2a1e4f; color: #cba6f7; }
+        .std-badge--23  { background: #3d1e3d; color: #f5c2e7; }
+    </style>
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Глава I. Фундаментальные типы</div>
+                <ul class="sidebar-nav" id="course-nav">
+                    <!-- navigation.js заполнит динамически -->
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.1.2</div>
+                <h1>Целочисленные типы</h1>
+
+                <p>
+                    Целочисленные типы — хребет большинства программ на C++: счётчики, индексы, идентификаторы,
+                    битовые маски. Стандарт гарантирует лишь <em>минимальные</em> размеры, поэтому важно знать,
+                    какой тип выбрать и чего ожидать на конкретной платформе.
+                </p>
+
+                <div class="iso-quote">
+                    <span class="iso-ref">[basic.fundamental] §6.7.1 — ISO/IEC 14882:2020</span>
+                    There are five standard signed integer types:
+                    <strong>signed char</strong>, <strong>short int</strong>, <strong>int</strong>,
+                    <strong>long int</strong>, and <strong>long long int</strong>.
+                    For each of the standard signed integer types, there exists a corresponding
+                    (but distinct) unsigned integer type.
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="overview-table">1. Обзор семейства целочисленных типов</h2>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Синонимы</th>
+                                <th>Мин. размер</th>
+                                <th>x86-64 (типично)</th>
+                                <th>Диапазон (signed)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>signed char</code></td>
+                                <td>—</td>
+                                <td>8 бит</td>
+                                <td>1 байт</td>
+                                <td class="cell-range">−128 … 127</td>
+                            </tr>
+                            <tr>
+                                <td><code>short int</code></td>
+                                <td><code>short</code></td>
+                                <td>≥16 бит</td>
+                                <td>2 байта</td>
+                                <td class="cell-range">−32 768 … 32 767</td>
+                            </tr>
+                            <tr>
+                                <td><code>int</code></td>
+                                <td><code>signed</code></td>
+                                <td>≥16 бит</td>
+                                <td>4 байта</td>
+                                <td class="cell-range">−2 147 483 648 … 2 147 483 647</td>
+                            </tr>
+                            <tr>
+                                <td><code>long int</code></td>
+                                <td><code>long</code></td>
+                                <td>≥32 бита</td>
+                                <td>8 б (Linux) / 4 б (Windows)</td>
+                                <td class="cell-range">платформенно-зависим</td>
+                            </tr>
+                            <tr>
+                                <td><code>long long int</code> <span class="std-badge std-badge--11">C++11</span></td>
+                                <td><code>long long</code></td>
+                                <td>≥64 бита</td>
+                                <td>8 байт</td>
+                                <td class="cell-range">−9.22×10¹⁸ … 9.22×10¹⁸</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Для каждого знакового типа существует беззнаковый аналог (<code>unsigned short</code>,
+                    <code>unsigned int</code> и т. д.), сдвигающий диапазон в положительную область и
+                    удваивающий максимум.
+                </p>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="per-type">2. Каждый тип — подробно</h2>
+
+                <!-- ── short ── -->
+                <h3 id="type-short">2.1 short</h3>
+                <p>
+                    <span class="key-term">short</span> — наименьший «полноценный» целый тип (не считая
+                    <code>signed char</code>). Используется там, где важна экономия памяти: большие массивы,
+                    сетевые пакеты, аудио-сэмплы.
+                </p>
+
+                <div class="int-types-grid">
+                    <div class="int-type-card int-type-card--short">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">short</span>
+                            <span class="int-type-card__name" style="color:var(--text-muted,#6c7086)">/ signed short int</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (гарантия)</span>
+                                <span class="int-type-card__row-value">≥ 16 бит</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">2 байта</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Диапазон</span>
+                                <span class="int-type-card__row-value">−32 768 … 32 767</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс литерала</span>
+                                <span class="int-type-card__row-value">нет (неявное сужение)</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Аудио-сэмплы (PCM 16-bit), компактные массивы, сетевые поля фиксированного размера.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="int-type-card int-type-card--uint">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">unsigned short</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">2 байта</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Диапазон</span>
+                                <span class="int-type-card__row-value">0 … 65 535</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Порты TCP/UDP (0–65535), пиксельные координаты, USB HID-отчёты.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — short</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    short          s1{32'767};           // C++14: digit separator
+    unsigned short s2{65'535u};
+
+    std::cout &lt;&lt; "short max = "   &lt;&lt; std::numeric_limits&lt;short&gt;::max()          &lt;&lt; '\n';
+    std::cout &lt;&lt; "ushort max = "  &lt;&lt; std::numeric_limits&lt;unsigned short&gt;::max() &lt;&lt; '\n';
+    std::cout &lt;&lt; "sizeof(short) = " &lt;&lt; sizeof(short) &lt;&lt; " bytes\n";
+
+    // Brace-init защищает от сужающего преобразования
+    // short bad{100000};  // ❌ ошибка компиляции — 100000 не влезает в short
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── int ── -->
+                <h3 id="type-int">2.2 int</h3>
+                <p>
+                    <span class="key-term">int</span> — «естественный» целочисленный тип платформы.
+                    Стандарт гарантирует минимум 16 бит, но на всех современных платформах он 32-битный.
+                    Это тип по умолчанию для целочисленных литералов, счётчиков и арифметики.
+                </p>
+
+                <div class="int-types-grid">
+                    <div class="int-type-card int-type-card--int">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">int</span>
+                            <span class="int-type-card__name" style="color:var(--text-muted,#6c7086)">/ signed int</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (гарантия)</span>
+                                <span class="int-type-card__row-value">≥ 16 бит</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">4 байта / 32 бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">INT_MIN</span>
+                                <span class="int-type-card__row-value">−2 147 483 648</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">INT_MAX</span>
+                                <span class="int-type-card__row-value">+2 147 483 647</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Счётчики циклов, индексы, флаги, возвращаемые значения функций.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="int-type-card int-type-card--uint">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">unsigned int</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">4 байта</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Диапазон</span>
+                                <span class="int-type-card__row-value">0 … 4 294 967 295</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42u или 42U</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Битовые маски, хеш-значения, счётчики без отрицательных значений.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/17/20/23 — int</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;format&gt;   // C++20
+#include &lt;print&gt;    // C++23
+
+int main() {
+    int x{42};
+    int y{-100};
+
+    // C++11: uniform initialization защищает от сужения
+    // int bad{3.14}; // ❌ ошибка — narrowing conversion
+
+    // C++14: digit separators для читаемости
+    int population{8'100'000'000};  // ❌ не влезет в int!
+    // int population{2'000'000'000}; // ✅ влезает
+
+    int big{2'000'000'000};
+    std::cout &lt;&lt; "big = " &lt;&lt; big &lt;&lt; '\n';           // C++03-compatible
+
+    // C++17: if с инициализатором
+    if (int result{big + 1}; result &lt; 0)
+        std::cout &lt;&lt; "Переполнение!\n";
+
+    // C++20: std::format — форматированный вывод
+    std::string s = std::format("INT_MAX = {:d}", std::numeric_limits&lt;int&gt;::max());
+    std::cout &lt;&lt; s &lt;&lt; '\n';
+
+    // C++23: std::print — прямо в stdout без cout
+    std::print("sizeof(int) = {} bytes\n", sizeof(int));
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── long ── -->
+                <h3 id="type-long">2.3 long</h3>
+                <p>
+                    <span class="key-term">long</span> — источник многих сюрпризов: его размер
+                    <strong>платформенно-зависим</strong>. На 64-битном Linux он 8 байт, на Windows — 4 байта.
+                    Это делает <code>long</code> нежелательным для переносимого кода; предпочтительнее
+                    <code>int</code> или <code>long long</code>.
+                </p>
+
+                <div class="int-types-grid">
+                    <div class="int-type-card int-type-card--long">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">long</span>
+                            <span class="int-type-card__name" style="color:var(--text-muted,#6c7086)">/ long int</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (гарантия)</span>
+                                <span class="int-type-card__row-value">≥ 32 бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Linux x86-64</span>
+                                <span class="int-type-card__row-value">8 байт (64 бит)</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Windows x64</span>
+                                <span class="int-type-card__row-value">4 байта (32 бит)</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42L или 42l</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                POSIX API (off_t, pid_t). Избегайте в переносимом коде — используйте int64_t.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="int-type-card int-type-card--uint">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">unsigned long</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Linux x86-64</span>
+                                <span class="int-type-card__row-value">0 … 18 446 744 073 709 551 615</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Windows x64</span>
+                                <span class="int-type-card__row-value">0 … 4 294 967 295</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42UL</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                В старом POSIX-коде — size_t и подобные системные типы.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Ловушка с long на разных платформах</div>
+                    <p>
+                        Код, который работает на Linux (где <code>sizeof(long) == 8</code>), может вести себя
+                        иначе на Windows (где <code>sizeof(long) == 4</code>). Никогда не предполагайте,
+                        что <code>long</code> — это 64 бита. Для гарантированного 64-битного типа
+                        используйте <code>long long</code> или <code>int64_t</code>.
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — long и платформенные различия</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    long a{1'000'000'000L};
+    unsigned long b{0xFFFF'FFFF'UL};
+
+    std::cout &lt;&lt; "sizeof(long) = " &lt;&lt; sizeof(long) &lt;&lt; " bytes\n";
+    std::cout &lt;&lt; "long max = " &lt;&lt; std::numeric_limits&lt;long&gt;::max() &lt;&lt; '\n';
+
+    // C++17: static_assert с сообщением
+    // static_assert(sizeof(long) == 8, "Ожидается 64-бит платформа (Linux)");
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── long long ── -->
+                <h3 id="type-long-long">2.4 long long <span class="std-badge std-badge--11">C++11</span></h3>
+                <p>
+                    <span class="key-term">long long</span> — единственный целочисленный тип,
+                    гарантирующий не менее 64 бит на <em>любой</em> поддерживаемой платформе.
+                    Его диапазон: $-2^{63}$ до $2^{63}-1$ ≈ ±9.2 × 10¹⁸.
+                    Используйте его всегда, когда значение может превысить ~2 млрд.
+                </p>
+
+                <div class="int-types-grid">
+                    <div class="int-type-card int-type-card--ll">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">long long</span>
+                            <span class="std-badge std-badge--11" style="margin-left:auto">C++11</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (гарантия)</span>
+                                <span class="int-type-card__row-value">≥ 64 бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">LLONG_MIN</span>
+                                <span class="int-type-card__row-value">−9 223 372 036 854 775 808</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">LLONG_MAX</span>
+                                <span class="int-type-card__row-value">+9 223 372 036 854 775 807</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42LL или 42ll</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Unix timestamps, ID записей в БД, файловые смещения (&gt;4 ГБ), астрономические расчёты.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="int-type-card int-type-card--uint">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">unsigned long long</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Диапазон</span>
+                                <span class="int-type-card__row-value">0 … 18.4 × 10¹⁸</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">ULLONG_MAX</span>
+                                <span class="int-type-card__row-value">18 446 744 073 709 551 615</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42ULL</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Криптография, хеш-значения, 64-битные битовые маски.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/14/20/23 — long long</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;format&gt;   // C++20
+#include &lt;print&gt;    // C++23
+
+int main() {
+    // ── C++11: brace-init, long long guaranteed 64-bit ──
+    long long unixMs{1'710'000'000'000LL};   // C++14: digit separators
+
+    // ── C++11: static_assert для compile-time проверки ──
+    static_assert(sizeof(long long) >= 8, "long long must be at least 8 bytes");
+
+    // ── ЛОВУШКА: переполнение до расширения типа ──
+    int a{100'000};
+    int b{100'000};
+    long long wrong{a * b};          // ❌ a*b — это int*int = UB (overflow)
+    long long right{(long long)a * b}; // ✅ один операнд long long — OK
+
+    std::cout &lt;&lt; "wrong = " &lt;&lt; wrong &lt;&lt; '\n';
+    std::cout &lt;&lt; "right = " &lt;&lt; right &lt;&lt; '\n';
+
+    // ── C++20: std::format для форматированного вывода ──
+    std::string msg = std::format(
+        "LLONG_MAX = {:L}",          // 'L' — локальный разделитель тысяч
+        std::numeric_limits&lt;long long&gt;::max()
+    );
+    std::cout &lt;&lt; msg &lt;&lt; '\n';
+
+    // ── C++23: std::print (без явного cout) ──
+    std::print("Unix timestamp (ms): {:d}\n", unixMs);
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div id="compiler-integers"></div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="signed-unsigned">3. Модификаторы signed и unsigned</h2>
+
+                <p>
+                    Добавление ключевого слова <code>unsigned</code> к любому целочисленному типу
+                    удваивает максимальное значение, но исключает отрицательные числа.
+                </p>
+
+                <div class="type-specs">
+                    <div class="type-spec">
+                        <span class="type-spec-label">signed int (4 байта)</span>
+                        <span class="type-spec-value">−2 147 483 648 … +2 147 483 647</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">unsigned int (4 байта)</span>
+                        <span class="type-spec-value">0 … 4 294 967 295</span>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Ловушка: смешение signed и unsigned</div>
+                    <p>
+                        При арифметике со смешанными типами компилятор неявно преобразует
+                        <em>знаковый</em> операнд к беззнаковому. Число <code>-1</code> превращается
+                        в огромное положительное (<code>UINT_MAX</code> = 4 294 967 295).
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — unsigned trap</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;format&gt;   // C++20
+
+int main() {
+    unsigned int umax{std::numeric_limits&lt;unsigned int&gt;::max()};
+
+    // ❌ Ловушка: -1 приводится к unsigned int = UINT_MAX = 4294967295
+    if (-1 &gt; umax)
+        std::cout &lt;&lt; "Кажется, -1 больше UINT_MAX?!\n"; // выполнится!
+
+    // ✅ Правильно: привести к общему знаковому типу
+    if (static_cast&lt;long long&gt;(-1) &lt; static_cast&lt;long long&gt;(umax))
+        std::cout &lt;&lt; "OK: -1 &lt; UINT_MAX\n";
+
+    // C++20: format с числами
+    std::print("umax = {}\n", umax);
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="overflow">4. Переполнение целочисленных типов</h2>
+
+                <p>
+                    Целые числа хранятся в фиксированном числе битов. Если результат выходит за пределы
+                    диапазона, происходит <span class="key-term">переполнение</span> — и поведение зависит
+                    от знаковости типа.
+                </p>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Переполнение signed — неопределённое поведение (UB)</div>
+                    <p>
+                        По стандарту переполнение <em>знакового</em> целого — это <strong>UB</strong>.
+                        Компилятор вправе генерировать любой код. Оптимизаторы активно используют этот факт:
+                        они могут удалять проверки, предполагая, что UB никогда не происходит.
+                    </p>
+                    <p>
+                        Для <em>беззнаковых</em> типов переполнение строго определено — результат берётся
+                        по модулю $2^n$ (wrap-around), что иногда намеренно используют в криптографии.
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/20 — overflow</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;print&gt;    // C++23
+
+int main() {
+    // ── Unsigned overflow: defined wrap-around ──
+    unsigned int u{std::numeric_limits&lt;unsigned int&gt;::max()};
+    ++u;   // 4294967295 + 1 = 0 (по модулю 2^32)
+    std::print("unsigned wrap: {}\n", u);   // 0
+
+    // ── Signed overflow: UB! ──
+    int s{std::numeric_limits&lt;int&gt;::max()};
+    // ++s;  // ❌ UB — компилятор вправе делать что угодно
+
+    // ✅ Безопасная проверка перед операцией (C++11)
+    if (s &lt; std::numeric_limits&lt;int&gt;::max()) {
+        ++s;
+    } else {
+        std::print("Переполнение предотвращено!\n");
+    }
+
+    // ✅ C++20: <bit> - std::has_single_bit, std::popcount и др.
+    // Для detached overflow detection см. __builtin_add_overflow (GCC/Clang)
+    int x{2'000'000'000};
+    int y{2'000'000'000};
+    int result{};
+    if (__builtin_add_overflow(x, y, &amp;result))
+        std::print("Overflow detected: {} + {} overflows int\n", x, y);
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="fixed-width">5. Типы с фиксированным размером — &lt;cstdint&gt;</h2>
+
+                <p>
+                    Когда точный размер критичен (бинарные форматы, сетевые протоколы, аппаратные
+                    регистры), используйте типы из <code>&lt;cstdint&gt;</code>. Они гарантируют
+                    точный размер или возвращают ошибку компиляции, если платформа его не поддерживает.
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Размер</th>
+                                <th>Знаковость</th>
+                                <th>Диапазон / max</th>
+                                <th>Пример применения</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>int8_t</code></td>
+                                <td>8 бит</td>
+                                <td>signed</td>
+                                <td>−128 … 127</td>
+                                <td>Аппаратные регистры, компактные флаги</td>
+                            </tr>
+                            <tr>
+                                <td><code>uint8_t</code></td>
+                                <td>8 бит</td>
+                                <td>unsigned</td>
+                                <td>0 … 255</td>
+                                <td>Байт данных, пиксель, байт буфера</td>
+                            </tr>
+                            <tr>
+                                <td><code>int16_t</code></td>
+                                <td>16 бит</td>
+                                <td>signed</td>
+                                <td>−32 768 … 32 767</td>
+                                <td>Аудио-сэмпл PCM</td>
+                            </tr>
+                            <tr>
+                                <td><code>uint16_t</code></td>
+                                <td>16 бит</td>
+                                <td>unsigned</td>
+                                <td>0 … 65 535</td>
+                                <td>Порт TCP/UDP, Unicode codepoint (BMP)</td>
+                            </tr>
+                            <tr>
+                                <td><code>int32_t</code></td>
+                                <td>32 бита</td>
+                                <td>signed</td>
+                                <td>−2.1×10⁹ … 2.1×10⁹</td>
+                                <td>IPv4-адрес, цвет ARGB</td>
+                            </tr>
+                            <tr>
+                                <td><code>uint32_t</code></td>
+                                <td>32 бита</td>
+                                <td>unsigned</td>
+                                <td>0 … 4.3×10⁹</td>
+                                <td>CRC32, хеш-значения</td>
+                            </tr>
+                            <tr>
+                                <td><code>int64_t</code></td>
+                                <td>64 бита</td>
+                                <td>signed</td>
+                                <td>±9.2×10¹⁸</td>
+                                <td>Unix timestamp, ID записей в БД</td>
+                            </tr>
+                            <tr>
+                                <td><code>uint64_t</code></td>
+                                <td>64 бита</td>
+                                <td>unsigned</td>
+                                <td>0 … 18.4×10¹⁸</td>
+                                <td>64-битная маска, большой счётчик</td>
+                            </tr>
+                            <tr>
+                                <td><code>intptr_t</code></td>
+                                <td>≥ ptr size</td>
+                                <td>signed</td>
+                                <td>платформенный</td>
+                                <td>Хранение указателя как числа</td>
+                            </tr>
+                            <tr>
+                                <td><code>std::size_t</code></td>
+                                <td>≥ ptr size</td>
+                                <td>unsigned</td>
+                                <td>0 … платформенный</td>
+                                <td>Размеры объектов, индексы контейнеров</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/17/20 — &lt;cstdint&gt;</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cstdint&gt;
+#include &lt;format&gt;   // C++20
+#include &lt;bit&gt;      // C++20: std::popcount, std::byteswap
+
+// Бинарный заголовок файла: каждое поле — точный размер
+struct BitmapFileHeader {
+    uint16_t signature;    // "BM" = 0x424D
+    uint32_t fileSize;
+    uint32_t reserved;
+    uint32_t dataOffset;
+};
+
+int main() {
+    // C++11: static_assert с brace-init
+    static_assert(sizeof(BitmapFileHeader) == 14, "Неверный размер структуры!");
+
+    // C++14: digit separators
+    uint64_t timestamp{1'710'000'000'000ULL};  // миллисекунды с Unix epoch
+
+    // C++17: structured bindings (для примера с парой)
+    auto [lo, hi] = std::pair{uint32_t{0xDEAD'BEEF}, uint32_t{0xCAFE'BABE}};
+
+    // C++20: std::popcount — количество единичных бит
+    uint32_t mask{0b1010'1010'1010'1010u};
+    int bits{static_cast&lt;int&gt;(std::popcount(mask))};
+
+    // C++20: std::format
+    std::print("timestamp = {}\n", timestamp);
+    std::print("popcount(mask) = {}\n", bits);
+    std::print("lo = {:#010x}, hi = {:#010x}\n", lo, hi);
+
+    // Правильный тип для индексов и размеров
+    std::size_t arraySize{1024};
+    for (std::size_t i{0}; i &lt; arraySize; ++i) { /* ... */ }
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Рекомендации по выбору типа</div>
+                    <ul>
+                        <li>Используйте <code>int</code> по умолчанию — это «естественный» тип платформы.</li>
+                        <li>Используйте <code>long long</code> если значения могут превысить ~2 млрд.</li>
+                        <li>Используйте <code>int32_t</code> / <code>uint8_t</code> и др. для бинарных протоколов и форматов.</li>
+                        <li>Используйте <code>std::size_t</code> для размеров и индексов контейнеров.</li>
+                        <li>Избегайте <code>long</code> в переносимом коде — его размер непредсказуем на разных платформах.</li>
+                        <li>Избегайте <code>unsigned</code> там, где возможны смешанные вычисления со знаковыми типами.</li>
+                    </ul>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="numeric-limits">6. std::numeric_limits — интроспекция типов</h2>
+
+                <p>
+                    Шаблон <code>std::numeric_limits&lt;T&gt;</code> из <code>&lt;limits&gt;</code>
+                    даёт compile-time доступ к свойствам любого числового типа — лучший способ
+                    узнать диапазон переносимо.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/20/23 — numeric_limits</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;cstdint&gt;
+#include &lt;print&gt;    // C++23
+
+template&lt;typename T&gt;
+void printTypeInfo(const char* name) {
+    using nl = std::numeric_limits&lt;T&gt;;
+    std::print("{:20s}: size={} bytes, min={:20}, max={}\n",
+        name,
+        sizeof(T),
+        nl::min(),
+        nl::max()
+    );
+}
+
+int main() {
+    printTypeInfo&lt;short&gt;("short");
+    printTypeInfo&lt;int&gt;("int");
+    printTypeInfo&lt;long&gt;("long");
+    printTypeInfo&lt;long long&gt;("long long");
+    printTypeInfo&lt;unsigned int&gt;("unsigned int");
+    printTypeInfo&lt;unsigned long long&gt;("unsigned long long");
+    printTypeInfo&lt;int32_t&gt;("int32_t");
+    printTypeInfo&lt;int64_t&gt;("int64_t");
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div id="compiler-numericlimits"></div>
+
+                <!-- Мини-тест -->
+                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
+                <p>10 вопросов по целочисленным типам C++.</p>
+                <div id="quiz-integers"></div>
+
+                <!-- Навигация -->
+                <div class="paragraph-nav">
+                    <a href="void.html" class="nav-prev">
+                        <span class="nav-dir">← Назад</span>
+                        <span class="nav-name">§1.1.1 Тип void и nullptr</span>
+                    </a>
+                    <a href="floating-point.html" class="nav-next">
+                        <span class="nav-dir">Далее →</span>
+                        <span class="nav-name">§1.1.3 Типы с плавающей точкой</span>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Right Sidebar: TOC -->
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav">
+                    <!-- toc.js заполнит автоматически -->
+                </nav>
+            </div>
+        </aside>
+
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <!-- JS -->
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', function () {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof CppCompiler !== 'undefined') {
+            new CppCompiler('compiler-integers',
+`#include <iostream>
+#include <limits>
+#include <climits>
+#include <cstdint>
+
+int main() {
+    // Brace-init
+    int            i{42};
+    long long      ll{9'000'000'000LL};
+    unsigned int   u{4'294'967'295u};
+
+    // Размеры
+    std::cout << "sizeof(short)     = " << sizeof(short)     << " bytes\\n";
+    std::cout << "sizeof(int)       = " << sizeof(int)       << " bytes\\n";
+    std::cout << "sizeof(long)      = " << sizeof(long)      << " bytes\\n";
+    std::cout << "sizeof(long long) = " << sizeof(long long) << " bytes\\n";
+    std::cout << "sizeof(int64_t)   = " << sizeof(int64_t)   << " bytes\\n";
+
+    // Диапазоны
+    std::cout << "INT_MAX  = " << std::numeric_limits<int>::max()       << "\\n";
+    std::cout << "LLONG_MAX = " << std::numeric_limits<long long>::max() << "\\n";
+    std::cout << "UINT_MAX = " << std::numeric_limits<unsigned int>::max() << "\\n";
+
+    // Fixed-width
+    static_assert(sizeof(int32_t) == 4);
+    static_assert(sizeof(int64_t) == 8);
+    std::cout << "ll = " << ll << "\\n";
+    return 0;
+}`);
+
+            new CppCompiler('compiler-numericlimits',
+`#include <iostream>
+#include <limits>
+#include <cstdint>
+
+template<typename T>
+void show(const char* name) {
+    std::cout << name
+              << ": " << sizeof(T) << "b"
+              << "  min=" << (long long)std::numeric_limits<T>::min()
+              << "  max=" << (unsigned long long)std::numeric_limits<T>::max()
+              << "\\n";
+}
+
+int main() {
+    show<short>("short           ");
+    show<int>("int             ");
+    show<long>("long            ");
+    show<long long>("long long       ");
+    show<unsigned int>("unsigned int    ");
+    show<unsigned long long>("ull             ");
+    show<int32_t>("int32_t         ");
+    show<int64_t>("int64_t         ");
+    return 0;
+}`);
+        }
+
+        if (typeof longLongQuestions !== 'undefined') {
+            new Quiz('quiz-integers', longLongQuestions, {
+                quizId: 'integers-mini',
+                title: 'Мини-тест: целочисленные типы',
+                type: 'mini'
+            });
+        }
+    });
+    </script>
+
+</body>
+</html>

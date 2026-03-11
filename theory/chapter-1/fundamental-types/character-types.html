@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1.4 Символьные типы — Курс C++</title>
+    <meta name="description" content="Символьные типы C++: char, wchar_t, char8_t, char16_t, char32_t. ASCII, Unicode, escape-последовательности, кодировки.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Глава I. Фундаментальные типы</div>
+                <ul class="sidebar-nav" id="course-nav">
+                    <!-- navigation.js заполнит динамически -->
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.1.4</div>
+                <h1>Символьные типы</h1>
+
+                <p>
+                    Символьные типы хранят отдельные символы и являются строительным материалом
+                    для строк. C++ унаследовал <code>char</code> от C и добавил богатое семейство
+                    Unicode-ориентированных типов, чтобы корректно работать с любым языком мира.
+                </p>
+
+                <!-- ══════════════════════════════════════════════════ -->
+                <h2 id="char">1. Тип char — базовый символьный тип</h2>
+
+                <div class="iso-quote">
+                    <span class="iso-ref">[basic.fundamental] §6.7.1 — ISO/IEC 14882</span>
+                    Type char is a distinct type that has an implementation-defined choice of
+                    signed or unsigned representation. Objects declared as characters (char)
+                    shall be large enough to store any member of the implementation's basic character set.
+                </div>
+
+                <div class="type-specs">
+                    <div class="type-spec">
+                        <span class="type-spec-label">Размер</span>
+                        <span class="type-spec-value">sizeof(char) == 1 (гарантия стандарта)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">Знаковость</span>
+                        <span class="type-spec-value">implementation-defined (зависит от платформы)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">Диапазон (signed)</span>
+                        <span class="type-spec-value">−128 … 127</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">Диапазон (unsigned)</span>
+                        <span class="type-spec-value">0 … 255</span>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Знаковость char не определена стандартом</div>
+                    <p>
+                        Простой <code>char</code> может быть знаковым или беззнаковым — это решает
+                        компилятор. На x86 обычно <em>signed</em>, на некоторых ARM — <em>unsigned</em>.
+                        Когда знаковость важна, используйте явно <code>signed char</code>
+                        или <code>unsigned char</code>.
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    char c = 'A';
+
+    // char хранит числовой код ASCII
+    std::cout &lt;&lt; "char: " &lt;&lt; c           &lt;&lt; '\n'; // A
+    std::cout &lt;&lt; "код:  " &lt;&lt; (int)c      &lt;&lt; '\n'; // 65
+
+    // Арифметика над char — это арифметика над ASCII-кодами
+    char next = c + 1;
+    std::cout &lt;&lt; "A+1:  " &lt;&lt; next        &lt;&lt; '\n'; // B
+
+    // Разница кодов
+    char z = 'z', a = 'a';
+    std::cout &lt;&lt; "'z'-'a' = " &lt;&lt; (z - a) &lt;&lt; '\n'; // 25
+
+    // sizeof гарантированно равен 1
+    std::cout &lt;&lt; "sizeof(char) = " &lt;&lt; sizeof(char) &lt;&lt; '\n';
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── signed/unsigned char ── -->
+                <h2 id="signed-unsigned-char">2. signed char, unsigned char и char — три разных типа</h2>
+
+                <p>
+                    В C++ <code>char</code>, <code>signed char</code> и <code>unsigned char</code> —
+                    это <strong>три различных типа</strong>, даже несмотря на то что занимают
+                    одинаковое количество памяти:
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Размер</th>
+                                <th>Диапазон</th>
+                                <th>Назначение</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>signed char</code></td>
+                                <td>1 байт (8 бит)</td>
+                                <td>−128 … 127</td>
+                                <td>Маленькое знаковое целое число</td>
+                            </tr>
+                            <tr>
+                                <td><code>unsigned char</code></td>
+                                <td>1 байт (8 бит)</td>
+                                <td>0 … 255</td>
+                                <td>Байт данных (пиксель, сетевой пакет)</td>
+                            </tr>
+                            <tr>
+                                <td><code>char</code></td>
+                                <td>1 байт (8 бит)</td>
+                                <td>signed или unsigned — зависит от компилятора</td>
+                                <td>Хранение числового кода символа ASCII</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Несмотря на то что <code>char</code> может иметь тот же диапазон, что и
+                    <code>signed char</code>, эти типы <strong>не эквивалентны</strong>.
+                    <code>char</code> предназначен для хранения <em>числового кода символа</em>,
+                    тогда как <code>signed char</code> — для хранения маленького числа.
+                    На разных компиляторах <code>char</code> может вести себя как знаковый или беззнаковый,
+                    поэтому при важности знаковости всегда используйте явную форму.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    char          c  = 'A';   // для символов (предпочтительно)
+    signed char   sc = -50;   // маленькое знаковое целое
+    unsigned char uc = 200;   // маленькое беззнаковое целое
+
+    std::cout &lt;&lt; "char    'A' = " &lt;&lt; c       &lt;&lt; " (код: " &lt;&lt; (int)c  &lt;&lt; ")\n";
+    std::cout &lt;&lt; "signed  sc  = " &lt;&lt; (int)sc &lt;&lt; '\n';
+    std::cout &lt;&lt; "unsigned uc = " &lt;&lt; (int)uc &lt;&lt; '\n';
+
+    // Инициализация через код — допустима, но не предпочтительна
+    char ch_by_code{ 97 };       // инициализация числом 97
+    char ch_by_literal{ 'a' };  // предпочтительный способ
+    // Обе переменные хранят одно значение, но читаемость второй выше
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Не путайте числовое и символьное значение</div>
+                    <p>
+                        <code>char ch{5};</code> — хранит число 5 (управляющий символ ENQ, непечатаемый).<br>
+                        <code>char ch{'5'};</code> — хранит код символа <code>'5'</code>, то есть число 53.<br>
+                        Это принципиально разные вещи!
+                    </p>
+                </div>
+
+                <!-- ── ASCII ── -->
+                <h2 id="ascii">3. Кодировка ASCII</h2>
+
+                <p>
+                    <span class="key-term">ASCII</span> (American Standard Code for Information Interchange) —
+                    7-битная кодировка, определяющая 128 символов (коды 0–127). Коды 0–31 и 127 —
+                    непечатаемые управляющие символы. Коды 32–126 — печатаемые знаки.
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Диапазон кодов</th>
+                                <th>Категория</th>
+                                <th>Примеры</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0–31, 127</td><td>Управляющие (непечатаемые)</td><td>NUL (0), LF (10), CR (13), ESC (27)</td></tr>
+                            <tr><td>32</td><td>Пробел</td><td>' '</td></tr>
+                            <tr><td>48–57</td><td>Цифры</td><td>'0'=48, '1'=49 … '9'=57</td></tr>
+                            <tr><td>65–90</td><td>Заглавные буквы</td><td>'A'=65, 'B'=66 … 'Z'=90</td></tr>
+                            <tr><td>97–122</td><td>Строчные буквы</td><td>'a'=97, 'b'=98 … 'z'=122</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="note-card">
+                    <div class="note-card__title">📌 Полезные соотношения в ASCII</div>
+                    <p>
+                        • Разница между заглавной и строчной буквой одинакова: <code>'a' - 'A' == 32</code>.<br>
+                        • Цифра <code>'0'</code> имеет код 48, поэтому <code>'5' - '0' == 5</code>.<br>
+                        • Для преобразования регистра: <code>ch | 32</code> → строчная, <code>ch &amp; ~32</code> → заглавная (только для ASCII-букв).
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    // Вывод ASCII-кода символа
+    char ch = 'A';
+    std::cout &lt;&lt; "Символ: " &lt;&lt; ch &lt;&lt; ", код: " &lt;&lt; (int)ch &lt;&lt; '\n';
+
+    // Соотношения
+    std::cout &lt;&lt; "'a' - 'A' = " &lt;&lt; ('a' - 'A') &lt;&lt; '\n';  // 32
+    std::cout &lt;&lt; "'5' - '0' = " &lt;&lt; ('5' - '0') &lt;&lt; '\n';  // 5 (числовое значение цифры)
+
+    // Перевод цифры в число
+    char digit = '7';
+    int  value = digit - '0';  // 7
+    std::cout &lt;&lt; "Цифра '" &lt;&lt; digit &lt;&lt; "' как число: " &lt;&lt; value &lt;&lt; '\n';
+
+    // Вывод всей таблицы печатаемых символов ASCII
+    for (int code = 32; code &lt;= 126; ++code)
+        std::cout &lt;&lt; (char)code;
+    std::cout &lt;&lt; '\n';
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── Ввод символов ── -->
+                <h2 id="input">4. Ввод символов</h2>
+
+                <p>
+                    <code>std::cin &gt;&gt;</code> пропускает ведущие пробелы и извлекает ровно один символ.
+                    Для извлечения пробельных символов используйте <code>std::cin.get(ch)</code>:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    std::cout &lt;&lt; "Введите символ: ";
+    char ch{};
+    std::cin &gt;&gt; ch;   // игнорирует пробелы перед символом
+    std::cout &lt;&lt; "Вы ввели: " &lt;&lt; ch &lt;&lt; '\n';
+
+    // Если пользователь вводит "abc", то:
+    // ch = 'a', а "bc" остаётся в буфере cin
+
+    // Для чтения пробелов используйте get():
+    char ch2{};
+    std::cin.get(ch2); // извлекает следующий символ из буфера (может быть пробелом!)
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── Escape-последовательности ── -->
+                <h2 id="escape">5. Escape-последовательности</h2>
+
+                <p>
+                    Некоторые символы нельзя вставить напрямую в код (перевод строки, кавычки, нулевой байт).
+                    Для них используются <span class="key-term">escape-последовательности</span> — специальные
+                    комбинации символов, начинающиеся с <code>\</code>:
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Имя</th><th>Последовательность</th><th>Значение</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Alert (звонок)</td><td><code>\a</code></td><td>Звуковой сигнал (BEL, код 7)</td></tr>
+                            <tr><td>Backspace</td><td><code>\b</code></td><td>Возврат на один символ (код 8)</td></tr>
+                            <tr><td>Form feed</td><td><code>\f</code></td><td>Перевод страницы (код 12)</td></tr>
+                            <tr><td>Newline</td><td><code>\n</code></td><td>Перевод строки (LF, код 10)</td></tr>
+                            <tr><td>Carriage return</td><td><code>\r</code></td><td>Возврат каретки (CR, код 13)</td></tr>
+                            <tr><td>Horizontal tab</td><td><code>\t</code></td><td>Горизонтальная табуляция (код 9)</td></tr>
+                            <tr><td>Vertical tab</td><td><code>\v</code></td><td>Вертикальная табуляция (код 11)</td></tr>
+                            <tr><td>Single quote</td><td><code>\'</code></td><td>Одинарная кавычка (код 39)</td></tr>
+                            <tr><td>Double quote</td><td><code>\"</code></td><td>Двойная кавычка (код 34)</td></tr>
+                            <tr><td>Backslash</td><td><code>\\</code></td><td>Обратный слэш (код 92)</td></tr>
+                            <tr><td>Question mark</td><td><code>\?</code></td><td>Знак вопроса (устарело)</td></tr>
+                            <tr><td>Null</td><td><code>\0</code></td><td>Нулевой символ — конец C-строки (код 0)</td></tr>
+                            <tr><td>Hex-код</td><td><code>\xNN</code></td><td>Символ с кодом NN (шестнадцатеричный)</td></tr>
+                            <tr><td>Oct-код</td><td><code>\NNN</code></td><td>Символ с кодом NNN (восьмеричный)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    std::cout &lt;&lt; "Строка 1\nСтрока 2\n";          // \n — новая строка
+    std::cout &lt;&lt; "Столбец1\tСтолбец2\n";           // \t — табуляция
+    std::cout &lt;&lt; "Путь: C:\\Users\\Vasya\\\n";     // \\ — буквальный слэш
+    std::cout &lt;&lt; "Он сказал: \"Привет!\"\n";       // \" — кавычка внутри строки
+    std::cout &lt;&lt; "Null: \0скрыт\n";               // \0 — обрывает C-строку
+
+    // Шестнадцатеричные escape-последовательности
+    char ch = '\x41'; // = 'A' (0x41 = 65 в десятичной)
+    std::cout &lt;&lt; ch &lt;&lt; '\n';
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── Unicode-типы ── -->
+                <h2 id="unicode-types">6. Unicode-символьные типы</h2>
+
+                <p>
+                    Для работы с интернациональным текстом C++ предоставляет специальные типы.
+                    Все они появились для явной семантики кодировки:
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Введён</th>
+                                <th>Кодировка</th>
+                                <th>Размер</th>
+                                <th>Литерал</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>wchar_t</code></td>
+                                <td>C++98</td>
+                                <td>UTF-16 (Win) / UTF-32 (Linux)</td>
+                                <td>2 б (Win) / 4 б (Linux)</td>
+                                <td><code>L'Я'</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>char16_t</code></td>
+                                <td><span class="std-badge std-badge--11">C++11</span></td>
+                                <td>UTF-16</td>
+                                <td>2 байта</td>
+                                <td><code>u'€'</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>char32_t</code></td>
+                                <td><span class="std-badge std-badge--11">C++11</span></td>
+                                <td>UTF-32</td>
+                                <td>4 байта</td>
+                                <td><code>U'🚀'</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>char8_t</code></td>
+                                <td><span class="std-badge std-badge--20">C++20</span></td>
+                                <td>UTF-8 (явная семантика)</td>
+                                <td>1 байт</td>
+                                <td><code>u8'A'</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    char     c   = 'A';          // ASCII / UTF-8 байт
+    wchar_t  wc  = L'Я';         // Широкий символ
+    char16_t c16 = u'\u20AC';    // € (U+20AC) в UTF-16
+    char32_t c32 = U'\U0001F680'; // 🚀 в UTF-32
+
+    std::cout &lt;&lt; "sizeof(char)     = " &lt;&lt; sizeof(char)     &lt;&lt; '\n';
+    std::cout &lt;&lt; "sizeof(wchar_t)  = " &lt;&lt; sizeof(wchar_t)  &lt;&lt; '\n';
+    std::cout &lt;&lt; "sizeof(char16_t) = " &lt;&lt; sizeof(char16_t) &lt;&lt; '\n';
+    std::cout &lt;&lt; "sizeof(char32_t) = " &lt;&lt; sizeof(char32_t) &lt;&lt; '\n';
+
+    // char16_t хранит числовой код Unicode
+    std::cout &lt;&lt; "€ code point: " &lt;&lt; (int)c16 &lt;&lt; '\n'; // 8364
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div id="compiler-chars"></div>
+
+                <div class="note-card">
+                    <div class="note-card__title">📌 Почему wchar_t непортабелен</div>
+                    <p>
+                        <code>wchar_t</code> имеет разный размер на Windows (2 байта, UTF-16) и Linux
+                        (4 байта, UTF-32). Для переносимого Unicode-кода предпочитайте <code>char32_t</code>
+                        или <code>char8_t</code> (C++20) с явной семантикой.
+                    </p>
+                </div>
+
+                <!-- ── Арифметика над char ── -->
+                <h2 id="char-arithmetic">7. Арифметика над символами</h2>
+
+                <p>
+                    Поскольку <code>char</code> — это числовой тип (1 байт), над ним можно выполнять
+                    арифметические операции. Это используется для работы с ASCII:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cctype&gt;
+
+int main() {
+    // Проверки символов через &lt;cctype&gt;
+    char c = 'A';
+    std::cout &lt;&lt; std::boolalpha;
+    std::cout &lt;&lt; "isalpha('A'): " &lt;&lt; (bool)std::isalpha(c) &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; "isupper('A'): " &lt;&lt; (bool)std::isupper(c) &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; "isdigit('A'): " &lt;&lt; (bool)std::isdigit(c) &lt;&lt; '\n'; // false
+
+    // Конвертация регистра
+    char lower = std::tolower('A'); // 'a'
+    char upper = std::toupper('z'); // 'Z'
+    std::cout &lt;&lt; "tolower('A') = " &lt;&lt; lower &lt;&lt; '\n';
+    std::cout &lt;&lt; "toupper('z') = " &lt;&lt; upper &lt;&lt; '\n';
+
+    // Перебор алфавита
+    for (char ch = 'a'; ch &lt;= 'z'; ++ch)
+        std::cout &lt;&lt; ch;
+    std::cout &lt;&lt; '\n';
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Мини-тест -->
+                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
+                <p>10 вопросов по символьным типам C++.</p>
+                <div id="quiz-chars"></div>
+
+                <!-- Навигация -->
+                <div class="paragraph-nav">
+                    <a href="floating-point.html" class="nav-prev">
+                        <span class="nav-dir">← Назад</span>
+                        <span class="nav-name">§1.1.3 Типы с плавающей точкой</span>
+                    </a>
+                    <a href="boolean.html" class="nav-next">
+                        <span class="nav-dir">Далее →</span>
+                        <span class="nav-name">§1.1.5 Логический тип bool</span>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', function () {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof CppCompiler !== 'undefined') {
+            new CppCompiler('compiler-chars',
+`#include <iostream>
+#include <cctype>
+
+int main() {
+    char c = 'H';
+    std::cout << "char: " << c << ", code: " << (int)c << "\\n";
+
+    // Арифметика
+    std::cout << "H+1 = " << (char)(c+1) << "\\n"; // I
+
+    // Проверки
+    std::cout << std::boolalpha;
+    std::cout << "isalpha: " << (bool)std::isalpha(c) << "\\n";
+    std::cout << "isupper: " << (bool)std::isupper(c) << "\\n";
+
+    // Алфавит
+    for (char ch = 'a'; ch <= 'z'; ++ch) std::cout << ch;
+    std::cout << "\\n";
+
+    // Размеры
+    std::cout << "sizeof(wchar_t)  = " << sizeof(wchar_t)  << "\\n";
+    std::cout << "sizeof(char16_t) = " << sizeof(char16_t) << "\\n";
+    std::cout << "sizeof(char32_t) = " << sizeof(char32_t) << "\\n";
+    return 0;
+}`);
+        }
+
+        if (typeof characterTypesQuestions !== 'undefined') {
+            new Quiz('quiz-chars', characterTypesQuestions, {
+                quizId: 'chars-mini',
+                title: 'Мини-тест: символьные типы',
+                type: 'mini'
+            });
+        }
+    });
+    </script>
+
+</body>
+</html>

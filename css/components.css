@@ -356,12 +356,61 @@
     font-weight: 500;
 }
 
+/* === Type Category Cards === */
+.type-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-5);
+    margin: var(--space-6) 0;
+}
+
+.type-category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-6);
+    background: var(--bg-card);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.type-category-card:hover {
+    border-color: var(--accent-blue);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(99, 179, 255, 0.2);
+}
+
+.type-category-card .category-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-3);
+}
+
+.type-category-card h3 {
+    color: var(--text-heading);
+    font-size: var(--fs-lg);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.type-category-card p {
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+    margin: 0;
+}
+
 @media (max-width: 640px) {
     .info-grid {
         grid-template-columns: 1fr;
     }
     
     .type-section .type-specs {
+        grid-template-columns: 1fr;
+    }
+    
+    .type-categories {
         grid-template-columns: 1fr;
     }
 }

@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1. Введение в фундаментальные типы — Курс C++</title>
+    <meta name="description" content="Фундаментальные типы данных C++: иерархия, sizeof, signed/unsigned, short/long. Полное руководство с диаграммами и примерами.">
+
+    <!-- Prism.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = { tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="../../../profile.html">Профиль</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Глава I. Фундаментальные типы</div>
+                <ul class="sidebar-nav" id="course-nav">
+                    <!-- navigation.js заполнит динамически из course-structure.json -->
+                    <li class="sidebar-para-item expanded">
+                        <a href="introduction-to-fundamental-data-types.html" class="sidebar-para-link active">
+                            <span class="sidebar-para-number">§1.1</span>
+                            <span class="sidebar-para-title">Фундаментальные типы</span>
+                        </a>
+                        <ul class="sidebar-sections open">
+                            <li class="sidebar-section-item">
+                                <a href="void.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.1</span>
+                                    <span class="sidebar-section-title">Тип void</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-section-item">
+                                <a href="integer-types.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.2</span>
+                                    <span class="sidebar-section-title">Целочисленные типы</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-section-item">
+                                <a href="floating-point.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.3</span>
+                                    <span class="sidebar-section-title">Типы с плавающей точкой</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-section-item">
+                                <a href="character-types.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.4</span>
+                                    <span class="sidebar-section-title">Символьные типы</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-section-item">
+                                <a href="boolean.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.5</span>
+                                    <span class="sidebar-section-title">Логический тип bool</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.1</div>
+                <h1>Введение в фундаментальные типы данных</h1>
+
+                <p>
+                    Каждая переменная в C++ имеет <span class="key-term">тип</span> — точное описание того,
+                    какие значения она может хранить, сколько памяти занимает и какие операции к ней применимы.
+                    <strong>Фундаментальные типы</strong> — это нулевой уровень системы типов C++: они встроены
+                    прямо в компилятор, не требуют подключения заголовков и являются строительным материалом
+                    для всех остальных типов программы.
+                </p>
+
+                <p>
+                    В отличие от языков с динамической типизацией (Python, JavaScript), C++ является
+                    <strong>статически типизированным языком</strong>: тип каждого выражения и переменной
+                    известен <em>на этапе компиляции</em>. Это позволяет компилятору генерировать максимально
+                    эффективный машинный код и выявлять ошибки до запуска программы.
+                </p>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="chto-takoe-tipy">1. Что такое фундаментальные типы</h2>
+
+                <div class="definition" data-label="Определение">
+                    <p>
+                        <strong>Фундаментальные типы</strong> (fundamental types) — встроенные типы языка C++,
+                        представляющие базовые значения: целые числа, числа с плавающей точкой, символы и
+                        логические значения. Они заданы непосредственно стандартом языка и не зависят от
+                        пользовательских определений или библиотек.
+                    </p>
+                    <p style="margin-top:var(--space-3);font-size:var(--fs-sm);color:var(--text-tertiary);">
+                        Стандарт ISO/IEC 14882: [basic.fundamental] §6.7.1
+                    </p>
+                </div>
+
+                <p>Стандарт C++ разделяет фундаментальные типы на пять групп:</p>
+
+                <ul>
+                    <li>
+                        <strong>Целочисленные типы</strong> — <code>signed char</code>, <code>short int</code>,
+                        <code>int</code>, <code>long int</code>, <code>long long int</code>
+                        и их беззнаковые варианты.
+                    </li>
+                    <li>
+                        <strong>Типы с плавающей точкой</strong> — <code>float</code>, <code>double</code>,
+                        <code>long double</code>. Представляют вещественные числа согласно IEEE 754.
+                    </li>
+                    <li>
+                        <strong>Символьные типы</strong> — <code>char</code>, <code>signed char</code>,
+                        <code>unsigned char</code>, <code>wchar_t</code>,
+                        <code>char8_t</code> <span class="std-badge std-badge--20">C++20</span>,
+                        <code>char16_t</code> <span class="std-badge std-badge--11">C++11</span>,
+                        <code>char32_t</code> <span class="std-badge std-badge--11">C++11</span>.
+                    </li>
+                    <li>
+                        <strong>Логический тип</strong> — <code>bool</code>, принимает значения
+                        <code>true</code> или <code>false</code>.
+                    </li>
+                    <li>
+                        <strong>Тип <code>void</code></strong> — специальный неполный тип,
+                        обозначающий отсутствие значения.
+                    </li>
+                </ul>
+
+                <div class="iso-quote">
+                    <span class="iso-ref">ISO/IEC 14882 — [basic.fundamental] §6.7.1</span>
+                    «There are five <em>standard signed integer types</em>: "signed char", "short int",
+                    "int", "long int", and "long long int". In this list, each type provides at least as
+                    much storage as those preceding it in the list.»
+                </div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="sistema-tipov">2. Система типов C++</h2>
+
+                <p>C++ — <strong>строго и статически типизированный язык</strong>. Это означает, что:</p>
+                <ul>
+                    <li>Каждое выражение имеет тип, определяемый на этапе компиляции.</li>
+                    <li>Компилятор проверяет совместимость типов при каждой операции.</li>
+                    <li>Неявные преобразования разрешены только между совместимыми типами.</li>
+                    <li>Явное преобразование типов (<code>static_cast</code>, <code>reinterpret_cast</code>) всегда под контролем программиста.</li>
+                </ul>
+
+                <div class="info-card">
+                    <div class="info-card__title">Статическая типизация и производительность</div>
+                    <p>
+                        Знание типов на этапе компиляции позволяет компилятору выбирать оптимальные
+                        машинные инструкции: для <code>int</code> — 32-битные целочисленные операции,
+                        для <code>double</code> — операции FPU/SIMD, для <code>bool</code> — битовые
+                        инструкции. Именно поэтому C++ даёт производительность, сравнимую с ассемблером.
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    // Целочисленные типы
+    int         population   = 8'000'000'000; // C++14: апостроф — разделитель
+    short       port         = 8080;
+    long long   distance     = 9'460'730'472'580'800LL; // световой год в метрах
+
+    // Вещественные типы
+    float       pi_f  = 3.14159f;
+    double      pi_d  = 3.141592653589793;
+    long double pi_ld = 3.141592653589793238L;
+
+    // Символьный и логический
+    char        letter     = 'A';
+    bool        is_running = true;
+
+    std::cout &lt;&lt; "int:       " &lt;&lt; population   &lt;&lt; '\n';
+    std::cout &lt;&lt; "short:     " &lt;&lt; port         &lt;&lt; '\n';
+    std::cout &lt;&lt; "long long: " &lt;&lt; distance     &lt;&lt; '\n';
+    std::cout &lt;&lt; "float:     " &lt;&lt; pi_f         &lt;&lt; '\n';
+    std::cout &lt;&lt; "double:    " &lt;&lt; pi_d         &lt;&lt; '\n';
+    std::cout &lt;&lt; "char:      " &lt;&lt; letter       &lt;&lt; '\n';
+    std::cout &lt;&lt; std::boolalpha;
+    std::cout &lt;&lt; "bool:      " &lt;&lt; is_running   &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div id="compiler-intro-types"></div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Неявные преобразования типов</div>
+                    <p>
+                        C++ разрешает неявные преобразования между числовыми типами, но они могут приводить
+                        к потере данных. Например, присваивание <code>int</code> в <code>short</code>
+                        может вызвать переполнение: значение <code>40000</code> не помещается в
+                        <code>short</code> (максимум 32 767). Используйте <code>static_cast&lt;T&gt;()</code>
+                        для явного преобразования типов.
+                    </p>
+                </div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="ierarkhiya-tipov">3. Иерархия фундаментальных типов</h2>
+
+                <p>
+                    На диаграмме ниже представлена полная иерархия всех фундаментальных типов C++
+                    с указанием стандарта, минимальных гарантированных размеров и псевдонимов из
+                    <code>&lt;cstdint&gt;</code>.
+                </p>
+
+                <div class="diagram-block">
+                    <div class="diagram-title">Полная иерархия фундаментальных типов C++</div>
+                    <svg viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+                        <defs>
+                            <marker id="arr" markerWidth="7" markerHeight="7" refX="3" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L6,3 z" fill="#4f5d8f"/>
+                            </marker>
+                        </defs>
+
+                        <!-- ROOT -->
+                        <rect x="374" y="8" width="452" height="46" rx="10" fill="rgba(131,56,236,0.2)" stroke="#8338EC" stroke-width="2"/>
+                        <text x="600" y="36" text-anchor="middle" fill="#C77DFF" font-size="15" font-weight="700" font-family="Segoe UI,sans-serif">Фундаментальные типы C++</text>
+
+                        <!-- Root → L1 connectors -->
+                        <line x1="600" y1="54" x2="140"  y2="100" stroke="#4f5d8f" stroke-width="1.5"/>
+                        <line x1="600" y1="54" x2="382"  y2="100" stroke="#4f5d8f" stroke-width="1.5"/>
+                        <line x1="600" y1="54" x2="660"  y2="100" stroke="#4f5d8f" stroke-width="1.5"/>
+                        <line x1="600" y1="54" x2="900"  y2="100" stroke="#4f5d8f" stroke-width="1.5"/>
+                        <line x1="600" y1="54" x2="1105" y2="100" stroke="#4f5d8f" stroke-width="1.5"/>
+
+                        <!-- L1: Категории -->
+                        <rect x="44"   y="100" width="192" height="44" rx="8" fill="rgba(167,139,250,0.2)" stroke="#a78bfa" stroke-width="2"/>
+                        <text x="140"  y="127" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="600" font-family="Segoe UI,sans-serif">Целочисленные</text>
+
+                        <rect x="278"  y="100" width="208" height="44" rx="8" fill="rgba(34,211,238,0.18)" stroke="#22d3ee" stroke-width="2"/>
+                        <text x="382"  y="127" text-anchor="middle" fill="#22d3ee" font-size="13" font-weight="600" font-family="Segoe UI,sans-serif">С плавающей точкой</text>
+
+                        <rect x="558"  y="100" width="204" height="44" rx="8" fill="rgba(52,211,153,0.18)" stroke="#34d399" stroke-width="2"/>
+                        <text x="660"  y="127" text-anchor="middle" fill="#34d399" font-size="13" font-weight="600" font-family="Segoe UI,sans-serif">Символьные</text>
+
+                        <rect x="812"  y="100" width="176" height="44" rx="8" fill="rgba(251,146,60,0.18)" stroke="#fb923c" stroke-width="2"/>
+                        <text x="900"  y="121" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Логический</text>
+                        <text x="900"  y="138" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">и nullptr_t</text>
+
+                        <rect x="1046" y="100" width="118" height="44" rx="8" fill="rgba(148,163,184,0.15)" stroke="#94a3b8" stroke-width="2"/>
+                        <text x="1105" y="127" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="600" font-family="Segoe UI,sans-serif">void</text>
+
+                        <!-- ── ЦЕЛОЧИСЛЕННЫЕ (x≈140) ── -->
+                        <line x1="140" y1="144" x2="140" y2="178" stroke="#a78bfa" stroke-width="1.5"/>
+                        <line x1="140" y1="178" x2="80"  y2="178" stroke="#a78bfa" stroke-width="1.5"/>
+                        <line x1="140" y1="178" x2="80"  y2="230" stroke="#a78bfa" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="140" y1="178" x2="80"  y2="282" stroke="#a78bfa" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="140" y1="178" x2="72"  y2="334" stroke="#a78bfa" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="140" y1="178" x2="72"  y2="386" stroke="#a78bfa" stroke-width="1.3" opacity="0.7"/>
+
+                        <rect x="24"  y="162" width="112" height="32" rx="6" fill="rgba(167,139,250,0.12)" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="80"  y="183" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">signed char</text>
+                        <text x="145" y="177" text-anchor="start" fill="#64748b" font-size="8">≥8 бит / int8_t</text>
+
+                        <rect x="24"  y="214" width="112" height="32" rx="6" fill="rgba(167,139,250,0.12)" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="80"  y="235" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">short int</text>
+                        <text x="145" y="229" text-anchor="start" fill="#64748b" font-size="8">≥16 бит / int16_t</text>
+
+                        <rect x="24"  y="266" width="112" height="32" rx="6" fill="rgba(167,139,250,0.12)" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="80"  y="287" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">int</text>
+                        <text x="145" y="281" text-anchor="start" fill="#64748b" font-size="8">≥16 бит / int32_t</text>
+
+                        <rect x="16"  y="318" width="112" height="32" rx="6" fill="rgba(167,139,250,0.12)" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="72"  y="339" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">long int</text>
+                        <text x="137" y="333" text-anchor="start" fill="#64748b" font-size="8">≥32 бита</text>
+
+                        <rect x="16"  y="370" width="112" height="32" rx="6" fill="rgba(167,139,250,0.12)" stroke="#a78bfa" stroke-width="1.5"/>
+                        <text x="72"  y="388" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">long long int</text>
+                        <text x="137" y="383" text-anchor="start" fill="#64748b" font-size="8">≥64 бита / int64_t</text>
+
+                        <!-- signed/unsigned ответвления для каждого целочисленного -->
+                        <line x1="136" y1="178" x2="197" y2="162" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <line x1="136" y1="178" x2="197" y2="196" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <rect x="197" y="154" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="168" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">signed</text>
+                        <rect x="197" y="188" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="202" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">unsigned</text>
+
+                        <line x1="136" y1="230" x2="197" y2="214" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <line x1="136" y1="230" x2="197" y2="248" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <rect x="197" y="206" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="220" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">signed</text>
+                        <rect x="197" y="240" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="254" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">unsigned</text>
+
+                        <line x1="136" y1="282" x2="197" y2="266" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <line x1="136" y1="282" x2="197" y2="300" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <rect x="197" y="258" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="272" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">signed</text>
+                        <rect x="197" y="292" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="306" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">unsigned</text>
+
+                        <line x1="128" y1="334" x2="197" y2="318" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <line x1="128" y1="334" x2="197" y2="352" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <rect x="197" y="310" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="324" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">signed</text>
+                        <rect x="197" y="344" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="358" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">unsigned</text>
+
+                        <line x1="128" y1="386" x2="197" y2="370" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <line x1="128" y1="386" x2="197" y2="404" stroke="#a78bfa" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.7"/>
+                        <rect x="197" y="362" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="376" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">signed</text>
+                        <rect x="197" y="396" width="56" height="20" rx="4" fill="rgba(167,139,250,0.07)" stroke="#a78bfa" stroke-width="0.9"/>
+                        <text x="225" y="410" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">unsigned</text>
+
+                        <rect x="16"  y="424" width="237" height="26" rx="5" fill="rgba(167,139,250,0.06)" stroke="#a78bfa" stroke-width="1" stroke-dasharray="4 3"/>
+                        <text x="135" y="441" text-anchor="middle" fill="#c4b5fd" font-size="8" font-family="Consolas,monospace">&lt;cstdint&gt;: int8_t…int64_t, uint8_t…uint64_t</text>
+
+                        <!-- ── ПЛАВАЮЩАЯ ТОЧКА (x≈382) ── -->
+                        <line x1="382" y1="144" x2="382" y2="178" stroke="#22d3ee" stroke-width="1.5"/>
+                        <line x1="382" y1="178" x2="340" y2="178" stroke="#22d3ee" stroke-width="1.5"/>
+                        <line x1="382" y1="178" x2="340" y2="240" stroke="#22d3ee" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="382" y1="178" x2="340" y2="302" stroke="#22d3ee" stroke-width="1.3" opacity="0.7"/>
+
+                        <rect x="290" y="162" width="100" height="32" rx="6" fill="rgba(34,211,238,0.12)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="340" y="183" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="Consolas,monospace">float</text>
+                        <text x="400" y="175" text-anchor="start" fill="#64748b" font-size="8">32 бит, 7 цифр</text>
+
+                        <rect x="290" y="224" width="100" height="32" rx="6" fill="rgba(34,211,238,0.12)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="340" y="245" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="Consolas,monospace">double</text>
+                        <text x="400" y="237" text-anchor="start" fill="#64748b" font-size="8">64 бит, 15–16 цифр</text>
+
+                        <rect x="282" y="286" width="116" height="32" rx="6" fill="rgba(34,211,238,0.12)" stroke="#22d3ee" stroke-width="1.5"/>
+                        <text x="340" y="299" text-anchor="middle" fill="#e2e8f0" font-size="9.5" font-family="Consolas,monospace">long double</text>
+                        <text x="340" y="313" text-anchor="middle" fill="#64748b" font-size="8">≥64 бит (80/128)</text>
+
+                        <rect x="282" y="336" width="152" height="30" rx="5" fill="rgba(34,211,238,0.06)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="4 3"/>
+                        <text x="358" y="348" text-anchor="middle" fill="#67e8f9" font-size="8">IEEE 754</text>
+                        <text x="358" y="360" text-anchor="middle" fill="#67e8f9" font-size="8">расширенная точность</text>
+
+                        <!-- ── СИМВОЛЬНЫЕ (x≈660) ── -->
+                        <line x1="660" y1="144" x2="660" y2="178" stroke="#34d399" stroke-width="1.5"/>
+                        <line x1="660" y1="178" x2="620" y2="178" stroke="#34d399" stroke-width="1.5"/>
+                        <line x1="660" y1="178" x2="620" y2="226" stroke="#34d399" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="660" y1="178" x2="620" y2="274" stroke="#34d399" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="660" y1="178" x2="620" y2="322" stroke="#34d399" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="660" y1="178" x2="620" y2="370" stroke="#34d399" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="660" y1="178" x2="620" y2="418" stroke="#34d399" stroke-width="1.3" opacity="0.7"/>
+                        <line x1="660" y1="178" x2="620" y2="466" stroke="#34d399" stroke-width="1.3" opacity="0.7"/>
+
+                        <rect x="570" y="162" width="100" height="32" rx="6" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="1.5"/>
+                        <text x="620" y="183" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="Consolas,monospace">char</text>
+                        <text x="682" y="180" text-anchor="start" fill="#64748b" font-size="8">1 байт, ASCII/UTF-8</text>
+
+                        <rect x="562" y="210" width="116" height="32" rx="6" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="1.5"/>
+                        <text x="620" y="231" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">signed char</text>
+                        <text x="688" y="228" text-anchor="start" fill="#64748b" font-size="8">-128…127</text>
+
+                        <rect x="556" y="258" width="128" height="32" rx="6" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="1.5"/>
+                        <text x="620" y="279" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">unsigned char</text>
+                        <text x="694" y="276" text-anchor="start" fill="#64748b" font-size="8">0…255</text>
+
+                        <rect x="566" y="306" width="108" height="32" rx="6" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="1.5"/>
+                        <text x="620" y="327" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">wchar_t</text>
+                        <text x="684" y="324" text-anchor="start" fill="#64748b" font-size="8">2–4 байта</text>
+
+                        <rect x="566" y="354" width="108" height="32" rx="6" fill="rgba(52,211,153,0.12)" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="5 2"/>
+                        <text x="620" y="375" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">char8_t</text>
+                        <text x="684" y="369" text-anchor="start" fill="#fdba74" font-size="8">C++20, 1 байт</text>
+
+                        <rect x="566" y="402" width="108" height="32" rx="6" fill="rgba(52,211,153,0.12)" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="5 2"/>
+                        <text x="620" y="423" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">char16_t</text>
+                        <text x="684" y="419" text-anchor="start" fill="#67e8f9" font-size="8">C++11, UTF-16</text>
+
+                        <rect x="566" y="450" width="108" height="32" rx="6" fill="rgba(52,211,153,0.12)" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="5 2"/>
+                        <text x="620" y="471" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">char32_t</text>
+                        <text x="684" y="467" text-anchor="start" fill="#67e8f9" font-size="8">C++11, UTF-32</text>
+
+                        <!-- ── BOOL / nullptr_t (x≈900) ── -->
+                        <line x1="900" y1="144" x2="900" y2="178" stroke="#fb923c" stroke-width="1.5"/>
+                        <line x1="900" y1="178" x2="870" y2="178" stroke="#fb923c" stroke-width="1.5"/>
+                        <line x1="900" y1="178" x2="870" y2="240" stroke="#fb923c" stroke-width="1.3" opacity="0.7"/>
+
+                        <rect x="830" y="162" width="80" height="32" rx="6" fill="rgba(251,146,60,0.12)" stroke="#fb923c" stroke-width="1.5"/>
+                        <text x="870" y="183" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="Consolas,monospace">bool</text>
+                        <text x="920" y="178" text-anchor="start" fill="#64748b" font-size="8">true / false</text>
+
+                        <rect x="818" y="224" width="104" height="32" rx="6" fill="rgba(251,146,60,0.12)" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="5 2"/>
+                        <text x="870" y="245" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Consolas,monospace">nullptr_t</text>
+                        <text x="932" y="241" text-anchor="start" fill="#67e8f9" font-size="8">C++11</text>
+
+                        <!-- ── VOID ── -->
+                        <line x1="1105" y1="144" x2="1105" y2="162" stroke="#94a3b8" stroke-width="1.5"/>
+                        <rect x="1056" y="162" width="98" height="32" rx="6" fill="rgba(148,163,184,0.12)" stroke="#94a3b8" stroke-width="1.5"/>
+                        <text x="1105" y="183" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Consolas,monospace">void</text>
+                        <text x="1105" y="206" text-anchor="middle" fill="#64748b" font-size="8">неполный тип</text>
+
+                        <!-- Легенда -->
+                        <rect x="44"  y="560" width="110" height="22" rx="4" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1"/>
+                        <text x="99"  y="575" text-anchor="middle" fill="#c4b5fd" font-size="9" font-family="Segoe UI,sans-serif">C++98 (сплошная рамка)</text>
+                        <rect x="44"  y="588" width="110" height="22" rx="4" fill="rgba(34,211,238,0.1)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="5 2"/>
+                        <text x="99"  y="603" text-anchor="middle" fill="#67e8f9" font-size="9" font-family="Segoe UI,sans-serif">C++11 (штрих / циан)</text>
+                        <rect x="44"  y="616" width="110" height="22" rx="4" fill="rgba(251,146,60,0.1)" stroke="#fb923c" stroke-width="1" stroke-dasharray="5 2"/>
+                        <text x="99"  y="631" text-anchor="middle" fill="#fdba74" font-size="9" font-family="Segoe UI,sans-serif">C++20 (штрих / оранж)</text>
+
+                        <text x="600" y="690" text-anchor="middle" fill="#475569" font-size="9.5" font-style="italic" font-family="Segoe UI,sans-serif">
+                            Размеры — минимальные гарантии стандарта; фактические зависят от платформы и компилятора
+                        </text>
+                        <rect x="260" y="560" width="268" height="22" rx="4" fill="rgba(148,163,184,0.08)" stroke="#475569" stroke-width="1" stroke-dasharray="3 3"/>
+                        <text x="394" y="575" text-anchor="middle" fill="#64748b" font-size="8.5" font-family="Segoe UI,sans-serif">signed/unsigned применяются только к целочисленным типам</text>
+                        <rect x="560" y="560" width="300" height="22" rx="4" fill="rgba(52,211,153,0.06)" stroke="#34d399" stroke-width="1" stroke-dasharray="3 3"/>
+                        <text x="710" y="575" text-anchor="middle" fill="#6ee7b7" font-size="8.5" font-family="Consolas,monospace">&lt;cstdint&gt;: псевдонимы с точным размером</text>
+                    </svg>
+                </div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="sizeof-operator">4. Оператор <code>sizeof</code></h2>
+
+                <p>
+                    Оператор <code>sizeof</code> — встроенный унарный оператор C++, вычисляемый
+                    <strong>на этапе компиляции</strong>. Он возвращает размер объекта или типа
+                    в байтах (тип результата — <code>std::size_t</code>).
+                </p>
+
+                $$\text{биты} = \texttt{sizeof}(T) \times \texttt{CHAR\_BIT}$$
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Гарантия стандарта</th>
+                                <th>Типичный x86-64</th>
+                                <th>Диапазон (signed)</th>
+                                <th>Диапазон (unsigned)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>char</code></td><td>1 байт</td><td class="cell-highlight">1 байт</td><td class="cell-range">-127…127</td><td class="cell-range">0…255</td></tr>
+                            <tr><td><code>short</code></td><td>≥ 2 байта</td><td class="cell-highlight">2 байта</td><td class="cell-range">-32 767…32 767</td><td class="cell-range">0…65 535</td></tr>
+                            <tr><td><code>int</code></td><td>≥ 2 байта</td><td class="cell-highlight">4 байта</td><td class="cell-range">-2 147 483 648…2 147 483 647</td><td class="cell-range">0…4 294 967 295</td></tr>
+                            <tr><td><code>long</code></td><td>≥ 4 байта</td><td class="cell-highlight">8 б (Linux) / 4 б (Win)</td><td class="cell-range">платформ.-зависим</td><td class="cell-range">платформ.-зависим</td></tr>
+                            <tr><td><code>long long</code></td><td>≥ 8 байт</td><td class="cell-highlight">8 байт</td><td class="cell-range">-9 223 372 036 854 775 808…max</td><td class="cell-range">0…18 446 744 073 709 551 615</td></tr>
+                            <tr><td><code>float</code></td><td>≥ 4 байта</td><td class="cell-highlight">4 байта</td><td class="cell-range" colspan="2">±3.4×10³⁸ (7 значащих цифр)</td></tr>
+                            <tr><td><code>double</code></td><td>≥ 8 байт</td><td class="cell-highlight">8 байт</td><td class="cell-range" colspan="2">±1.7×10³⁰⁸ (15–16 значащих цифр)</td></tr>
+                            <tr><td><code>long double</code></td><td>≥ sizeof(double)</td><td class="cell-highlight">16 б (Linux) / 8 б (MSVC)</td><td class="cell-range" colspan="2">80-бит расшир. точность (Linux)</td></tr>
+                            <tr><td><code>bool</code></td><td>не менее 1 байта</td><td class="cell-highlight">1 байт</td><td class="cell-range" colspan="2">false (0) / true (1)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;climits&gt;
+
+int main() {
+    std::cout &lt;&lt; "CHAR_BIT  = " &lt;&lt; CHAR_BIT       &lt;&lt; " бит в байте\n";
+    std::cout &lt;&lt; "char      = " &lt;&lt; sizeof(char)      &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "short     = " &lt;&lt; sizeof(short)     &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "int       = " &lt;&lt; sizeof(int)       &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "long      = " &lt;&lt; sizeof(long)      &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "long long = " &lt;&lt; sizeof(long long) &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "float     = " &lt;&lt; sizeof(float)     &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "double    = " &lt;&lt; sizeof(double)    &lt;&lt; " байт\n";
+    std::cout &lt;&lt; "bool      = " &lt;&lt; sizeof(bool)      &lt;&lt; " байт\n";
+
+    std::cout &lt;&lt; "\nint min = " &lt;&lt; std::numeric_limits&lt;int&gt;::min() &lt;&lt; '\n';
+    std::cout &lt;&lt; "int max = " &lt;&lt; std::numeric_limits&lt;int&gt;::max() &lt;&lt; '\n';
+    std::cout &lt;&lt; "ll  max = " &lt;&lt; std::numeric_limits&lt;long long&gt;::max() &lt;&lt; '\n';
+    std::cout &lt;&lt; "dbl eps = " &lt;&lt; std::numeric_limits&lt;double&gt;::epsilon() &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div id="compiler-sizeof"></div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="modifikatory">5. Модификаторы: <code>signed</code>, <code>unsigned</code>, <code>short</code>, <code>long</code></h2>
+
+                <p>
+                    C++ позволяет модифицировать целочисленные типы с помощью ключевых слов-спецификаторов.
+                    Они влияют на <strong>диапазон значений</strong> (знаковость) и <strong>размер</strong> типа.
+                </p>
+
+                <div class="type-specs">
+                    <div class="type-spec">
+                        <span class="type-spec-label">signed</span>
+                        <span class="type-spec-value">знаковый (бит знака)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">unsigned</span>
+                        <span class="type-spec-value">беззнаковый (только ≥0)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">short</span>
+                        <span class="type-spec-value">≥16 бит (не длиннее int)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">long</span>
+                        <span class="type-spec-value">≥32 бит (не короче int)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">long long</span>
+                        <span class="type-spec-value">≥64 бит (C++11)</span>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Запись в коде</th>
+                                <th>Канонический тип</th>
+                                <th>Размер (x86-64)</th>
+                                <th>Диапазон</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>signed char</code></td><td><code>signed char</code></td><td>1 байт</td><td class="cell-range">-128…127</td></tr>
+                            <tr><td><code>unsigned char</code></td><td><code>unsigned char</code></td><td>1 байт</td><td class="cell-range">0…255</td></tr>
+                            <tr><td><code>short</code>, <code>short int</code>, <code>signed short</code></td><td><code>short int</code></td><td>2 байта</td><td class="cell-range">-32 768…32 767</td></tr>
+                            <tr><td><code>unsigned short</code></td><td><code>unsigned short int</code></td><td>2 байта</td><td class="cell-range">0…65 535</td></tr>
+                            <tr><td><code>int</code>, <code>signed</code>, <code>signed int</code></td><td><code>int</code></td><td>4 байта</td><td class="cell-range">-2 147 483 648…2 147 483 647</td></tr>
+                            <tr><td><code>unsigned</code>, <code>unsigned int</code></td><td><code>unsigned int</code></td><td>4 байта</td><td class="cell-range">0…4 294 967 295</td></tr>
+                            <tr><td><code>long</code>, <code>long int</code>, <code>signed long</code></td><td><code>long int</code></td><td>8 б (Linux) / 4 б (Win)</td><td class="cell-range">платформ.-зависим</td></tr>
+                            <tr><td><code>long long</code>, <code>signed long long</code></td><td><code>long long int</code></td><td>8 байт</td><td class="cell-range">-9 223 372 036 854 775 808…max</td></tr>
+                            <tr><td><code>unsigned long long</code></td><td><code>unsigned long long int</code></td><td>8 байт</td><td class="cell-range">0…18 446 744 073 709 551 615</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Знаковость <code>char</code>: платформенная неопределённость</div>
+                    <p>
+                        Знаковость простого <code>char</code> <strong>не определена стандартом</strong> — она зависит
+                        от платформы. На x86 обычно signed, на некоторых ARM — unsigned. Используйте
+                        <code>signed char</code> или <code>unsigned char</code> явно, когда знаковость важна.
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    signed   int si = -1;
+    unsigned int ui = static_cast&lt;unsigned int&gt;(si); // все биты = 1
+
+    std::cout &lt;&lt; "signed int -1   = " &lt;&lt; si &lt;&lt; '\n';
+    std::cout &lt;&lt; "unsigned int -1 = " &lt;&lt; ui &lt;&lt; '\n'; // 4294967295
+
+    // Опасность смешения знаковых и беззнаковых
+    unsigned int umax = std::numeric_limits&lt;unsigned int&gt;::max();
+    if (-1 &lt; umax) {
+        std::cout &lt;&lt; "Сравнение верно\n";
+    } else {
+        std::cout &lt;&lt; "Ловушка: -1 неявно стал UMAX!\n";
+    }
+
+    // Знаковость char
+    signed char   sc = 127;
+    unsigned char uc = 127;
+    ++sc; // UB! переполнение signed
+    ++uc; // OK: 128
+    std::cout &lt;&lt; "signed char 127+1   = " &lt;&lt; static_cast&lt;int&gt;(sc) &lt;&lt; '\n';
+    std::cout &lt;&lt; "unsigned char 127+1 = " &lt;&lt; static_cast&lt;int&gt;(uc) &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div id="compiler-modifiers"></div>
+
+                <div class="info-card">
+                    <div class="info-card__title">Рекомендация: используйте &lt;cstdint&gt;</div>
+                    <p>
+                        Когда нужен тип с <em>точно</em> заданным размером (бинарные протоколы, оборудование),
+                        используйте <code>int8_t</code>, <code>int16_t</code>, <code>int32_t</code>,
+                        <code>int64_t</code> и <code>uint*_t</code> из <code>&lt;cstdint&gt;</code>.
+                        Они гарантируют точный размер на любой поддерживаемой платформе.
+                    </p>
+                </div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
+                <p>10 вопросов разных форматов по материалу этого параграфа.</p>
+                <div id="quiz-intro-types"></div>
+
+                <!-- Навигация между параграфами -->
+                <div class="paragraph-nav">
+                    <a href="../../../index.html" class="nav-prev">
+                        <span class="nav-dir">← Назад</span>
+                        <span class="nav-name">Главная страница курса</span>
+                    </a>
+                    <a href="void.html" class="nav-next">
+                        <span class="nav-dir">Далее →</span>
+                        <span class="nav-name">§1.1.1 Тип void</span>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Right Sidebar: TOC -->
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav">
+                    <!-- toc.js заполнит автоматически -->
+                </nav>
+            </div>
+        </aside>
+
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+        <p style="margin-top:var(--space-2);">Статическая типизация — основа надёжного и быстрого кода</p>
+    </footer>
+
+    <!-- JS -->
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script src="../../../js/effects.js"></script>
+
+    <script>
+    // Reading progress bar
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', function () {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    // Copy code helper
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+
+    // Инициализация компиляторов
+    document.addEventListener('DOMContentLoaded', () => {
+        new CppCompiler('compiler-intro-types', `#include <iostream>\n\nint main() {\n    int x = 42;\n    double pi = 3.14159265358979;\n    bool flag = true;\n    char ch = 'A';\n\n    std::cout << "int:    " << x << "\\n";\n    std::cout << "double: " << pi << "\\n";\n    std::cout << std::boolalpha << "bool:   " << flag << "\\n";\n    std::cout << "char:   " << ch << " (код: " << (int)ch << ")\\n";\n    return 0;\n}`);
+
+        new CppCompiler('compiler-sizeof', `#include <iostream>\n#include <limits>\n#include <climits>\n\nint main() {\n    std::cout << "CHAR_BIT  = " << CHAR_BIT << "\\n";\n    std::cout << "char      = " << sizeof(char) << " байт\\n";\n    std::cout << "short     = " << sizeof(short) << " байт\\n";\n    std::cout << "int       = " << sizeof(int) << " байт\\n";\n    std::cout << "long      = " << sizeof(long) << " байт\\n";\n    std::cout << "long long = " << sizeof(long long) << " байт\\n";\n    std::cout << "float     = " << sizeof(float) << " байт\\n";\n    std::cout << "double    = " << sizeof(double) << " байт\\n";\n    std::cout << "int max   = " << std::numeric_limits<int>::max() << "\\n";\n    std::cout << "ll  max   = " << std::numeric_limits<long long>::max() << "\\n";\n    return 0;\n}`);
+
+        new CppCompiler('compiler-modifiers', `#include <iostream>\n#include <limits>\n\nint main() {\n    signed   int si = -1;\n    unsigned int ui = static_cast<unsigned int>(si);\n    std::cout << "signed -1   = " << si << "\\n";\n    std::cout << "unsigned -1 = " << ui << "\\n";\n\n    unsigned int umax = std::numeric_limits<unsigned int>::max();\n    if (-1 < static_cast<long long>(umax))\n        std::cout << "OK: -1 < UMAX\\n";\n    else\n        std::cout << "ЛОВУШКА: подписано/без подписи!\\n";\n    return 0;\n}`);
+
+        // Мини-тест — используем банк вопросов из quiz.js
+        if (typeof introTypesQuestions !== 'undefined') {
+            new Quiz('quiz-intro-types', introTypesQuestions, {
+                quizId: 'intro-types-mini',
+                title: 'Мини-тест: фундаментальные типы',
+                type: 'mini'
+            });
+        }
+    });
+    </script>
+
+</body>
+</html>

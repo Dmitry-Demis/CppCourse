@@ -1,0 +1,344 @@
+/* ============================================
+   THEORY PAGES — shared component styles
+   Используется всеми страницами theory/
+   ============================================ */
+
+/* ── Reading progress bar ── */
+.reading-progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+    z-index: calc(var(--z-sticky) + 10);
+    transition: width 0.1s linear;
+    pointer-events: none;
+}
+
+/* ── Standard-label badges ── */
+.std-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    vertical-align: middle;
+    margin-left: 4px;
+}
+.std-badge--98  { background: rgba(167,139,250,0.2); color: #c4b5fd; border: 1px solid #a78bfa; }
+.std-badge--11  { background: rgba(34,211,238,0.2);  color: #67e8f9; border: 1px solid #22d3ee; }
+.std-badge--14  { background: rgba(52,211,153,0.2);  color: #6ee7b7; border: 1px solid #34d399; }
+.std-badge--17  { background: rgba(52,211,153,0.2);  color: #6ee7b7; border: 1px solid #34d399; }
+.std-badge--20  { background: rgba(251,146,60,0.2);  color: #fdba74; border: 1px solid #fb923c; }
+.std-badge--23  { background: rgba(255,0,110,0.2);   color: #ff80b5; border: 1px solid #ff006e; }
+
+/* ── Section badge (chapter / paragraph marker) ── */
+.section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-4);
+    color: var(--accent-purple);
+    background: var(--accent-purple-dim);
+    border: 1px solid rgba(131,56,236,0.4);
+}
+
+/* ── Key term highlight ── */
+.key-term {
+    color: var(--accent-cyan);
+    font-weight: var(--fw-semibold);
+    font-style: italic;
+}
+
+/* ── ISO quote block ── */
+.iso-quote {
+    background: rgba(99,102,241,0.08);
+    border-left: 3px solid var(--accent-purple);
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-6) 0;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+.iso-quote .iso-ref {
+    display: block;
+    color: var(--accent-purple);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* ── Warning / danger block ── */
+.warning-block {
+    background: rgba(251,86,7,0.08);
+    border: 1px solid rgba(251,86,7,0.35);
+    border-left: 4px solid var(--accent-red);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-6) 0;
+}
+.warning-block__title {
+    font-weight: 700;
+    color: #ff8c69;
+    margin-bottom: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-sm);
+}
+.warning-block p { color: var(--text-secondary); margin: 0; font-size: var(--fs-sm); }
+
+/* ── Info card (green / cyan) ── */
+.info-card {
+    background: rgba(6,255,165,0.06);
+    border: 1px solid rgba(6,255,165,0.25);
+    border-left: 4px solid var(--accent-cyan);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-6) 0;
+}
+.info-card__title {
+    font-weight: 700;
+    color: var(--accent-cyan);
+    margin-bottom: var(--space-2);
+    font-size: var(--fs-sm);
+}
+.info-card p { color: var(--text-secondary); margin: 0; font-size: var(--fs-sm); }
+
+/* ── Note card (blue) ── */
+.note-card {
+    background: rgba(58,134,255,0.07);
+    border: 1px solid rgba(58,134,255,0.3);
+    border-left: 4px solid var(--accent-blue);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-6) 0;
+}
+.note-card__title {
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin-bottom: var(--space-2);
+    font-size: var(--fs-sm);
+}
+.note-card p { color: var(--text-secondary); margin: 0; font-size: var(--fs-sm); }
+
+/* ── Type spec strip ── */
+.type-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 var(--space-6);
+}
+.type-spec {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    min-width: 110px;
+    flex: 1 1 110px;
+}
+.type-spec-label {
+    display: block;
+    font-size: var(--fs-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-1);
+}
+.type-spec-value {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* ── Diagram block ── */
+.diagram-block {
+    margin: var(--space-8) 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    overflow-x: auto;
+}
+.diagram-title {
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-4);
+    font-size: var(--fs-sm);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* ── Table ── */
+.table-wrapper {
+    overflow-x: auto;
+    margin: var(--space-6) 0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
+}
+.table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+    min-width: 560px;
+}
+.table-wrapper th {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-weight: 700;
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    border-bottom: 2px solid var(--border-primary);
+    white-space: nowrap;
+}
+.table-wrapper td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+    vertical-align: middle;
+}
+.table-wrapper tr:last-child td { border-bottom: none; }
+.table-wrapper tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+.table-wrapper code {
+    font-family: var(--font-mono);
+    background: var(--bg-card);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.85em;
+    color: #c4b5fd;
+}
+.table-wrapper td.cell-range {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    color: var(--text-tertiary);
+}
+.cell-highlight { color: var(--accent-cyan); font-weight: 600; }
+
+/* ── Code block ── */
+.code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: var(--radius-lg);
+    margin: var(--space-6) 0;
+    overflow: hidden;
+}
+.code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-5);
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid var(--code-border);
+}
+.code-lang {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.code-actions { display: flex; gap: var(--space-2); }
+.btn-code {
+    padding: var(--space-1) var(--space-3);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    color: var(--text-tertiary);
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-code:hover, .btn-code.copied {
+    background: var(--accent-purple-dim);
+    border-color: var(--accent-purple);
+    color: var(--accent-violet);
+}
+.code-content { padding: var(--space-5); overflow-x: auto; }
+.code-content pre { margin: 0; }
+
+/* ── Modifier combination row ── */
+.row-equiv { color: var(--accent-yellow); font-style: italic; }
+
+/* ── Section h2 / h3 numbering from TOC ── */
+h2[data-toc-number]::before,
+h3[data-toc-number]::before {
+    content: attr(data-toc-number) " ";
+    color: var(--text-tertiary);
+    font-size: 0.85em;
+    font-weight: normal;
+    font-family: var(--font-mono);
+}
+
+/* ── Mini-quiz section separator ── */
+.quiz-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-10) 0 var(--space-4);
+    color: var(--accent-yellow);
+    font-weight: 700;
+    font-size: var(--fs-lg);
+}
+.quiz-section-title::before,
+.quiz-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-primary));
+}
+.quiz-section-title::after {
+    background: linear-gradient(to left, transparent, var(--border-primary));
+}
+
+/* ── Paragraph bottom nav ── */
+.paragraph-nav {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--border-primary);
+}
+.paragraph-nav a {
+    flex: 1;
+    display: block;
+    padding: var(--space-4) var(--space-6);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: all var(--transition-base);
+}
+.paragraph-nav a:hover {
+    border-color: var(--accent-purple);
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    text-decoration: none;
+}
+.paragraph-nav a .nav-dir {
+    font-size: var(--fs-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.paragraph-nav a .nav-name { font-weight: 600; margin-top: var(--space-1); }
+.paragraph-nav a.nav-next { text-align: right; }
+
+/* Responsive */
+@media (max-width: 640px) {
+    .type-specs { flex-direction: column; }
+    .paragraph-nav { flex-direction: column; }
+    .diagram-block { padding: var(--space-4) var(--space-3); }
+}

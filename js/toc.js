@@ -1,109 +1,126 @@
 // ============================================
-// TABLE OF CONTENTS GENERATOR
-// Автоматическая генерация содержания из заголовков
+// TABLE OF CONTENTS GENERATOR v2
+// Поддержка h2 + h3, иерархическая нумерация
 // ============================================
 
 /**
- * Генерирует содержание (TOC) из заголовков h2 на странице
+ * Генерирует содержание (TOC) из заголовков h2 и h3 на странице.
+ * h2 — разделы первого уровня (нумерация: 1, 2, 3…)
+ * h3 — подразделы   (нумерация: 1.1, 1.2, 2.1…)
  */
 function generateTOC() {
     const content = document.querySelector('.chapter-content');
-    const tocNav = document.querySelector('.toc-nav');
-    
+    const tocNav  = document.querySelector('.toc-nav');
+
     if (!content || !tocNav) return;
-    
-    // Находим все заголовки h2
-    const headings = content.querySelectorAll('h2');
-    
+
+    const headings = content.querySelectorAll('h2, h3');
+
     if (headings.length === 0) {
-        tocNav.innerHTML = '<div style="color: var(--text-tertiary); font-size: var(--fs-xs); padding: var(--space-2);">Нет разделов</div>';
+        tocNav.innerHTML = '<div style="color:var(--text-tertiary);font-size:var(--fs-xs);padding:var(--space-2);">Нет разделов</div>';
         return;
     }
-    
+
     tocNav.innerHTML = '';
-    
-    headings.forEach((heading, index) => {
-        // Добавляем ID к заголовку, если его нет
+
+    let h2Counter = 0;
+    let h3Counter = 0;
+
+    headings.forEach((heading) => {
+        // Присваиваем ID, если нет
         if (!heading.id) {
-            heading.id = `section-${index + 1}`;
+            const slug = heading.textContent
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-zа-яё0-9\s]/gi, '')
+                .replace(/\s+/g, '-')
+                .substring(0, 60);
+            heading.id = slug || `section-${Math.random().toString(36).substring(2, 7)}`;
         }
-        
+
+        let number = '';
+        if (heading.tagName === 'H2') {
+            h2Counter++;
+            h3Counter = 0;
+            number = `${h2Counter}.`;
+        } else {
+            h3Counter++;
+            number = `${h2Counter}.${h3Counter}.`;
+        }
+
+        // Сохраняем номер в dataset для подсветки
+        heading.dataset.tocNumber = number;
+
         const a = document.createElement('a');
         a.href = `#${heading.id}`;
-        a.className = 'toc-item';
-        a.textContent = heading.textContent;
-        
-        a.onclick = (e) => {
+        a.className = heading.tagName === 'H2' ? 'toc-item toc-h2' : 'toc-item toc-h3';
+        a.dataset.target = heading.id;
+
+        a.innerHTML = `<span class="toc-number">${number}</span><span class="toc-text">${heading.textContent.trim()}</span>`;
+
+        a.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            // Плавная прокрутка к заголовку
-            const headerOffset = 80; // Высота header + отступ
-            const elementPosition = heading.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-            
-            // Highlight активного элемента
-            document.querySelectorAll('.toc-item').forEach(link => {
-                link.classList.remove('active');
-            });
-            a.classList.add('active');
-        };
-        
+            scrollToHeading(heading);
+            setActiveLink(a);
+        });
+
         tocNav.appendChild(a);
     });
+
+    // Подсвечиваем первый элемент сразу
+    highlightActiveTOC();
+}
+
+function scrollToHeading(heading) {
+    const headerOffset = 80;
+    const top = heading.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top, behavior: 'smooth' });
+}
+
+function setActiveLink(activeEl) {
+    document.querySelectorAll('.toc-item').forEach(el => el.classList.remove('active'));
+    activeEl.classList.add('active');
 }
 
 /**
- * Подсвечивает активный раздел в TOC при скролле
+ * Подсвечивает активный раздел при скролле.
  */
 function highlightActiveTOC() {
-    const headings = document.querySelectorAll('.chapter-content h2');
+    const headings = Array.from(document.querySelectorAll('.chapter-content h2, .chapter-content h3'));
     const tocItems = document.querySelectorAll('.toc-item');
-    
-    if (headings.length === 0 || tocItems.length === 0) return;
-    
-    let currentActive = null;
-    const scrollPosition = window.scrollY + 100; // Offset для активации
-    
-    headings.forEach((heading) => {
-        const headingTop = heading.offsetTop;
-        
-        if (scrollPosition >= headingTop) {
-            currentActive = heading.id;
+
+    if (!headings.length || !tocItems.length) return;
+
+    const scrollPosition = window.scrollY + 110;
+    let currentId = headings[0].id;
+
+    for (const heading of headings) {
+        if (heading.offsetTop <= scrollPosition) {
+            currentId = heading.id;
         }
-    });
-    
-    // Обновляем активный элемент в TOC
-    if (currentActive) {
-        tocItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('href') === `#${currentActive}`) {
-                item.classList.add('active');
-            }
-        });
     }
+
+    tocItems.forEach(item => {
+        const isActive = item.dataset.target === currentId;
+        item.classList.toggle('active', isActive);
+    });
 }
 
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
+// ============================================
+// Инициализация
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
     generateTOC();
-    
-    // Отслеживаем скролл для подсветки активного раздела
+
+    // Дебаунсированный обработчик скролла
     let ticking = false;
-    window.addEventListener('scroll', function() {
+    window.addEventListener('scroll', () => {
         if (!ticking) {
-            window.requestAnimationFrame(function() {
+            requestAnimationFrame(() => {
                 highlightActiveTOC();
                 ticking = false;
             });
             ticking = true;
         }
-    });
-    
-    // Подсвечиваем первый элемент при загрузке
-    highlightActiveTOC();
+    }, { passive: true });
 });

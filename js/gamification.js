@@ -4,13 +4,13 @@
 
 class GameSystem {
     constructor() {
-        this.coins = parseInt(localStorage.getItem('cpp_coins') || '0');
-        this.xp = parseInt(localStorage.getItem('cpp_xp') || '0');
-        this.level = parseInt(localStorage.getItem('cpp_level') || '1');
-        this.achievements = JSON.parse(localStorage.getItem('cpp_achievements') || '[]');
-        this.quests = this.initializeQuests();
+        // this.coins = parseInt(localStorage.getItem('cpp_coins') || '0');
+        // this.xp = parseInt(localStorage.getItem('cpp_xp') || '0');
+        // this.level = parseInt(localStorage.getItem('cpp_level') || '1');
+        // this.achievements = JSON.parse(localStorage.getItem('cpp_achievements') || '[]');
+        // this.quests = this.initializeQuests();
         
-        this.init();
+        // this.init();
     }
     
     init() {

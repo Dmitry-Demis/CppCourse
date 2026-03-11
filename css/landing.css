@@ -218,6 +218,35 @@
     margin-top: var(--space-4);
 }
 
+/* Chapter Topics List */
+.chapter-topics {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-primary);
+}
+
+.chapter-topics .topic-item {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--accent-blue);
+    margin-bottom: var(--space-2);
+}
+
+.chapter-topics .topic-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+
+.chapter-topics .topic-list span {
+    font-size: var(--fs-xs);
+    color: var(--text-tertiary);
+    padding: var(--space-1) var(--space-2);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+}
+
 /* === Features Section === */
 .features-section {
     padding: var(--space-16) var(--space-6);

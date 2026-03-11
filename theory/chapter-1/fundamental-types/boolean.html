@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1.5 Логический тип bool — Курс C++</title>
+    <meta name="description" content="Тип bool в C++: true/false, преобразования, логические операторы, boolalpha, применение в условиях и флагах.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Глава I. Фундаментальные типы</div>
+                <ul class="sidebar-nav" id="course-nav">
+                    <!-- navigation.js заполнит динамически -->
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.1.5</div>
+                <h1>Логический тип bool</h1>
+
+                <p>
+                    Тип <code>bool</code> — простейший из фундаментальных типов: он принимает всего
+                    два значения — <code>true</code> и <code>false</code>. Несмотря на кажущуюся тривиальность,
+                    понимание <span class="key-term">правил преобразований</span> и поведения в выражениях
+                    предотвращает целый класс трудноуловимых ошибок.
+                </p>
+
+                <!-- ══════════════════════════════════════════════════ -->
+                <h2 id="bool-basics">1. Основы типа bool</h2>
+
+                <div class="iso-quote">
+                    <span class="iso-ref">[basic.fundamental] §6.7.1 — ISO/IEC 14882</span>
+                    Values of type bool are either true or false.
+                    A value of type bool participates in integral promotions.
+                    An rvalue of type bool converted to type int, with false becoming zero and true becoming one.
+                </div>
+
+                <div class="type-specs">
+                    <div class="type-spec">
+                        <span class="type-spec-label">Значения</span>
+                        <span class="type-spec-value">true (1) и false (0)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">Размер</span>
+                        <span class="type-spec-value">обычно 1 байт (стандарт не фиксирует)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">true → int</span>
+                        <span class="type-spec-value">1 (гарантировано)</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">false → int</span>
+                        <span class="type-spec-value">0 (гарантировано)</span>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    bool t = true;
+    bool f = false;
+
+    // По умолчанию cout выводит 1/0
+    std::cout &lt;&lt; "true  = " &lt;&lt; t &lt;&lt; '\n'; // 1
+    std::cout &lt;&lt; "false = " &lt;&lt; f &lt;&lt; '\n'; // 0
+
+    // С boolalpha выводится "true"/"false"
+    std::cout &lt;&lt; std::boolalpha;
+    std::cout &lt;&lt; "true  = " &lt;&lt; t &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; "false = " &lt;&lt; f &lt;&lt; '\n'; // false
+
+    // bool в арифметике — интегральное повышение до int
+    std::cout &lt;&lt; std::noboolalpha;
+    std::cout &lt;&lt; "true + true = "  &lt;&lt; (t + t) &lt;&lt; '\n'; // 2
+    std::cout &lt;&lt; "true * 5    = "  &lt;&lt; (t * 5) &lt;&lt; '\n'; // 5
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── Преобразования ── -->
+                <h2 id="conversions">2. Преобразования в bool и из bool</h2>
+
+                <p>
+                    Любой тип неявно преобразуется в <code>bool</code> по правилу:
+                    <strong>нулевое/пустое/нулевой указатель → false, всё остальное → true</strong>.
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Значение</th><th>→ bool</th><th>Пример</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>0</code> (int)</td><td><code>false</code></td><td><code>bool b = 0;</code></td></tr>
+                            <tr><td>Любое ненулевое число</td><td><code>true</code></td><td><code>bool b = 42;</code> → <code>true</code></td></tr>
+                            <tr><td><code>0.0</code> (double)</td><td><code>false</code></td><td><code>bool b = 0.0;</code></td></tr>
+                            <tr><td><code>nullptr</code></td><td><code>false</code></td><td><code>bool b = nullptr;</code></td></tr>
+                            <tr><td>Ненулевой указатель</td><td><code>true</code></td><td><code>bool b = &x;</code></td></tr>
+                            <tr><td><code>""</code> (пустая строка)</td><td><code>true</code> (!)</td><td>Строковый литерал — это указатель, ≠ nullptr</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    std::cout &lt;&lt; std::boolalpha;
+
+    // int → bool
+    bool b1 = 0;    // false
+    bool b2 = 1;    // true
+    bool b3 = -42;  // true  (ненулевое!)
+    bool b4 = 100;  // true
+
+    std::cout &lt;&lt; b1 &lt;&lt; ' ' &lt;&lt; b2 &lt;&lt; ' ' &lt;&lt; b3 &lt;&lt; ' ' &lt;&lt; b4 &lt;&lt; '\n';
+    // false true true true
+
+    // double → bool
+    bool b5 = 0.0;   // false
+    bool b6 = 0.001; // true
+
+    // Указатель → bool
+    int x = 5;
+    bool b7 = nullptr; // false
+    bool b8 = &x;      // true
+
+    std::cout &lt;&lt; b5 &lt;&lt; ' ' &lt;&lt; b6 &lt;&lt; ' ' &lt;&lt; b7 &lt;&lt; ' ' &lt;&lt; b8 &lt;&lt; '\n';
+    // false true false true
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── Логические операторы ── -->
+                <h2 id="logical-ops">3. Логические операторы</h2>
+
+                <p>
+                    Результат операторов сравнения и логических операторов всегда имеет тип <code>bool</code>:
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Оператор</th><th>Описание</th><th>Пример</th><th>Результат</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>&&</code></td><td>Логическое И</td><td><code>true && false</code></td><td><code>false</code></td></tr>
+                            <tr><td><code>||</code></td><td>Логическое ИЛИ</td><td><code>true || false</code></td><td><code>true</code></td></tr>
+                            <tr><td><code>!</code></td><td>Логическое НЕ</td><td><code>!true</code></td><td><code>false</code></td></tr>
+                            <tr><td><code>==</code></td><td>Равно</td><td><code>3 == 3</code></td><td><code>true</code></td></tr>
+                            <tr><td><code>!=</code></td><td>Не равно</td><td><code>3 != 4</code></td><td><code>true</code></td></tr>
+                            <tr><td><code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></td><td>Сравнение</td><td><code>3 &lt; 5</code></td><td><code>true</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int a = 5, b = 10;
+    std::cout &lt;&lt; std::boolalpha;
+
+    // Операторы сравнения возвращают bool
+    std::cout &lt;&lt; (a &lt; b)  &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; (a == b) &lt;&lt; '\n'; // false
+    std::cout &lt;&lt; (a != b) &lt;&lt; '\n'; // true
+
+    // Логические операторы — ленивые вычисления (short-circuit)
+    bool flag = (a &gt; 0) &amp;&amp; (b &lt; 100); // оба выполняются
+    bool lazy = (a &lt; 0) &amp;&amp; (b &lt; 100); // правая часть НЕ вычисляется!
+
+    std::cout &lt;&lt; flag &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; lazy &lt;&lt; '\n'; // false (b&lt;100 не вычислялось)
+
+    // Практический пример: защита от деления на ноль
+    int divisor = 0;
+    if (divisor != 0 &amp;&amp; a / divisor &gt; 2) { /* безопасно */ }
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div id="compiler-bool"></div>
+
+                <div class="note-card">
+                    <div class="note-card__title">📌 Ленивые вычисления (short-circuit evaluation)</div>
+                    <p>
+                        Оператор <code>&&</code>: если левая часть <code>false</code> — правая <em>не вычисляется</em>.<br>
+                        Оператор <code>||</code>: если левая часть <code>true</code> — правая <em>не вычисляется</em>.<br>
+                        Это фундаментальный механизм защиты от ошибок (деление на ноль, нулевой указатель).
+                    </p>
+                </div>
+
+                <!-- ── Типичные паттерны ── -->
+                <h2 id="patterns">4. Типичные паттерны использования</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+// Функции, возвращающие bool — семантически чистее int
+bool isPrime(int n) {
+    if (n &lt; 2) return false;
+    for (int i = 2; i * i &lt;= n; ++i)
+        if (n % i == 0) return false;
+    return true;
+}
+
+bool isValidAge(int age) {
+    return age &gt;= 0 &amp;&amp; age &lt;= 150;
+}
+
+int main() {
+    // Флаги-bool для управления состоянием
+    bool found = false;
+    bool isRunning = true;
+
+    // Цикл с bool-флагом
+    int arr[] = {1, 5, 3, 7, 2};
+    for (int x : arr) {
+        if (x == 3) { found = true; break; }
+    }
+
+    std::cout &lt;&lt; std::boolalpha;
+    std::cout &lt;&lt; "found: "   &lt;&lt; found       &lt;&lt; '\n';
+    std::cout &lt;&lt; "isPrime(7): " &lt;&lt; isPrime(7) &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; "isPrime(9): " &lt;&lt; isPrime(9) &lt;&lt; '\n'; // false
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">✅ Ключевые выводы</div>
+                    <p>
+                        • <code>bool</code> принимает только <code>true</code> (1) и <code>false</code> (0).<br>
+                        • Любое ненулевое значение → <code>true</code>; ноль и <code>nullptr</code> → <code>false</code>.<br>
+                        • <code>std::boolalpha</code> переключает вывод на "true"/"false".<br>
+                        • Логические операторы <code>&&</code> и <code>||</code> — ленивые: правая часть может не вычисляться.<br>
+                        • Результат сравнений (<code>==</code>, <code>&lt;</code> и др.) всегда <code>bool</code>.
+                    </p>
+                </div>
+
+                <!-- Мини-тест -->
+                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
+                <p>10 вопросов по типам bool и void.</p>
+                <div id="quiz-bool"></div>
+
+                <!-- Навигация -->
+                <div class="paragraph-nav">
+                    <a href="character-types.html" class="nav-prev">
+                        <span class="nav-dir">← Назад</span>
+                        <span class="nav-name">§1.1.4 Символьные типы</span>
+                    </a>
+                    <a href="introduction-to-fundamental-data-types.html" class="nav-next">
+                        <span class="nav-dir">↑ К параграфу</span>
+                        <span class="nav-name">§1.1 Фундаментальные типы — обзор</span>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', function () {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof CppCompiler !== 'undefined') {
+            new CppCompiler('compiler-bool',
+`#include <iostream>
+
+int main() {
+    std::cout << std::boolalpha;
+
+    // Преобразования в bool
+    std::cout << "0 -> " << (bool)0   << "\\n"; // false
+    std::cout << "1 -> " << (bool)1   << "\\n"; // true
+    std::cout << "42-> " << (bool)42  << "\\n"; // true
+
+    // Арифметика
+    std::cout << std::noboolalpha;
+    bool t = true, f = false;
+    std::cout << "true+true = " << (t+t) << "\\n"; // 2
+    std::cout << "true*5    = " << (t*5) << "\\n"; // 5
+
+    // Short-circuit
+    std::cout << std::boolalpha;
+    int divisor = 0;
+    bool safe = (divisor != 0) && (10 / divisor > 2);
+    std::cout << "safe div: " << safe << "\\n"; // false (без краша)
+    return 0;
+}`);
+        }
+
+        if (typeof boolVoidQuestions !== 'undefined') {
+            new Quiz('quiz-bool', boolVoidQuestions, {
+                quizId: 'bool-mini',
+                title: 'Мини-тест: bool и void',
+                type: 'mini'
+            });
+        }
+    });
+    </script>
+
+</body>
+</html>
