@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1.10. Преобразование типов и static_cast — Курс C++</title>
+    <meta name="description" content="Преобразование типов в C++: неявные и явные преобразования, static_cast, сужающие преобразования и потеря данных.">
+
+    <!-- Prism.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = { tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="../../../profile.html">Профиль</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Глава I. Фундаментальные типы</div>
+                <ul class="sidebar-nav" id="course-nav">
+                    <!-- navigation.js заполнит динамически из course-structure.json -->
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.1.10</div>
+                <h1>Преобразование типов и static_cast</h1>
+
+                <p>
+                    В C++ значения разных типов часто нужно комбинировать: складывать <code>int</code> с <code>double</code>,
+                    присваивать <code>long</code> в <code>short</code>, передавать <code>float</code> в функцию,
+                    ожидающую <code>int</code>. Компилятор автоматически выполняет <span class="key-term">преобразования типов</span>,
+                    но не все они безопасны. В этом разделе мы разберём, как работают неявные и явные преобразования,
+                    и когда использовать <code>static_cast</code>.
+                </p>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="implicit-conversion">1. Неявное преобразование типов</h2>
+
+                <div class="definition" data-label="Определение">
+                    <p>
+                        <strong>Неявное преобразование типов</strong> (implicit type conversion) — автоматическое
+                        преобразование значения из одного типа в другой, выполняемое компилятором без явного указания
+                        программиста. Также называется <strong>автоматическим преобразованием</strong> или
+                        <strong>приведением типов</strong> (type coercion).
+                    </p>
+                </div>
+
+                <h3>1.1. Расширяющие преобразования (Widening conversions)</h3>
+
+                <p>
+                    <strong>Расширяющие преобразования</strong> — преобразования, при которых значение меньшего типа
+                    помещается в больший тип без потери данных:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int i = 42;
+    double d = i;  // int → double (расширяющее преобразование)
+    
+    std::cout &lt;&lt; "i = " &lt;&lt; i &lt;&lt; '\n';  // 42
+    std::cout &lt;&lt; "d = " &lt;&lt; d &lt;&lt; '\n';  // 42.0
+    
+    // Безопасные расширяющие преобразования:
+    short s = 100;
+    int i2 = s;        // short → int ✅
+    long l = i2;       // int → long ✅
+    long long ll = l;  // long → long long ✅
+    
+    float f = 3.14f;
+    double d2 = f;     // float → double ✅
+    
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">Безопасные расширяющие преобразования</div>
+                    <p>
+                        Расширяющие преобразования между целочисленными типами ($\text{short} \to \text{int} \to \text{long} \to \text{long long}$)
+                        и от <code>float</code> к <code>double</code> всегда безопасны — значение сохраняется точно.
+                    </p>
+                </div>
+
+                <h3>1.2. Сужающие преобразования (Narrowing conversions)</h3>
+
+                <p>
+                    <strong>Сужающие преобразования</strong> — преобразования, при которых значение большего типа
+                    помещается в меньший тип. Это может привести к <strong>потере данных</strong>:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    double d = 3.14159;
+    int i = d;  // double → int (сужающее преобразование)
+    
+    std::cout &lt;&lt; "d = " &lt;&lt; d &lt;&lt; '\n';  // 3.14159
+    std::cout &lt;&lt; "i = " &lt;&lt; i &lt;&lt; '\n';  // 3 (дробная часть отброшена!)
+    
+    // Опасные сужающие преобразования:
+    int big = 100000;
+    short s = big;  // int → short (переполнение!)
+    
+    std::cout &lt;&lt; "big = " &lt;&lt; big &lt;&lt; '\n';  // 100000
+    std::cout &lt;&lt; "s = "   &lt;&lt; s   &lt;&lt; '\n';  // -31072 (неопределённое поведение!)
+    
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Опасность сужающих преобразований</div>
+                    <p>
+                        Сужающие преобразования могут привести к:
+                    </p>
+                    <ul style="margin:0;padding-left:var(--space-4);">
+                        <li><strong>Потере точности</strong>: $3.14159 \to 3$</li>
+                        <li><strong>Переполнению</strong>: $100\,000$ не помещается в <code>short</code> (макс. $32\,767$)</li>
+                        <li><strong>Неопределённому поведению</strong>: результат непредсказуем</li>
+                    </ul>
+                </div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="explicit-conversion">2. Явное преобразование типов</h2>
+
+                <p>
+                    Чтобы сделать преобразование типов явным и показать, что вы осознаёте возможную потерю данных,
+                    используйте <strong>явное приведение типов</strong> (explicit type casting).
+                </p>
+
+                <h3>2.1. C-style cast (устаревший)</h3>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — C-style cast</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">double d = 3.14;
+int i = (int)d;  // C-style cast (не рекомендуется в C++)</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Не используйте C-style cast в C++</div>
+                    <p>
+                        C-style cast <code>(int)value</code> слишком мощный и может выполнять опасные преобразования
+                        (например, <code>reinterpret_cast</code>). В C++ используйте <code>static_cast</code>.
+                    </p>
+                </div>
+
+                <h3>2.2. static_cast — безопасное явное преобразование</h3>
+
+                <div class="definition" data-label="Определение">
+                    <p>
+                        <strong>static_cast</strong> — оператор явного преобразования типов в C++, выполняющий
+                        проверки на этапе компиляции. Используется для безопасных преобразований между
+                        совместимыми типами.
+                    </p>
+                </div>
+
+                <p>Синтаксис:</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">static_cast&lt;новый_тип&gt;(выражение)</code></pre>
+                    </div>
+                </div>
+
+                <p>Примеры:</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    // 1. Явное преобразование double → int
+    double d = 3.14159;
+    int i = static_cast&lt;int&gt;(d);
+    std::cout &lt;&lt; "d = " &lt;&lt; d &lt;&lt; ", i = " &lt;&lt; i &lt;&lt; '\n';  // d = 3.14159, i = 3
+    
+    // 2. Явное преобразование int → double для точного деления
+    int a = 7;
+    int b = 2;
+    
+    double result1 = a / b;  // 3 (целочисленное деление!)
+    double result2 = static_cast&lt;double&gt;(a) / b;  // 3.5 (правильно!)
+    
+    std::cout &lt;&lt; "7 / 2 = " &lt;&lt; result1 &lt;&lt; '\n';  // 3
+    std::cout &lt;&lt; "7.0 / 2 = " &lt;&lt; result2 &lt;&lt; '\n';  // 3.5
+    
+    // 3. Явное преобразование char → int
+    char ch = 'A';
+    int ascii = static_cast&lt;int&gt;(ch);
+    std::cout &lt;&lt; "Символ '" &lt;&lt; ch &lt;&lt; "' имеет код " &lt;&lt; ascii &lt;&lt; '\n';  // 65
+    
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div id="compiler-static-cast"></div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="numeric-promotion">3. Числовые повышения (Numeric promotions)</h2>
+
+                <p>
+                    При выполнении арифметических операций компилятор автоматически повышает типы операндов
+                    до более широкого типа:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;typeinfo&gt;
+
+int main() {
+    short s1 = 10;
+    short s2 = 20;
+    
+    // short + short → int + int → int
+    auto result = s1 + s2;
+    
+    std::cout &lt;&lt; "Тип result: " &lt;&lt; typeid(result).name() &lt;&lt; '\n';  // int
+    std::cout &lt;&lt; "result = " &lt;&lt; result &lt;&lt; '\n';  // 30
+    
+    // Смешанные типы: int + double → double + double → double
+    int i = 5;
+    double d = 2.5;
+    auto result2 = i + d;
+    
+    std::cout &lt;&lt; "Тип result2: " &lt;&lt; typeid(result2).name() &lt;&lt; '\n';  // double
+    std::cout &lt;&lt; "result2 = " &lt;&lt; result2 &lt;&lt; '\n';  // 7.5
+    
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">Правила числовых повышений</div>
+                    <p>
+                        При арифметических операциях компилятор повышает типы в следующем порядке:
+                    </p>
+                    <p style="text-align:center;margin-top:var(--space-3);">
+                        $\text{char/short} \to \text{int} \to \text{long} \to \text{long long} \to \text{float} \to \text{double} \to \text{long double}$
+                    </p>
+                    <p style="margin-top:var(--space-3);">
+                        Результат операции имеет тип наиболее широкого операнда.
+                    </p>
+                </div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="brace-init">4. Brace-initialization и защита от сужения</h2>
+
+                <p>
+                    C++11 ввёл <strong>uniform initialization</strong> (инициализацию фигурными скобками),
+                    которая <strong>запрещает сужающие преобразования</strong> на этапе компиляции:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    // Старый стиль — разрешает сужающие преобразования
+    int i1 = 3.14;  // ✅ компилируется, но теряется точность
+    std::cout &lt;&lt; "i1 = " &lt;&lt; i1 &lt;&lt; '\n';  // 3
+    
+    // Brace-init — запрещает сужающие преобразования
+    // int i2{3.14};  // ❌ ошибка компиляции: narrowing conversion
+    
+    // Явное преобразование с brace-init
+    int i3{static_cast&lt;int&gt;(3.14)};  // ✅ OK, явно указано
+    std::cout &lt;&lt; "i3 = " &lt;&lt; i3 &lt;&lt; '\n';  // 3
+    
+    // Переполнение тоже запрещено
+    // short s{100000};  // ❌ ошибка: 100000 не помещается в short
+    
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">Рекомендация: используйте brace-init</div>
+                    <p>
+                        Всегда используйте <code>{}</code> для инициализации переменных — это защитит вас
+                        от случайных сужающих преобразований и потери данных.
+                    </p>
+                </div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="common-pitfalls">5. Частые ошибки</h2>
+
+                <h3>5.1. Целочисленное деление</h3>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int a = 7;
+    int b = 2;
+    
+    // ❌ НЕПРАВИЛЬНО: int / int = int
+    double result1 = a / b;
+    std::cout &lt;&lt; "7 / 2 = " &lt;&lt; result1 &lt;&lt; '\n';  // 3.0 (не 3.5!)
+    
+    // ✅ ПРАВИЛЬНО: преобразуем хотя бы один операнд в double
+    double result2 = static_cast&lt;double&gt;(a) / b;
+    std::cout &lt;&lt; "7.0 / 2 = " &lt;&lt; result2 &lt;&lt; '\n';  // 3.5
+    
+    // Альтернатива: умножение на 1.0
+    double result3 = 1.0 * a / b;
+    std::cout &lt;&lt; "1.0 * 7 / 2 = " &lt;&lt; result3 &lt;&lt; '\n';  // 3.5
+    
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h3>5.2. Переполнение при преобразовании</h3>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions">
+                            <button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    int big = 100000;
+    
+    // ❌ Переполнение: 100000 не помещается в short (макс. 32767)
+    short s = static_cast&lt;short&gt;(big);
+    std::cout &lt;&lt; "big = " &lt;&lt; big &lt;&lt; '\n';  // 100000
+    std::cout &lt;&lt; "s = " &lt;&lt; s &lt;&lt; '\n';      // -31072 (неопределённое поведение!)
+    
+    // ✅ Проверка перед преобразованием
+    if (big &lt;= std::numeric_limits&lt;short&gt;::max() &amp;&amp; 
+        big &gt;= std::numeric_limits&lt;short&gt;::min()) {
+        short safe = static_cast&lt;short&gt;(big);
+        std::cout &lt;&lt; "Безопасное преобразование: " &lt;&lt; safe &lt;&lt; '\n';
+    } else {
+        std::cout &lt;&lt; "Ошибка: значение не помещается в short!\n";
+    }
+    
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ════════════════════════════════════════════ -->
+                <h2 id="summary">Заключение</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">Ключевые моменты</div>
+                    <ul style="margin:0;padding-left:var(--space-4);">
+                        <li><strong>Неявные преобразования</strong> выполняются автоматически, но могут быть опасны</li>
+                        <li><strong>Расширяющие преобразования</strong> безопасны (short → int → long)</li>
+                        <li><strong>Сужающие преобразования</strong> могут привести к потере данных</li>
+                        <li>Используйте <code>static_cast&lt;T&gt;()</code> для явных преобразований</li>
+                        <li>Избегайте C-style cast <code>(int)value</code> в C++</li>
+                        <li>Используйте <code>{}</code> для инициализации — защита от сужения</li>
+                        <li>Проверяйте диапазоны перед преобразованием в меньший тип</li>
+                    </ul>
+                </div>
+
+                <div class="iso-quote">
+                    <span class="iso-ref">ISO/IEC 14882 — [expr.static.cast] §7.6.1.9</span>
+                    «The result of the expression static_cast&lt;T&gt;(v) is the result of converting the value
+                    of v to type T. If T is a reference type, the result is an lvalue; otherwise, the result
+                    is a prvalue.»
+                </div>
+
+            </div>
+
+            <!-- Navigation -->
+            <nav class="lesson-nav">
+                <a href="sizeof-operator.html" class="lesson-nav__prev">
+                    <span class="lesson-nav__label">← Предыдущий урок</span>
+                    <span class="lesson-nav__title">Оператор sizeof</span>
+                </a>
+                <a href="../../../index.html" class="lesson-nav__next">
+                    <span class="lesson-nav__label">Следующий урок →</span>
+                    <span class="lesson-nav__title">Вернуться к главам</span>
+                </a>
+            </nav>
+
+        </main>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/progress.js"></script>
+    <script src="../../../js/mobile-menu.js"></script>
+    <script src="../../../js/code-copy.js"></script>
+    <script src="../../../js/compiler.js"></script>
+
+</body>
+</html>

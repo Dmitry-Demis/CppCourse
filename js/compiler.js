@@ -243,13 +243,55 @@ class CppCompiler {
 function createCompilerFromCodeBlock(codeBlockId, compilerId) {
     const codeBlock = document.getElementById(codeBlockId);
     if (!codeBlock) return;
-    
+
     const code = codeBlock.querySelector('code').textContent;
-    
+
     // Create compiler container after code block
     const compilerContainer = document.createElement('div');
     compilerContainer.id = compilerId;
     codeBlock.parentNode.insertBefore(compilerContainer, codeBlock.nextSibling);
-    
+
     new CppCompiler(compilerId, code);
 }
+
+// ── Авто-кнопки «▶ Запустить» для каждого блока кода C++ ──
+function initAutoRunButtons() {
+    document.querySelectorAll('.code-block').forEach((block, i) => {
+        const codeEl = block.querySelector('pre code');
+        if (!codeEl) return;
+
+        // Пропускаем не-C++ блоки (без class вообще или явно не cpp)
+        const cls = codeEl.className;
+        if (cls && !cls.includes('language-cpp') && !cls.includes('cpp') && !cls.includes('c++')) return;
+
+        // Не добавляем кнопку дважды
+        const actions = block.querySelector('.code-actions');
+        if (!actions || actions.querySelector('.btn-run')) return;
+
+        const code = codeEl.textContent;
+        const compilerId = `auto-compiler-${i}`;
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-code btn-run';
+        btn.textContent = '▶ Запустить';
+        btn.addEventListener('click', () => toggleAutoCompiler(block, code, compilerId, btn));
+        actions.appendChild(btn);
+    });
+}
+
+function toggleAutoCompiler(block, code, compilerId, btn) {
+    let container = document.getElementById(compilerId);
+    if (container) {
+        const hidden = container.style.display === 'none';
+        container.style.display = hidden ? '' : 'none';
+        btn.textContent = hidden ? '▼ Скрыть' : '▶ Запустить';
+        return;
+    }
+    container = document.createElement('div');
+    container.id = compilerId;
+    block.insertAdjacentElement('afterend', container);
+    btn.textContent = '▼ Скрыть';
+    new CppCompiler(compilerId, code);
+}
+
+document.addEventListener('DOMContentLoaded', () => initAutoRunButtons());

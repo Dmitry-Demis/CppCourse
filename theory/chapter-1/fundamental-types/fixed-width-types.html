@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1.5 Типы с фиксированным размером — Курс C++</title>
+    <meta name="description" content="Типы с фиксированным размером в C++: &lt;cstdint&gt;, int32_t, uint64_t, size_t, std::numeric_limits — когда и зачем использовать.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <script>
+        MathJax = { tex: { inlineMath:[['$','$'],['\\(','\\)']] }, svg:{fontCache:'global'} };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+
+    <style>
+        .std-badge--14 { background: #4a3f1a; color: #f9e2af; }
+        .std-badge--17 { background: #1e3a4f; color: #89dceb; }
+        .std-badge--20 { background: #2a1e4f; color: #cba6f7; }
+        .std-badge--23 { background: #3d1e3d; color: #f5c2e7; }
+    </style>
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.1.5</div>
+                <h1>Типы с фиксированным размером</h1>
+
+                <p>
+                    Стандарт C++ не гарантирует точных размеров для <code>int</code>, <code>long</code>
+                    и других базовых типов. Когда точный размер критичен — сетевые протоколы, бинарные
+                    форматы, аппаратные регистры — используйте типы из <code>&lt;cstdint&gt;</code>.
+                </p>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="cstdint">1. Заголовок &lt;cstdint&gt;</h2>
+
+                <div class="iso-quote">
+                    <span class="iso-ref">[cstdint.syn] — ISO/IEC 14882:2020</span>
+                    The header &lt;cstdint&gt; defines all functions, types, and macros
+                    the same as the C standard library header &lt;stdint.h&gt;.
+                </div>
+
+                <p>Типы делятся на четыре категории:</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Размер</th>
+                                <th>Знаковость</th>
+                                <th>Диапазон / max</th>
+                                <th>Применение</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="5" style="background:rgba(137,180,250,.08);font-style:italic;color:var(--text-muted,#6c7086)">— Точный размер (exact-width) —</td></tr>
+                            <tr>
+                                <td><code>int8_t</code></td><td>8 бит</td><td>signed</td>
+                                <td>−128 … 127</td>
+                                <td>Аппаратные регистры, компактные флаги</td>
+                            </tr>
+                            <tr>
+                                <td><code>uint8_t</code></td><td>8 бит</td><td>unsigned</td>
+                                <td>0 … 255</td>
+                                <td>Байт данных, пиксель, байт буфера</td>
+                            </tr>
+                            <tr>
+                                <td><code>int16_t</code></td><td>16 бит</td><td>signed</td>
+                                <td>−32 768 … 32 767</td>
+                                <td>Аудио-сэмпл PCM 16-bit</td>
+                            </tr>
+                            <tr>
+                                <td><code>uint16_t</code></td><td>16 бит</td><td>unsigned</td>
+                                <td>0 … 65 535</td>
+                                <td>Порт TCP/UDP, Unicode codepoint (BMP)</td>
+                            </tr>
+                            <tr>
+                                <td><code>int32_t</code></td><td>32 бита</td><td>signed</td>
+                                <td>±2.1×10⁹</td>
+                                <td>IPv4-адрес, цвет ARGB</td>
+                            </tr>
+                            <tr>
+                                <td><code>uint32_t</code></td><td>32 бита</td><td>unsigned</td>
+                                <td>0 … 4.3×10⁹</td>
+                                <td>CRC32, хеш-значения</td>
+                            </tr>
+                            <tr>
+                                <td><code>int64_t</code></td><td>64 бита</td><td>signed</td>
+                                <td>±9.2×10¹⁸</td>
+                                <td>Unix timestamp, ID записей в БД</td>
+                            </tr>
+                            <tr>
+                                <td><code>uint64_t</code></td><td>64 бита</td><td>unsigned</td>
+                                <td>0 … 18.4×10¹⁸</td>
+                                <td>64-битная маска, SHA-256 слово</td>
+                            </tr>
+                            <tr><td colspan="5" style="background:rgba(137,180,250,.08);font-style:italic;color:var(--text-muted,#6c7086)">— Минимальный размер (least-width) —</td></tr>
+                            <tr>
+                                <td><code>int_least8_t</code></td><td>≥8 бит</td><td>signed</td>
+                                <td colspan="2">Гарантирует хотя бы 8 бит; может быть шире</td>
+                            </tr>
+                            <tr><td colspan="5" style="background:rgba(137,180,250,.08);font-style:italic;color:var(--text-muted,#6c7086)">— Быстрейший тип заданного минимума (fast) —</td></tr>
+                            <tr>
+                                <td><code>int_fast8_t</code></td><td>≥8 бит</td><td>signed</td>
+                                <td colspan="2">Самый быстрый тип, вмещающий ≥8 бит (часто 32 или 64)</td>
+                            </tr>
+                            <tr><td colspan="5" style="background:rgba(137,180,250,.08);font-style:italic;color:var(--text-muted,#6c7086)">— Pointer-sized типы —</td></tr>
+                            <tr>
+                                <td><code>intptr_t</code></td><td>≥sizeof(void*)</td><td>signed</td>
+                                <td>платформенный</td>
+                                <td>Хранение указателя как числа</td>
+                            </tr>
+                            <tr>
+                                <td><code>uintptr_t</code></td><td>≥sizeof(void*)</td><td>unsigned</td>
+                                <td>платформенный</td>
+                                <td>Адресная арифметика</td>
+                            </tr>
+                            <tr>
+                                <td><code>std::size_t</code></td><td>≥sizeof(void*)</td><td>unsigned</td>
+                                <td>0 … platform max</td>
+                                <td>Размеры объектов, индексы контейнеров</td>
+                            </tr>
+                            <tr>
+                                <td><code>std::ptrdiff_t</code></td><td>≥sizeof(void*)</td><td>signed</td>
+                                <td>платформенный</td>
+                                <td>Разность двух указателей</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/17/20 — &lt;cstdint&gt; на практике</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cstdint&gt;
+#include &lt;format&gt;   // C++20
+
+// Бинарный заголовок BMP: каждое поле — точный размер
+#pragma pack(push, 1)
+struct BitmapFileHeader {
+    uint16_t signature{0x4D42};   // "BM"
+    uint32_t fileSize{};
+    uint32_t reserved{};
+    uint32_t dataOffset{};
+};
+#pragma pack(pop)
+
+int main() {
+    // C++11: static_assert проверяет размер на этапе компиляции
+    static_assert(sizeof(BitmapFileHeader) == 14, "BMP header must be 14 bytes");
+    static_assert(sizeof(int32_t)  == 4);
+    static_assert(sizeof(uint64_t) == 8);
+
+    // C++14: digit separators
+    uint64_t timestamp{1'710'000'000'000ULL};  // ms с Unix epoch
+
+    // C++17: structured bindings (пример с парой)
+    auto [lo, hi] = std::pair{uint32_t{0xDEAD'BEEFu}, uint32_t{0xCAFE'BABEu}};
+
+    // C++20: std::format с hex
+    std::cout &lt;&lt; std::format("lo = {:#010x}, hi = {:#010x}\n", lo, hi);
+    std::cout &lt;&lt; std::format("timestamp = {}\n", timestamp);
+
+    // size_t для контейнеров и sizeof
+    std::size_t bufSize{1024};
+    std::cout &lt;&lt; std::format("bufSize = {} bytes\n", bufSize);
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="numeric-limits">2. std::numeric_limits — интроспекция типов</h2>
+
+                <p>
+                    Шаблон <code>std::numeric_limits&lt;T&gt;</code> из <code>&lt;limits&gt;</code>
+                    предоставляет compile-time константы для любого числового типа.
+                    Это переносимый способ узнать диапазон без «магических чисел».
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Член</th><th>Тип возврата</th><th>Описание</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>min()</code></td><td><code>T</code></td><td>Минимальное значение (для float — минимум по модулю &gt; 0)</td></tr>
+                            <tr><td><code>max()</code></td><td><code>T</code></td><td>Максимальное конечное значение</td></tr>
+                            <tr><td><code>lowest()</code></td><td><code>T</code></td><td>Наименьшее конечное значение (= min() для целых, -max() для float)</td></tr>
+                            <tr><td><code>digits</code></td><td><code>int</code></td><td>Количество значащих бит (без знака)</td></tr>
+                            <tr><td><code>is_signed</code></td><td><code>bool</code></td><td>true для знаковых типов</td></tr>
+                            <tr><td><code>is_integer</code></td><td><code>bool</code></td><td>true для целочисленных типов</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/23 — std::numeric_limits</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;cstdint&gt;
+#include &lt;print&gt;    // C++23
+
+template&lt;typename T&gt;
+void showType(const char* name) {
+    using nl = std::numeric_limits&lt;T&gt;;
+    std::print("{:25s}: {:2d}b  signed={:1}  min={:25}  max={}\n",
+        name,
+        sizeof(T),
+        nl::is_signed,
+        (long long)nl::min(),
+        (unsigned long long)nl::max()
+    );
+}
+
+int main() {
+    showType&lt;int8_t&gt;  ("int8_t");
+    showType&lt;uint8_t&gt; ("uint8_t");
+    showType&lt;int16_t&gt; ("int16_t");
+    showType&lt;int32_t&gt; ("int32_t");
+    showType&lt;int64_t&gt; ("int64_t");
+    showType&lt;uint64_t&gt;("uint64_t");
+    showType&lt;short&gt;   ("short");
+    showType&lt;int&gt;     ("int");
+    showType&lt;long&gt;    ("long");
+    showType&lt;long long&gt;("long long");
+
+    // Compile-time использование:
+    constexpr int MAX_SCORE = std::numeric_limits&lt;int&gt;::max();
+    static_assert(MAX_SCORE == 2'147'483'647);
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div id="compiler-fixedwidth"></div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="when-to-use">3. Когда использовать fixed-width типы?</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">✅ Используйте int32_t / uint8_t когда:</div>
+                    <ul>
+                        <li><strong>Бинарные форматы</strong> — BMP, PNG, JPEG, ZIP, ELF</li>
+                        <li><strong>Сетевые протоколы</strong> — TCP/IP заголовки, HTTP/2 frames</li>
+                        <li><strong>Аппаратные регистры</strong> — MMIO, USB, I2C, SPI</li>
+                        <li><strong>Межплатформенная совместимость</strong> — сериализация, IPC</li>
+                        <li><strong>Память критична</strong> — большие массивы uint8_t vs int</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Используйте int / long long для общего кода</div>
+                    <p>
+                        В обычном бизнес-логике: счётчики, флаги, результаты вычислений — используйте
+                        <code>int</code> (или <code>long long</code> для больших значений).
+                        Базовые типы более читаемы и часто быстрее на конкретной платформе.
+                        Fixed-width типы — для случаев, где размер имеет <em>семантическое значение</em>.
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/17/20 — выбор типа по контексту</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cstdint&gt;
+#include &lt;vector&gt;
+#include &lt;span&gt;     // C++20
+
+// ✅ Бинарный парсер: uint8_t/uint32_t — точный размер важен
+struct PngChunk {
+    uint32_t length{};     // big-endian, 4 байта
+    uint32_t type{};       // 4 ASCII-символа
+    // ... data ...
+    uint32_t crc{};        // CRC32
+};
+
+// ✅ Бизнес-логика: int — читаемо и достаточно
+int calculateScore(int base, int bonus, int penalty) {
+    return base + bonus - penalty;  // диапазон int более чем достаточен
+}
+
+// ✅ Буфер данных: span + uint8_t
+void processBuffer(std::span&lt;const uint8_t&gt; data) {  // C++20: std::span
+    std::cout &lt;&lt; "Processing " &lt;&lt; data.size() &lt;&lt; " bytes\n";
+}
+
+int main() {
+    // ✅ Правильный тип для размеров
+    std::vector&lt;int&gt; v(100);
+    for (std::size_t i{0}; i &lt; v.size(); ++i)
+        v[i] = static_cast&lt;int&gt;(i * i);
+
+    // ✅ C++20: range-based с индексом через std::views::enumerate (C++23)
+    for (auto&amp; val : v)
+        val *= 2;
+
+    std::cout &lt;&lt; "Score: " &lt;&lt; calculateScore(100, 50, 20) &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Навигация -->
+                <div class="paragraph-nav">
+                    <!-- navigation.js заполнит динамически из course-structure.json -->
+                </div>
+
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', function () {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof CppCompiler !== 'undefined') {
+            new CppCompiler('compiler-fixedwidth',
+`#include <iostream>
+#include <limits>
+#include <cstdint>
+
+template<typename T>
+void show(const char* name) {
+    using nl = std::numeric_limits<T>;
+    std::cout << name
+              << ": " << sizeof(T) << "b"
+              << "  signed=" << nl::is_signed
+              << "  min=" << (long long)nl::min()
+              << "  max=" << (unsigned long long)nl::max()
+              << "\\n";
+}
+
+int main() {
+    show<int8_t>   ("int8_t   ");
+    show<uint8_t>  ("uint8_t  ");
+    show<int16_t>  ("int16_t  ");
+    show<int32_t>  ("int32_t  ");
+    show<int64_t>  ("int64_t  ");
+    show<uint64_t> ("uint64_t ");
+    show<int>      ("int      ");
+    show<long>     ("long     ");
+    show<long long>("long long");
+
+    // static_assert на этапе компиляции
+    static_assert(sizeof(int32_t) == 4, "int32_t must be 4 bytes");
+    static_assert(sizeof(int64_t) == 8, "int64_t must be 8 bytes");
+    std::cout << "\\nAll static_asserts passed!\\n";
+
+    return 0;
+}`);
+        }
+    });
+    </script>
+
+</body>
+</html>

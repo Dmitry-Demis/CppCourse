@@ -2,7 +2,7 @@
   "course": {
     "title": "Курс C++",
     "description": "Интерактивный курс по программированию на языке C++",
-    "version": "2.1.0"
+    "version": "2.2.0"
   },
   "chapters": [
     {
@@ -34,8 +34,29 @@
               "testQuestions": 10
             },
             {
-              "id": "floating-point",
+              "id": "signed-unsigned",
               "number": "1.1.3",
+              "title": "Знаковые и беззнаковые типы",
+              "file": "theory/chapter-1/fundamental-types/signed-unsigned.html",
+              "hasTest": false
+            },
+            {
+              "id": "integer-overflow",
+              "number": "1.1.4",
+              "title": "Переполнение целых чисел",
+              "file": "theory/chapter-1/fundamental-types/integer-overflow.html",
+              "hasTest": false
+            },
+            {
+              "id": "fixed-width-types",
+              "number": "1.1.5",
+              "title": "Типы с фиксированным размером",
+              "file": "theory/chapter-1/fundamental-types/fixed-width-types.html",
+              "hasTest": false
+            },
+            {
+              "id": "floating-point",
+              "number": "1.1.6",
               "title": "Типы с плавающей точкой",
               "file": "theory/chapter-1/fundamental-types/floating-point.html",
               "hasTest": true,
@@ -43,7 +64,7 @@
             },
             {
               "id": "character-types",
-              "number": "1.1.4",
+              "number": "1.1.7",
               "title": "Символьные типы",
               "file": "theory/chapter-1/fundamental-types/character-types.html",
               "hasTest": true,
@@ -51,11 +72,25 @@
             },
             {
               "id": "boolean",
-              "number": "1.1.5",
+              "number": "1.1.8",
               "title": "Логический тип bool",
               "file": "theory/chapter-1/fundamental-types/boolean.html",
               "hasTest": true,
               "testQuestions": 10
+            },
+            {
+              "id": "sizeof-operator",
+              "number": "1.1.9",
+              "title": "Оператор sizeof",
+              "file": "theory/chapter-1/fundamental-types/sizeof-operator.html",
+              "hasTest": false
+            },
+            {
+              "id": "type-conversion",
+              "number": "1.1.10",
+              "title": "Преобразование типов и static_cast",
+              "file": "theory/chapter-1/fundamental-types/type-conversion.html",
+              "hasTest": false
             }
           ],
           "finalTest": {
@@ -85,8 +120,8 @@
       { "level": 6, "pointsRequired": 2000, "title": "Мастер C++" }
     ],
     "achievements": [
-      { "id": "fundamental-types-complete", "title": "Знаток системы типов C++",        "icon": "🔍", "paragraphId": "fundamental-types" },
-      { "id": "chapter1-complete",          "title": "Покоритель Главы I",              "icon": "🏆", "chapterId": "chapter-1" }
+      { "id": "fundamental-types-complete", "title": "Знаток системы типов C++",   "icon": "🔍", "paragraphId": "fundamental-types" },
+      { "id": "chapter1-complete",          "title": "Покоритель Главы I",          "icon": "🏆", "chapterId": "chapter-1" }
     ]
   }
 }

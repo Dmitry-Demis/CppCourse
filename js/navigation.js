@@ -1,65 +1,91 @@
 // ============================================
-// NAVIGATION SYSTEM v2 — C++ Course
+// NAVIGATION SYSTEM v3 — C++ Course
 // • Мобильное меню
-// • Динамическая боковая панель из course-structure.json
+// • Динамический левый сайдбар из course-structure.json
+// • Динамическая prev/next навигация секций
+// • Динамическая prev/next навигация параграфов
 // • Индикаторы прогресса и блокировки параграфов
-// • Кнопки «Предыдущий / Следующий параграф»
 // ============================================
 
-document.addEventListener('DOMContentLoaded', () => {
+// Вычисляем корень сайта по URL самого скрипта — работает и с file://, и с http://
+// document.currentScript доступен синхронно при разборе скрипта
+const _siteRoot = (() => {
+    const src = (document.currentScript || {}).src || '';
+    const m = src.match(/^(.*\/)js\/navigation\.js/);
+    return m ? m[1] : './';
+})();
+
+// ── Highlight.js — подключается один раз отсюда, не нужен в каждом HTML ──
+(function () {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js';
+    s.onload = () => {
+        // Скрипты в конце <body>: DOM уже разобран, но DOMContentLoaded ещё не сработал
+        if (document.readyState !== 'loading') {
+            hljs.highlightAll();
+        } else {
+            document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());
+        }
+    };
+    document.head.appendChild(s);
+}());
+
+document.addEventListener('DOMContentLoaded', async () => {
     initMobileMenu();
-    initCourseNav();
-    initParagraphNav();
     initReadingProgress();
     initCopyCode();
+
+    // Загружаем structure один раз — используем везде
+    const structure = await loadCourseStructure();
+    if (!structure) return;
+
+    buildCourseNav(structure);
+    buildSectionNav(structure);
+    buildParagraphNav(structure);
 });
 
 // ------------------------------------------
-// МОБИЛЬНОЕ МЕНЮ
+// ЗАГРУЗКА course-structure.json (кэш)
 // ------------------------------------------
-function initMobileMenu() {
-    const btn     = document.querySelector('.mobile-menu-btn');
-    const sidebar = document.querySelector('.sidebar');
-    if (!btn || !sidebar) return;
+let _structureCache = null;
 
-    btn.addEventListener('click', () => {
-        const open = sidebar.classList.toggle('open');
-        btn.setAttribute('aria-expanded', open);
-    });
+async function loadCourseStructure() {
+    if (_structureCache) return _structureCache;
 
-    document.addEventListener('click', (e) => {
-        if (!sidebar.contains(e.target) && !btn.contains(e.target)) {
-            sidebar.classList.remove('open');
-            btn.setAttribute('aria-expanded', 'false');
-        }
-    });
+    try {
+        const res = await fetch(_siteRoot + 'course-structure.json');
+        _structureCache = await res.json();
+        return _structureCache;
+    } catch (err) {
+        console.error('Navigation: failed to load course-structure.json', err);
+        return null;
+    }
 }
 
 // ------------------------------------------
-// ДИНАМИЧЕСКАЯ НАВИГАЦИЯ ИЗ course-structure.json
+// ЛЕВЫЙ САЙДБАР (все главы и секции)
 // ------------------------------------------
-async function initCourseNav() {
+function buildCourseNav(structure) {
     const nav = document.querySelector('.sidebar-nav');
     if (!nav) return;
 
-    // Определяем текущий файл относительно корня
     const currentPath = normalizePath(window.location.pathname);
-
-    let structure;
-    try {
-        // Вычисляем путь к JSON относительно текущего файла
-        const depth = (currentPath.match(/\//g) || []).length;
-        const prefix = depth > 0 ? '../'.repeat(depth) : '';
-        const res = await fetch(`${prefix}course-structure.json`);
-        structure  = await res.json();
-    } catch {
-        return; // Не можем загрузить — оставляем статический HTML
-    }
-
-    const { chapters } = structure;
     nav.innerHTML = '';
 
-    chapters.forEach(chapter => {
+    // Находим главу, которой принадлежит текущая страница, для заголовка сайдбара
+    let activeChapter = structure.chapters[0];
+    outer: for (const ch of structure.chapters) {
+        for (const para of ch.paragraphs) {
+            if (isCurrentPage(currentPath, para.file, para.legacyFile)) { activeChapter = ch; break outer; }
+            for (const sec of (para.sections || [])) {
+                if (sec.file && isCurrentPage(currentPath, sec.file)) { activeChapter = ch; break outer; }
+            }
+        }
+    }
+    const titleEl = document.querySelector('.sidebar-title');
+    if (titleEl) titleEl.textContent = `Глава ${activeChapter.number}. ${activeChapter.title}`;
+
+    structure.chapters.forEach(chapter => {
         const chapterEl = document.createElement('li');
         chapterEl.className = 'sidebar-chapter';
         chapterEl.innerHTML = `<span class="sidebar-chapter-title">Глава ${chapter.number}. ${chapter.title}</span>`;
@@ -68,53 +94,44 @@ async function initCourseNav() {
         ul.className = 'sidebar-paragraphs';
 
         chapter.paragraphs.forEach((para, idx) => {
-            const isUnlocked = isParagraphUnlocked(chapter.paragraphs, idx);
+            const isUnlocked   = isParagraphUnlocked(chapter.paragraphs, idx);
             const isParaActive = isCurrentPage(currentPath, para.file, para.legacyFile);
+            const sections     = para.sections || [];
 
-            // Проверяем, активна ли одна из секций этого параграфа
-            const sections = para.sections || [];
             const activeSectionIdx = sections.findIndex(s => s.file && isCurrentPage(currentPath, s.file));
             const isExpanded = isParaActive || activeSectionIdx !== -1;
-
-            const isDone = isParagraphDone(para.id);
+            const isDone     = isParagraphDone(para.id);
 
             const li = document.createElement('li');
             li.className = 'sidebar-para-item' + (isExpanded ? ' expanded' : '');
 
-            // Ссылка на параграф
             const a = document.createElement('a');
             a.className = 'sidebar-para-link' +
-                (isParaActive   ? ' active'   : '') +
-                (isDone         ? ' done'     : '') +
-                (!isUnlocked    ? ' locked'   : '');
+                (isParaActive ? ' active' : '') +
+                (isDone       ? ' done'   : '') +
+                (!isUnlocked  ? ' locked' : '');
 
-            if (isUnlocked) {
-                a.href = resolveHref(currentPath, para.file);
-            } else {
-                a.href = '#';
+            a.href = isUnlocked ? resolveHref(currentPath, para.file) : '#';
+            if (!isUnlocked) {
                 a.title = 'Пройдите итоговый тест предыдущего параграфа';
+                a.addEventListener('click', e => { e.preventDefault(); showLockedNotice(); });
             }
 
-            const progress = getQuizProgress(para.id);
+            const progress  = getQuizProgress(para.id);
             const chapterNum = chapter.number;
-
             a.innerHTML = `
                 <span class="sidebar-para-number">§${chapterNum}.${para.number}</span>
                 <span class="sidebar-para-title">${para.title}</span>
                 <span class="sidebar-para-status">
-                    ${isDone      ? '<span class="status-done">✓</span>'   : ''}
-                    ${!isUnlocked ? '<span class="status-lock">🔒</span>'  : ''}
+                    ${isDone      ? '<span class="status-done">✓</span>'  : ''}
+                    ${!isUnlocked ? '<span class="status-lock">🔒</span>' : ''}
                     ${progress && !isDone ? `<span class="para-pct">${progress}%</span>` : ''}
                     ${sections.length > 0 ? `<span class="sidebar-para-arrow">${isExpanded ? '▾' : '▸'}</span>` : ''}
                 </span>`;
 
-            if (!isUnlocked) {
-                a.addEventListener('click', e => { e.preventDefault(); showLockedNotice(); });
-            }
-
             li.appendChild(a);
 
-            // ── Подменю секций (показываем всегда, если параграф раскрыт) ──
+            // Подменю секций
             if (sections.length > 0) {
                 const subUl = document.createElement('ul');
                 subUl.className = 'sidebar-sections' + (isExpanded ? ' open' : '');
@@ -149,10 +166,174 @@ async function initCourseNav() {
     });
 }
 
+// ------------------------------------------
+// PREV/NEXT НАВИГАЦИЯ ДЛЯ СЕКЦИЙ
+// Заполняет .paragraph-nav на страницах секций
+// ------------------------------------------
+function buildSectionNav(structure) {
+    const container = document.querySelector('.paragraph-nav');
+    if (!container) return;
+
+    const currentPath = normalizePath(window.location.pathname);
+
+    // Строим плоский список всех секций всех параграфов всех глав
+    const allSections = [];
+    for (const chapter of structure.chapters) {
+        for (const para of chapter.paragraphs) {
+            for (const section of (para.sections || [])) {
+                allSections.push({
+                    ...section,
+                    chapterNum : chapter.number,
+                    paraNum    : para.number,
+                    paraFile   : para.file,
+                    paraTitle  : para.title
+                });
+            }
+        }
+    }
+
+    const currentIdx = allSections.findIndex(s => s.file && isCurrentPage(currentPath, s.file));
+    if (currentIdx === -1) return; // Не секция — выходим, buildParagraphNav обработает
+
+    const prev    = currentIdx > 0                    ? allSections[currentIdx - 1] : null;
+    const next    = currentIdx < allSections.length - 1 ? allSections[currentIdx + 1] : null;
+    const current = allSections[currentIdx];
+
+    // Для первой секции назад — страница обзора параграфа
+    const prevHtml = prev
+        ? `<a href="${resolveHref(currentPath, prev.file)}" class="nav-prev">
+               <span class="nav-dir">← Назад</span>
+               <span class="nav-name">${prev.number} ${prev.title}</span>
+           </a>`
+        : current.paraFile
+            ? `<a href="${resolveHref(currentPath, current.paraFile)}" class="nav-prev">
+                   <span class="nav-dir">← Назад</span>
+                   <span class="nav-name">§${current.chapterNum}.${current.paraNum} Обзор параграфа</span>
+               </a>`
+            : '';
+
+    // Для последней секции вперёд — страница обзора параграфа
+    const nextHtml = next
+        ? `<a href="${resolveHref(currentPath, next.file)}" class="nav-next">
+               <span class="nav-dir">Далее →</span>
+               <span class="nav-name">${next.number} ${next.title}</span>
+           </a>`
+        : current.paraFile
+            ? `<a href="${resolveHref(currentPath, current.paraFile)}" class="nav-next">
+                   <span class="nav-dir">↑ К параграфу</span>
+                   <span class="nav-name">§${current.chapterNum}.${current.paraNum} ${current.paraTitle}</span>
+               </a>`
+            : '';
+
+    container.innerHTML = prevHtml + nextHtml;
+}
+
+// ------------------------------------------
+// PREV/NEXT НАВИГАЦИЯ ДЛЯ ПАРАГРАФОВ
+// Заполняет .paragraph-nav на страницах параграфов
+// ------------------------------------------
+function buildParagraphNav(structure) {
+    const container = document.querySelector('.paragraph-nav');
+    if (!container) return;
+
+    // Если контейнер уже заполнен buildSectionNav — не трогаем
+    if (container.innerHTML.trim() !== '') return;
+
+    const currentPath = normalizePath(window.location.pathname);
+    const allParas    = structure.chapters.flatMap(ch => ch.paragraphs);
+    const currentIdx  = allParas.findIndex(p => isCurrentPage(currentPath, p.file, p.legacyFile));
+
+    if (currentIdx === -1) return;
+
+    const currentPara = allParas[currentIdx];
+    const prev        = currentIdx > 0                  ? allParas[currentIdx - 1] : null;
+    const next        = currentIdx < allParas.length - 1 ? allParas[currentIdx + 1] : null;
+    const firstSection = (currentPara.sections || [])[0] || null;
+
+    const prevHtml = prev
+        ? `<a href="${resolveHref(currentPath, prev.file)}" class="nav-prev">
+               <span class="nav-dir">← Назад</span>
+               <span class="nav-name">§${prev.number || ''} ${prev.title}</span>
+           </a>`
+        : `<a href="${resolveHref(currentPath, 'index.html')}" class="nav-prev">
+               <span class="nav-dir">← Назад</span>
+               <span class="nav-name">Главная</span>
+           </a>`;
+
+    const nextHtml = next
+        ? `<a href="${resolveHref(currentPath, next.file)}" class="nav-next ${isParagraphUnlocked(allParas, currentIdx + 1) ? '' : 'locked'}">
+               <span class="nav-dir">Далее →</span>
+               <span class="nav-name">§${next.number || ''} ${next.title}</span>
+           </a>`
+        : firstSection
+            ? `<a href="${resolveHref(currentPath, firstSection.file)}" class="nav-next">
+               <span class="nav-dir">Начать →</span>
+               <span class="nav-name">${firstSection.number} ${firstSection.title}</span>
+           </a>`
+            : '';
+
+    container.innerHTML = prevHtml + nextHtml;
+}
+
+// ------------------------------------------
+// МОБИЛЬНОЕ МЕНЮ
+// ------------------------------------------
+function initMobileMenu() {
+    const btn     = document.querySelector('.mobile-menu-btn');
+    const sidebar = document.querySelector('.sidebar');
+    if (!btn || !sidebar) return;
+
+    btn.addEventListener('click', () => {
+        const open = sidebar.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && !btn.contains(e.target)) {
+            sidebar.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+        }
+    });
+}
+
+// ------------------------------------------
+// ПРОГРЕСС-БАР ЧТЕНИЯ
+// ------------------------------------------
+function initReadingProgress() {
+    const bar = document.querySelector('.reading-progress-bar');
+    if (!bar) return;
+
+    const update = () => {
+        const docH = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = docH > 0 ? `${Math.min(window.scrollY / docH * 100, 100)}%` : '0%';
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+}
+
+// ------------------------------------------
+// КНОПКИ «КОПИРОВАТЬ КОД»
+// ------------------------------------------
+function initCopyCode() {
+    document.querySelectorAll('.btn-code').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+            navigator.clipboard.writeText(code).then(() => {
+                const orig = btn.textContent;
+                btn.textContent = 'Скопировано ✓';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            });
+        });
+    });
+}
+
+// ------------------------------------------
+// ВСПОМОГАТЕЛЬНЫЕ
+// ------------------------------------------
 function isParagraphUnlocked(paragraphs, idx) {
-    if (idx === 0) return true; // Первый параграф всегда открыт
+    if (idx === 0) return true;
     const prev = paragraphs[idx - 1];
-    // Разблокирован, если у предыдущего нет finalTest ИЛИ finalTest пройден
     if (!prev.finalTest) return true;
     return !!localStorage.getItem(`final_passed_${prev.id}`);
 }
@@ -162,9 +343,7 @@ function isParagraphDone(paraId) {
 }
 
 function getQuizProgress(paraId) {
-    // Ищем любой сохранённый результат финального теста
-    const key = `quiz_final_${paraId}`;
-    const data = localStorage.getItem(key);
+    const data = localStorage.getItem(`quiz_final_${paraId}`);
     if (!data) return null;
     try { return JSON.parse(data).best; } catch { return null; }
 }
@@ -181,93 +360,7 @@ function showLockedNotice() {
     setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// ------------------------------------------
-// КНОПКИ «ПРЕДЫДУЩИЙ / СЛЕДУЮЩИЙ ПАРАГРАФ»
-// ------------------------------------------
-async function initParagraphNav() {
-    const container = document.querySelector('.paragraph-nav');
-    if (!container) return;
-
-    const currentPath = normalizePath(window.location.pathname);
-
-    let structure;
-    try {
-        const depth = (currentPath.match(/\//g) || []).length;
-        const prefix = depth > 0 ? '../'.repeat(depth) : '';
-        const res = await fetch(`${prefix}course-structure.json`);
-        structure  = await res.json();
-    } catch { return; }
-
-    // Плоский список всех параграфов
-    const allParas = structure.chapters.flatMap(ch => ch.paragraphs);
-    const currentIdx = allParas.findIndex(p =>
-        isCurrentPage(currentPath, p.file, p.legacyFile)
-    );
-
-    if (currentIdx === -1) return;
-
-    const prev = currentIdx > 0               ? allParas[currentIdx - 1] : null;
-    const next = currentIdx < allParas.length - 1 ? allParas[currentIdx + 1] : null;
-
-    const depth  = (currentPath.match(/\//g) || []).length;
-    const prefix = depth > 1 ? '../'.repeat(depth - 1) : '';
-
-    container.innerHTML = `
-        <div class="para-nav-inner">
-            ${prev ? `<a class="para-nav-btn para-nav-prev" href="${prefix}${prev.file}">
-                ← <span>${prev.title}</span>
-            </a>` : '<span></span>'}
-            ${next ? `<a class="para-nav-btn para-nav-next ${isParagraphUnlocked(allParas, currentIdx + 1) ? '' : 'locked'}"
-                         href="${isParagraphUnlocked(allParas, currentIdx + 1) ? prefix + next.file : '#'}">
-                <span>${next.title}</span> →
-            </a>` : '<span></span>'}
-        </div>`;
-}
-
-// ------------------------------------------
-// ПРОГРЕСС-БАР ЧТЕНИЯ (верхняя полоса)
-// ------------------------------------------
-function initReadingProgress() {
-    const bar = document.querySelector('.reading-progress-bar');
-    if (!bar) return;
-
-    const update = () => {
-        const docH   = document.documentElement.scrollHeight - window.innerHeight;
-        const pct    = docH > 0 ? (window.scrollY / docH) * 100 : 0;
-        bar.style.width = `${Math.min(pct, 100)}%`;
-    };
-
-    window.addEventListener('scroll', update, { passive: true });
-    update();
-}
-
-// ------------------------------------------
-// КНОПКИ «КОПИРОВАТЬ КОД»
-// ------------------------------------------
-function initCopyCode() {
-    document.querySelectorAll('.btn-code[data-action="copy"], .btn-code').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const block = btn.closest('.code-block');
-            if (!block) return;
-            const code = block.querySelector('code')?.textContent || '';
-            navigator.clipboard.writeText(code).then(() => {
-                const orig = btn.textContent;
-                btn.textContent = 'Скопировано ✓';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = orig;
-                    btn.classList.remove('copied');
-                }, 2000);
-            });
-        });
-    });
-}
-
-// ------------------------------------------
-// ВСПОМОГАТЕЛЬНЫЕ
-// ------------------------------------------
 function normalizePath(path) {
-    // Приводим к виду без начального /
     return path.replace(/^\//, '').replace(/\\/g, '/');
 }
 
@@ -275,20 +368,14 @@ function isCurrentPage(currentPath, ...files) {
     return files.some(f => f && currentPath.endsWith(f));
 }
 
-function resolveHref(currentPath, targetFile) {
-    // Для простоты: вычисляем глубину текущей страницы и строим относительный путь
-    const currentParts = currentPath.split('/');
-    const targetParts  = targetFile.split('/');
-    const depth        = currentParts.length - 1;
-    const prefix       = depth > 0 ? '../'.repeat(depth) : '';
-    return prefix + targetFile;
+// Строит абсолютный URL от корня сайта — работает для любой глубины и любого протокола
+function resolveHref(_currentPath, targetFile) {
+    return _siteRoot + targetFile;
 }
 
-// Экспортируем copyCode для inline onclick
+// Глобальный copyCode для inline onclick
 window.copyCode = function(btn) {
-    const block = btn.closest('.code-block');
-    if (!block) return;
-    const code = block.querySelector('code')?.textContent || '';
+    const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
     navigator.clipboard.writeText(code).then(() => {
         const orig = btn.textContent;
         btn.textContent = 'Скопировано ✓';

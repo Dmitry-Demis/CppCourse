@@ -126,45 +126,67 @@ code {
     content: counter(linenumber);
 }
 
-/* Синтаксис C++ */
-.token.keyword {
+/* Базовый блок highlight.js — убираем дефолтный фон, используем наш */
+.hljs {
+    background: transparent;
+    color: #E0E0E0;
+    padding: 0;
+}
+
+/* Синтаксис C++ (highlight.js классы) */
+.hljs-keyword,
+.hljs-literal {
     color: var(--code-keyword);
     font-weight: 600;
 }
 
-.token.function {
+.hljs-title,
+.hljs-title.function_ {
     color: var(--code-function);
     font-weight: 600;
 }
 
-.token.string {
+.hljs-string,
+.hljs-char.escape_ {
     color: var(--code-string);
 }
 
-.token.number {
+.hljs-number {
     color: var(--code-number);
 }
 
-.token.comment {
+.hljs-comment {
     color: var(--code-comment);
     font-style: italic;
 }
 
-.token.type {
+.hljs-type,
+.hljs-built_in {
     color: var(--code-type);
     font-weight: 600;
 }
 
-.token.operator {
+.hljs-operator {
     color: var(--code-operator);
 }
 
-.token.preprocessor {
+.hljs-meta,
+.hljs-meta .hljs-keyword {
     color: var(--code-preprocessor);
+    font-weight: normal;
 }
 
-.token.punctuation {
+.hljs-punctuation {
     color: #89DDFF;
+}
+
+.hljs-params {
+    color: #E0E0E0;
+}
+
+.hljs-variable,
+.hljs-attr {
+    color: #E0E0E0;
 }
 
 /* Подсветка важных строк */

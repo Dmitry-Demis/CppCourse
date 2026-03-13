@@ -67,7 +67,7 @@
         <!-- Left Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-section">
-                <div class="sidebar-title">Глава I. Фундаментальные типы</div>
+                <div class="sidebar-title"></div>
                 <ul class="sidebar-nav" id="course-nav">
                     <!-- navigation.js заполнит динамически из course-structure.json -->
                     <li class="sidebar-para-item expanded">
@@ -89,21 +89,45 @@
                                 </a>
                             </li>
                             <li class="sidebar-section-item">
-                                <a href="floating-point.html" class="sidebar-section-link">
+                                <a href="signed-unsigned.html" class="sidebar-section-link">
                                     <span class="sidebar-section-number">1.1.3</span>
+                                    <span class="sidebar-section-title">Знаковые и беззнаковые типы</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-section-item">
+                                <a href="integer-overflow.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.4</span>
+                                    <span class="sidebar-section-title">Переполнение целых чисел</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-section-item">
+                                <a href="fixed-width-types.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.5</span>
+                                    <span class="sidebar-section-title">Типы с фиксированным размером</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-section-item">
+                                <a href="floating-point.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.6</span>
                                     <span class="sidebar-section-title">Типы с плавающей точкой</span>
                                 </a>
                             </li>
                             <li class="sidebar-section-item">
                                 <a href="character-types.html" class="sidebar-section-link">
-                                    <span class="sidebar-section-number">1.1.4</span>
+                                    <span class="sidebar-section-number">1.1.7</span>
                                     <span class="sidebar-section-title">Символьные типы</span>
                                 </a>
                             </li>
                             <li class="sidebar-section-item">
                                 <a href="boolean.html" class="sidebar-section-link">
-                                    <span class="sidebar-section-number">1.1.5</span>
+                                    <span class="sidebar-section-number">1.1.8</span>
                                     <span class="sidebar-section-title">Логический тип bool</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-section-item">
+                                <a href="sizeof-operator.html" class="sidebar-section-link">
+                                    <span class="sidebar-section-number">1.1.9</span>
+                                    <span class="sidebar-section-title">Оператор sizeof</span>
                                 </a>
                             </li>
                         </ul>
@@ -652,14 +676,7 @@ int main() {
 
                 <!-- Навигация между параграфами -->
                 <div class="paragraph-nav">
-                    <a href="../../../index.html" class="nav-prev">
-                        <span class="nav-dir">← Назад</span>
-                        <span class="nav-name">Главная страница курса</span>
-                    </a>
-                    <a href="void.html" class="nav-next">
-                        <span class="nav-dir">Далее →</span>
-                        <span class="nav-name">§1.1.1 Тип void</span>
-                    </a>
+                    <!-- navigation.js заполнит динамически из course-structure.json -->
                 </div>
 
             </div>
