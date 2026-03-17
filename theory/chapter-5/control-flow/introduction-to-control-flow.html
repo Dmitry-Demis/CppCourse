@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§5.1 Введение в управление потоком — Курс C++</title>
+    <meta name="description" content="Путь выполнения программы, ветвление, категории операторов управления потоком в C++: условия, циклы, прыжки, исключения.">
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="index.html" class="active">Глава V</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава V — §5.1</div>
+                <h1>Введение в управление потоком</h1>
+
+                <p>
+                    По умолчанию CPU выполняет инструкции строго сверху вниз.
+                    Конкретная последовательность инструкций, которую проходит программа,
+                    называется <span class="key-term">путём выполнения</span> (execution path).
+                    Программа, у которой путь всегда одинаков, называется <span class="key-term">прямолинейной</span>.
+                </p>
+
+                <div class="code-block" data-example="chapter-4/control-flow/execution-path.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — прямолинейная программа</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <p>
+                    Прямолинейные программы ограничены: они не могут реагировать на ввод,
+                    повторять действия или обрабатывать ошибки. Для этого нужны
+                    <span class="key-term">операторы управления потоком</span>.
+                    Когда такой оператор передаёт управление в другое место — это называется
+                    <span class="key-term">ветвлением</span> (branching).
+                </p>
+
+                <h2 id="categories">1. Категории операторов управления потоком</h2>
+
+                <p>В C++ есть шесть категорий:</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Категория</th>
+                                <th>Что делает</th>
+                                <th>Операторы C++</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Условные</strong></td>
+                                <td>Выполняют код только при выполнении условия</td>
+                                <td><code>if</code>, <code>else</code>, <code>switch</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Прыжки</strong></td>
+                                <td>Передают управление в другое место</td>
+                                <td><code>goto</code>, <code>break</code>, <code>continue</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Вызовы функций</strong></td>
+                                <td>Прыжок в функцию и возврат обратно</td>
+                                <td>вызов функции, <code>return</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Циклы</strong></td>
+                                <td>Повторяют блок кода ноль или более раз</td>
+                                <td><code>while</code>, <code>do-while</code>, <code>for</code>, range-for</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Остановка</strong></td>
+                                <td>Завершают программу</td>
+                                <td><code>std::exit()</code>, <code>std::abort()</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Исключения</strong></td>
+                                <td>Специальный механизм обработки ошибок</td>
+                                <td><code>try</code>, <code>throw</code>, <code>catch</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block" data-example="chapter-4/control-flow/branching-demo.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — ветвление и цикл</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="why-matters">2. Почему это важно</h2>
+
+                <p>
+                    До этой главы программы могли делать только фиксированный набор действий.
+                    Управление потоком — особенно циклы — открывает возможность писать программы
+                    с реальной пользой: обрабатывать коллекции данных, валидировать ввод,
+                    реализовывать алгоритмы.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">📌 Что изучим в этой главе</div>
+                    <ul>
+                        <li><strong>§5.2</strong> — оператор <code>if</code>, блоки, if-else vs if-if</li>
+                        <li><strong>§5.3</strong> — типичные ошибки: dangling else, null statement, <code>=</code> вместо <code>==</code></li>
+                    </ul>
+                </div>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

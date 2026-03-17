@@ -1,0 +1,238 @@
+/* ============================================
+   ACHIEVEMENTS PAGE
+   ============================================ */
+
+.achievements-page .page-wrapper {
+    display: block;
+}
+.achievements-page .main-content {
+    max-width: var(--page-max-width);
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6) var(--space-16);
+}
+
+/* === Page Header === */
+.ach-page-header {
+    text-align: center;
+    padding: var(--space-12) 0 var(--space-10);
+}
+.ach-page-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-family: var(--font-serif);
+    margin-bottom: var(--space-3);
+}
+.ach-page-header p {
+    color: var(--text-secondary);
+    font-size: var(--fs-lg);
+}
+
+/* === Stats Bar === */
+.ach-stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-8);
+    margin-bottom: var(--space-12);
+    flex-wrap: wrap;
+}
+.ach-stat {
+    text-align: center;
+}
+.ach-stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--grad-vivid);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+.ach-stat-label {
+    font-size: var(--fs-sm);
+    color: var(--text-tertiary);
+    margin-top: var(--space-1);
+}
+
+/* === Group === */
+.ach-group {
+    margin-bottom: var(--space-12);
+}
+.ach-group-title {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--text-heading);
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+/* === Hex Grid === */
+.ach-hex-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    justify-content: flex-start;
+}
+
+/* === Hexagon Card === */
+.ach-hex-card {
+    position: relative;
+    width: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: default;
+    animation: achFadeIn .5s ease both;
+}
+.ach-hex-card:nth-child(1)  { animation-delay: .05s; }
+.ach-hex-card:nth-child(2)  { animation-delay: .10s; }
+.ach-hex-card:nth-child(3)  { animation-delay: .15s; }
+.ach-hex-card:nth-child(4)  { animation-delay: .20s; }
+.ach-hex-card:nth-child(5)  { animation-delay: .25s; }
+.ach-hex-card:nth-child(6)  { animation-delay: .30s; }
+
+@keyframes achFadeIn {
+    from { opacity: 0; transform: translateY(20px) scale(.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Hexagon shape */
+.ach-hex {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .3s ease, filter .3s ease;
+}
+.ach-hex-card:hover .ach-hex {
+    transform: scale(1.08) translateY(-4px);
+    filter: brightness(1.15);
+}
+
+/* Gradient fill — unlocked */
+.ach-hex-bg {
+    position: absolute;
+    inset: 0;
+    clip-path: inherit;
+    background: var(--ach-grad, linear-gradient(135deg, #5b4fcf, #3b82f6));
+    opacity: .9;
+}
+
+/* Shimmer overlay */
+.ach-hex-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.25) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* Border ring */
+.ach-hex-ring {
+    position: absolute;
+    inset: -4px;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: var(--ach-grad, linear-gradient(135deg, #5b4fcf, #3b82f6));
+    z-index: 0;
+    opacity: .4;
+    filter: blur(8px);
+    transition: opacity .3s, filter .3s;
+}
+.ach-hex-card:hover .ach-hex-ring {
+    opacity: .85;
+    filter: blur(12px);
+}
+
+/* SVG icon inside hex */
+.ach-hex-img {
+    position: relative;
+    z-index: 1;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
+}
+
+/* Locked state */
+.ach-hex-card.locked .ach-hex-bg {
+    background: rgba(255,255,255,.06) !important;
+    opacity: 1;
+}
+.ach-hex-card.locked .ach-hex-ring {
+    opacity: 0;
+}
+.ach-hex-card.locked .ach-hex-img {
+    filter: grayscale(1) opacity(.3);
+}
+.ach-hex-card.locked .ach-hex::after {
+    content: '🔒';
+    position: absolute;
+    font-size: 1.6rem;
+    z-index: 2;
+}
+.ach-hex-card.locked .ach-hex-card-name {
+    color: var(--text-tertiary);
+}
+
+/* Card text */
+.ach-hex-card-name {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--text-heading);
+    text-align: center;
+    line-height: 1.2;
+}
+.ach-hex-card-desc {
+    font-size: var(--fs-xs);
+    color: var(--text-tertiary);
+    text-align: center;
+    line-height: 1.4;
+}
+.ach-hex-card-reward {
+    font-size: var(--fs-xs);
+    color: #fbbf24;
+    font-weight: 600;
+}
+.ach-hex-card-date {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-top: -var(--space-1);
+}
+
+/* Progress bar under hex */
+.ach-hex-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,.08);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: var(--space-1);
+}
+.ach-hex-progress-fill {
+    height: 100%;
+    background: var(--ach-grad, linear-gradient(90deg, #5b4fcf, #3b82f6));
+    border-radius: 99px;
+    transition: width .6s ease;
+}
+
+/* Pulse glow on newly unlocked */
+@keyframes achGlow {
+    0%, 100% { filter: brightness(1); }
+    50%       { filter: brightness(1.4) drop-shadow(0 0 12px var(--ach-color, #a78bfa)); }
+}
+.ach-hex-card.new-unlock .ach-hex {
+    animation: achGlow 1.5s ease 3;
+}
+
+@media (max-width: 640px) {
+    .ach-hex-grid { gap: var(--space-3); }
+    .ach-hex-card { width: 130px; }
+    .ach-hex { width: 90px; height: 90px; }
+    .ach-hex-img { width: 44px; height: 44px; }
+}

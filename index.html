@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="css/gamification.css">
     <link rel="stylesheet" href="css/code-highlight.css">
     <link rel="stylesheet" href="css/effects.css">
-
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
     
@@ -39,6 +38,9 @@
             <nav class="header-nav">
                 <a href="index.html" class="active">Главная</a>
                 <a href="theory/chapter-1/fundamental-types/introduction-to-fundamental-data-types.html">Глава I</a>
+                <a href="achievements.html">🏆 Достижения</a>
+                <a href="register.html">Регистрация</a>
+                <a href="login.html" id="navAuthLink">Вход</a>
             </nav>
 
             <button class="mobile-menu-btn" aria-label="Открыть меню">
@@ -94,35 +96,34 @@
                 </div>
             </section>
 
-            <!-- Chapters Grid -->
+            <!-- Player Card — shown only when logged in -->
+            <section class="player-card-section" id="player-card-section" style="display:none">
+                <div class="player-card" id="player-card">
+                    <div class="pc-avatar" id="pc-avatar">👤</div>
+                    <div class="pc-info">
+                        <div class="pc-name" id="pc-name"></div>
+                        <div class="pc-level" id="pc-level"></div>
+                        <div class="pc-xp-bar-wrap">
+                            <div class="pc-xp-bar"><div class="pc-xp-fill" id="pc-xp-fill"></div></div>
+                            <span class="pc-xp-label" id="pc-xp-label"></span>
+                        </div>
+                    </div>
+                    <div class="pc-stats">
+                        <div class="pc-stat" title="Монеты">🪙 <span id="pc-coins">0</span></div>
+                        <div class="pc-stat" title="Ключи">🗝️ <span id="pc-keys">0</span></div>
+                        <div class="pc-stat" title="Streak">🔥 <span id="pc-streak">0</span></div>
+                    </div>
+                    <button class="pc-missions-btn" onclick="openQuestsPanel()">🎯 Миссии</button>
+                </div>
+            </section>
+
+            <!-- Chapters Grid — заполняется динамически из course-structure.json -->
             <section class="chapters-section" id="chapters">
                 <div class="section-header">
                     <h2>Содержание курса</h2>
-                    <p>Глава I: Фундаментальные типы данных — основа программирования на C++</p>
+                    <p id="course-description"></p>
                 </div>
-
-                <div class="chapters-grid">
-                    <a href="theory/chapter-1/fundamental-types/introduction-to-fundamental-data-types.html" class="chapter-card" style="--card-color: #58a6ff">
-                        <span class="card-number">Глава I</span>
-                        <h3>Основы C++</h3>
-                        <p>Фундаментальные типы данных: void, целочисленные, с плавающей точкой, символьные и логический типы.</p>
-                        <div class="card-tags">
-                            <span class="tag tag--beginner">Начальный</span>
-                            <span class="tag tag--standard">C++17</span>
-                        </div>
-                        <div class="chapter-topics">
-                            <div class="topic-item">§1.1 Фундаментальные типы</div>
-                            <div class="topic-list">
-                                <span>• void</span>
-                                <span>• int, long, short</span>
-                                <span>• float, double</span>
-                                <span>• char</span>
-                                <span>• bool</span>
-                            </div>
-                        </div>
-                        <span class="card-arrow">Изучить →</span>
-                    </a>
-                </div>
+                <div class="chapters-grid" id="chapters-grid"></div>
             </section>
 
             <!-- Features Section -->
@@ -172,6 +173,107 @@
     <script src="js/gamification.js"></script>
     <script src="js/code-highlighter.js"></script>
     <script src="js/effects.js"></script>
+    <script>
+        // Update nav based on auth state — only update href, initHeaderUser() handles the name
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        const navLink = document.getElementById('navAuthLink');
+        if (user && navLink) {
+            navLink.style.display = 'none'; // initHeaderUser() in navigation.js adds the profile link
+        }
+
+        // Player card
+        function initPlayerCard() {
+            const u = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+            if (!u) return;
+            const section = document.getElementById('player-card-section');
+            if (section) section.style.display = '';
+
+            const coins  = (() => { try { return JSON.parse(localStorage.getItem('gs_coins') || '0'); } catch { return 0; } })();
+            const keys   = (() => { try { return JSON.parse(localStorage.getItem('gs_keys')  || '0'); } catch { return 0; } })();
+            const level  = (() => { try { return JSON.parse(localStorage.getItem('gs_level') || '1'); } catch { return 1; } })();
+            const xp     = (() => { try { return JSON.parse(localStorage.getItem('gs_xp')    || '0'); } catch { return 0; } })();
+            const streak = u.currentStreak || 0;
+            const needed = level * 120;
+
+            const LEVEL_TITLES = ['','Новичок','Ученик','Практикант','Программист','Эксперт','Мастер C++'];
+            const LEVEL_ICONS  = ['','🌱','📘','⚙️','💻','🔬','👑'];
+
+            document.getElementById('pc-name').textContent    = u.firstName + ' ' + u.lastName;
+            document.getElementById('pc-level').innerHTML     = `${LEVEL_ICONS[level] || '⭐'} Уровень ${level} · ${LEVEL_TITLES[level] || ''}`;
+            document.getElementById('pc-xp-fill').style.width = Math.min(xp / needed * 100, 100) + '%';
+            document.getElementById('pc-xp-label').textContent = `${xp} / ${needed} XP`;
+            document.getElementById('pc-coins').textContent   = coins;
+            document.getElementById('pc-keys').textContent    = keys;
+            document.getElementById('pc-streak').textContent  = streak;
+            document.getElementById('pc-avatar').textContent  = LEVEL_ICONS[level] || '👤';
+        }
+        initPlayerCard();
+
+        // Chapter card colors
+        const CARD_COLORS = ['#58a6ff', '#f78166', '#7ee787', '#d2a8ff', '#ffa657'];
+
+        async function buildChaptersGrid() {
+            const grid = document.getElementById('chapters-grid');
+            const desc = document.getElementById('course-description');
+            if (!grid) return;
+
+            let structure;
+            try {
+                const res = await fetch('/api/course-structure');
+                structure = await res.json();
+            } catch (e) {
+                grid.innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить структуру курса.</p>';
+                return;
+            }
+
+            if (desc) desc.textContent = structure.course?.description || '';
+
+            structure.chapters.forEach((chapter, ci) => {
+                const color = CARD_COLORS[ci % CARD_COLORS.length];
+
+                // Collect all paragraphs' sections for this chapter
+                const allSections = chapter.paragraphs.flatMap(p => {
+                    // index link for the paragraph
+                    const indexFile = p.file ? p.file.replace(/[^/]+\.html$/, 'index.html') : null;
+                    return (p.sections || []).slice(0, 5).map(s => ({
+                        title: s.title,
+                        file: s.file
+                    }));
+                });
+
+                // Chapter index = first paragraph's index.html
+                const firstPara = chapter.paragraphs[0];
+                const chapterIndex = firstPara?.file
+                    ? firstPara.file.replace(/[^/]+\.html$/, 'index.html')
+                    : (firstPara?.file || '#');
+
+                const sectionsHtml = allSections.slice(0, 6).map(s =>
+                    `<a class="chapter-section-link" href="${s.file || '#'}" onclick="event.stopPropagation()">
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3" fill="currentColor" opacity=".5"/></svg>
+                        ${s.title}
+                    </a>`
+                ).join('');
+
+                const card = document.createElement('div');
+                card.className = 'chapter-card';
+                card.style.setProperty('--card-color', color);
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', () => { location.href = chapterIndex; });
+                card.innerHTML = `
+                    <span class="card-number">Глава ${chapter.number}</span>
+                    <h3>${chapter.title}</h3>
+                    <p>${chapter.description || ''}</p>
+                    <div class="chapter-topics">
+                        <div class="chapter-sections-list">${sectionsHtml}</div>
+                    </div>
+                    <span class="card-arrow">Изучить →</span>`;
+
+                grid.appendChild(card);
+            });
+        }
+
+        buildChaptersGrid();
+    </script>
     <script>
         // GSAP Animations
         document.addEventListener('DOMContentLoaded', function() {

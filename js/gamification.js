@@ -1,444 +1,453 @@
 /* ============================================
-   GAMIFICATION SYSTEM - Game Logic
+   GAMIFICATION SYSTEM
+   Coins, XP, Quests, Daily reward, Reading time
    ============================================ */
 
+// ── Storage helpers ──────────────────────────────────────────────────────────
+const GS = {
+    get: (k, def) => { try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); } catch { return def; } },
+    set: (k, v)   => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+// ── Quest definitions ─────────────────────────────────────────────────────────
+const QUEST_DEFS = [
+    // Daily
+    { id: 'daily_code',    type: 'daily',   icon: '💻', name: 'Первый код дня',     desc: 'Запустите любой код',          target: 1,  reward: 30,  xp: 15 },
+    { id: 'daily_read',    type: 'daily',   icon: '📖', name: 'Читатель',            desc: 'Прочитайте 5 минут',           target: 5,  reward: 40,  xp: 20 },
+    { id: 'daily_quiz',    type: 'daily',   icon: '✎',  name: 'Проверь себя',        desc: 'Пройдите любой тест',          target: 1,  reward: 50,  xp: 25 },
+    // Weekly
+    { id: 'weekly_tests',  type: 'weekly',  icon: '🎯', name: 'Тестировщик',         desc: 'Пройдите 5 тестов за неделю', target: 5,  reward: 200, xp: 100 },
+    { id: 'weekly_code',   type: 'weekly',  icon: '⚙️', name: 'Кодер недели',        desc: 'Запустите код 10 раз',         target: 10, reward: 150, xp: 75 },
+    // Permanent challenges
+    { id: 'ch_streak3',    type: 'challenge', icon: '🔥', name: '3 дня подряд',      desc: 'Заходите 3 дня подряд',        target: 3,  reward: 100, xp: 50 },
+    { id: 'ch_streak7',    type: 'challenge', icon: '🔥', name: 'Неделя подряд',     desc: 'Заходите 7 дней подряд',       target: 7,  reward: 300, xp: 150 },
+    { id: 'ch_tests10',    type: 'challenge', icon: '🏅', name: 'Знаток',            desc: 'Пройдите 10 тестов',           target: 10, reward: 250, xp: 125 },
+    { id: 'ch_read60',     type: 'challenge', icon: '📚', name: 'Час знаний',        desc: 'Прочитайте 60 минут суммарно', target: 60, reward: 200, xp: 100 },
+    { id: 'ch_code50',     type: 'challenge', icon: '💎', name: 'Мастер кода',       desc: 'Запустите код 50 раз',         target: 50, reward: 400, xp: 200 },
+];
+
+const ACHIEVEMENT_DEFS = [
+    // First steps
+    { id: 'first_code',   img: 'img/achievements/ach-first-code.svg',   name: 'Первый шаг',       desc: 'Запустите первый код',              reward: 50,   group: 'activity' },
+    { id: 'first_quiz',   img: 'img/achievements/ach-first-quiz.svg',   name: 'Первый тест',      desc: 'Пройдите первый тест',              reward: 50,   group: 'activity' },
+    // Streaks
+    { id: 'streak3',      img: 'img/achievements/ach-streak3.svg',      name: '3 дня подряд',     desc: 'Streak 3 дня',                      reward: 100,  group: 'activity' },
+    { id: 'streak7',      img: 'img/achievements/ach-streak7.svg',      name: 'Неделя',           desc: 'Streak 7 дней',                     reward: 300,  group: 'activity' },
+    { id: 'streak14',     img: 'img/achievements/ach-streak14.svg',     name: 'Две недели',       desc: 'Streak 14 дней',                    reward: 500,  group: 'activity' },
+    { id: 'streak30',     img: 'img/achievements/ach-streak30.svg',     name: 'Месяц',            desc: 'Streak 30 дней',                    reward: 1000, group: 'activity' },
+    // Chapters
+    { id: 'chapter1',     img: 'img/achievements/ach-chapter1.svg',     name: 'Основы освоены',   desc: 'Завершите главу 1',                 reward: 200,  group: 'chapters' },
+    { id: 'chapter2',     img: 'img/achievements/ach-chapter2.svg',     name: 'Знаток типов',     desc: 'Завершите главу 2',                 reward: 200,  group: 'chapters' },
+    { id: 'chapter3',     img: 'img/achievements/ach-chapter3.svg',     name: 'Мастер функций',   desc: 'Завершите главу 3',                 reward: 200,  group: 'chapters' },
+    { id: 'chapter4',     img: 'img/achievements/ach-chapter4.svg',     name: 'Архитектор',       desc: 'Завершите главу 4',                 reward: 200,  group: 'chapters' },
+    // Levels
+    { id: 'level5',       img: 'img/achievements/ach-level5.svg',       name: 'Уровень 5',        desc: 'Достигните 5 уровня',               reward: 500,  group: 'progress' },
+    { id: 'level10',      img: 'img/achievements/ach-level10.svg',      name: 'Уровень 10',       desc: 'Достигните 10 уровня',              reward: 1000, group: 'progress' },
+    // Reading
+    { id: 'read60',       img: 'img/achievements/ach-read60.svg',       name: 'Час знаний',       desc: '60 минут чтения',                   reward: 200,  group: 'activity' },
+    { id: 'read300',      img: 'img/achievements/ach-read300.svg',      name: 'Книгочей',         desc: '5 часов чтения',                    reward: 600,  group: 'activity' },
+    // Code
+    { id: 'code50',       img: 'img/achievements/ach-code50.svg',       name: 'Мастер кода',      desc: '50 запусков кода',                  reward: 400,  group: 'code' },
+    { id: 'code100',      img: 'img/achievements/ach-code100.svg',      name: 'Кодер',            desc: '100 запусков кода',                 reward: 800,  group: 'code' },
+    // Tests
+    { id: 'tests10',      img: 'img/achievements/ach-tests10.svg',      name: 'Знаток',           desc: '10 тестов пройдено',                reward: 250,  group: 'code' },
+    { id: 'tests25',      img: 'img/achievements/ach-tests25.svg',      name: 'Испытатель',       desc: '25 тестов пройдено',                reward: 500,  group: 'code' },
+    { id: 'perfect_quiz', img: 'img/achievements/ach-perfect.svg',      name: 'Перфекционист',    desc: 'Тест на 100%',                      reward: 150,  group: 'code' },
+    // Special
+    { id: 'night_owl',    img: 'img/achievements/ach-night-owl.svg',    name: 'Сова',             desc: 'Учитесь после полуночи',            reward: 100,  group: 'special' },
+    { id: 'early_bird',   img: 'img/achievements/ach-early-bird.svg',   name: 'Жаворонок',        desc: 'Учитесь до 7 утра',                 reward: 100,  group: 'special' },
+    { id: 'debugger',     img: 'img/achievements/ach-debugger.svg',     name: 'Отладчик',         desc: 'Исправьте ошибку компиляции',       reward: 150,  group: 'special' },
+    { id: 'explorer',     img: 'img/achievements/ach-explorer.svg',     name: 'Исследователь',    desc: 'Откройте все разделы главы',        reward: 200,  group: 'special' },
+    { id: 'comeback',     img: 'img/achievements/ach-comeback.svg',     name: 'Возвращение',      desc: 'Вернитесь после 7 дней отсутствия', reward: 100,  group: 'special' },
+    { id: 'legend',       img: 'img/achievements/ach-legend.svg',       name: 'Легенда',          desc: 'Получите все достижения',           reward: 2000, group: 'special' },
+];
+
+// ── Main class ────────────────────────────────────────────────────────────────
 class GameSystem {
     constructor() {
-        // this.coins = parseInt(localStorage.getItem('cpp_coins') || '0');
-        // this.xp = parseInt(localStorage.getItem('cpp_xp') || '0');
-        // this.level = parseInt(localStorage.getItem('cpp_level') || '1');
-        // this.achievements = JSON.parse(localStorage.getItem('cpp_achievements') || '[]');
-        // this.quests = this.initializeQuests();
-        
-        // this.init();
+        this.coins        = GS.get('gs_coins', 0);
+        this.keys         = GS.get('gs_keys', 0);
+        this.xp           = GS.get('gs_xp', 0);
+        this.level        = GS.get('gs_level', 1);
+        this.achievements = GS.get('gs_achievements', []);
+        this.quests       = this._initQuests();
+        this._checkDailyReset();
+        this._checkDailyReward();
+        this.init();
     }
-    
+
     init() {
-        this.createHUD();
-        this.createQuestsPanel();
-        this.createAchievementsModal();
-        this.updateDisplay();
-        this.checkDailyReset();
+        this._buildHUD();
+        this._checkTimeAchievements();
     }
-    
-    // ============================================
-    // HUD Creation
-    // ============================================
-    createHUD() {
+
+    // ── HUD ──────────────────────────────────────────────────────────────────
+    _buildHUD() {
+        if (document.getElementById('gs-hud')) return;
+        // Don't render HUD on landing page
+        if (document.body.classList.contains('landing-page')) return;
         const hud = document.createElement('div');
-        hud.className = 'game-hud';
+        hud.id = 'gs-hud';
         hud.innerHTML = `
-            <div class="coin-counter">
-                <div class="coin-icon">⭐</div>
-                <div class="coin-amount">${this.coins}</div>
-            </div>
-            <div class="xp-container">
-                <div class="xp-header">
-                    <div class="xp-level">Уровень ${this.level}</div>
-                    <div class="xp-text">${this.xp}/${this.getXPForNextLevel()} XP</div>
+            <div class="gs-hud-inner">
+                <div class="gs-coins" title="Монеты">🪙 <span id="gs-coins-val">${this.coins}</span></div>
+                <div class="gs-coins" title="Ключи">🗝️ <span id="gs-keys-val">${this.keys}</span></div>
+                <div class="gs-xp-wrap" title="Опыт">
+                    <span class="gs-xp-label">Ур.${this.level}</span>
+                    <div class="gs-xp-bar"><div class="gs-xp-fill" id="gs-xp-fill"></div></div>
+                    <span class="gs-xp-val" id="gs-xp-val"></span>
                 </div>
-                <div class="xp-bar">
-                    <div class="xp-fill" style="width: ${this.getXPPercentage()}%"></div>
-                </div>
-            </div>
-        `;
+                <button class="gs-quests-btn" id="gs-quests-btn" title="Квесты">🎯</button>
+            </div>`;
         document.body.appendChild(hud);
+        this._updateHUD();
+
+        document.getElementById('gs-quests-btn').addEventListener('click', () => this._toggleQuestsPanel());
+        this._buildQuestsPanel();
     }
-    
-    // ============================================
-    // Quests Panel
-    // ============================================
-    initializeQuests() {
-        const savedQuests = localStorage.getItem('cpp_quests');
-        if (savedQuests) {
-            return JSON.parse(savedQuests);
-        }
-        
-        return [
-            {
-                id: 'daily_1',
-                type: 'daily',
-                name: 'Первый код дня',
-                description: 'Запустите любой код',
-                progress: 0,
-                target: 1,
-                reward: 50,
-                completed: false
-            },
-            {
-                id: 'daily_2',
-                type: 'daily',
-                name: 'Исследователь',
-                description: 'Прочитайте 3 параграфа',
-                progress: 0,
-                target: 3,
-                reward: 100,
-                completed: false
-            },
-            {
-                id: 'weekly_1',
-                type: 'weekly',
-                name: 'Мастер типов',
-                description: 'Изучите все фундаментальные типы',
-                progress: 0,
-                target: 5,
-                reward: 500,
-                completed: false
-            },
-            {
-                id: 'challenge_1',
-                type: 'challenge',
-                name: 'Перфекционист',
-                description: 'Запустите код без ошибок 10 раз',
-                progress: 0,
-                target: 10,
-                reward: 1000,
-                completed: false
-            }
-        ];
+
+    _updateHUD() {
+        const coinsEl = document.getElementById('gs-coins-val');
+        const keysEl  = document.getElementById('gs-keys-val');
+        const fillEl  = document.getElementById('gs-xp-fill');
+        const valEl   = document.getElementById('gs-xp-val');
+        const lblEl   = document.querySelector('.gs-xp-label');
+        if (coinsEl) coinsEl.textContent = this.coins;
+        if (keysEl)  keysEl.textContent  = this.keys;
+        const needed = this._xpNeeded();
+        if (fillEl)  fillEl.style.width = Math.min(this.xp / needed * 100, 100) + '%';
+        if (valEl)   valEl.textContent  = `${this.xp}/${needed}`;
+        if (lblEl)   lblEl.textContent  = `Ур.${this.level}`;
     }
-    
-    createQuestsPanel() {
+
+    _xpNeeded() { return this.level * 120; }
+
+    // ── Quests panel ─────────────────────────────────────────────────────────
+    _buildQuestsPanel() {
+        if (document.getElementById('gs-panel')) return;
         const panel = document.createElement('div');
-        panel.className = 'quests-panel';
+        panel.id = 'gs-panel';
         panel.innerHTML = `
-            <div class="quests-header">
-                <div class="quests-icon">🎯</div>
-                <div class="quests-title">Квесты</div>
+            <div class="gs-panel-header">
+                <span>🎯 Квесты</span>
+                <button class="gs-panel-close" id="gs-panel-close">✕</button>
             </div>
-            <div class="quests-list" id="questsList"></div>
-        `;
+            <div id="gs-daily-reward"></div>
+            <div id="gs-quests-list"></div>`;
         document.body.appendChild(panel);
-        this.updateQuestsList();
+        document.getElementById('gs-panel-close').addEventListener('click', () => this._toggleQuestsPanel(false));
+        this._renderQuests();
+        this._renderDailyReward();
     }
-    
-    updateQuestsList() {
-        const list = document.getElementById('questsList');
-        if (!list) return;
-        
-        list.innerHTML = this.quests.map(quest => `
-            <div class="quest-item ${quest.completed ? 'completed' : ''}" data-quest-id="${quest.id}">
-                <div class="quest-header">
-                    <span class="quest-type ${quest.type}">${this.getQuestTypeLabel(quest.type)}</span>
-                    <span class="quest-name">${quest.name}</span>
-                </div>
-                <div class="quest-description">${quest.description}</div>
-                <div class="quest-progress">
-                    <div class="quest-bar">
-                        <div class="quest-bar-fill" style="width: ${(quest.progress / quest.target) * 100}%"></div>
+
+    _toggleQuestsPanel(force) {
+        const panel = document.getElementById('gs-panel');
+        if (!panel) return;
+        const open = force !== undefined ? force : !panel.classList.contains('open');
+        panel.classList.toggle('open', open);
+    }
+
+    _renderDailyReward() {
+        const el = document.getElementById('gs-daily-reward');
+        if (!el) return;
+        const claimed = GS.get('gs_daily_claimed', '');
+        const today   = new Date().toDateString();
+        if (claimed === today) {
+            el.innerHTML = `<div class="gs-daily claimed">✅ Ежедневная награда получена</div>`;
+        } else {
+            el.innerHTML = `<div class="gs-daily">
+                <span>🎁 Ежедневная награда</span>
+                <button class="gs-claim-btn" id="gs-claim-btn">Забрать +50🪙</button>
+            </div>`;
+            document.getElementById('gs-claim-btn')?.addEventListener('click', () => this._claimDaily());
+        }
+    }
+
+    _claimDaily() {
+        const today = new Date().toDateString();
+        GS.set('gs_daily_claimed', today);
+        this.earnCoins(50, 'ежедневная награда');
+        this.earnKeys(1, 'ежедневная награда');
+        this._renderDailyReward();
+    }
+
+    _renderQuests() {
+        const el = document.getElementById('gs-quests-list');
+        if (!el) return;
+        const progress = GS.get('gs_quest_progress', {});
+        const done     = GS.get('gs_quest_done', []);
+
+        const groups = { daily: [], weekly: [], challenge: [] };
+        QUEST_DEFS.forEach(q => {
+            if (q.type in groups) groups[q.type].push(q);
+        });
+
+        const labels = { daily: '📅 Ежедневные', weekly: '📆 Еженедельные', challenge: '🏆 Испытания' };
+        let html = '';
+        for (const [type, quests] of Object.entries(groups)) {
+            html += `<div class="gs-quest-group-title">${labels[type]}</div>`;
+            quests.forEach(q => {
+                const cur  = progress[q.id] || 0;
+                const isDone = done.includes(q.id);
+                const pct  = Math.min(cur / q.target * 100, 100);
+                html += `<div class="gs-quest-item ${isDone ? 'done' : ''}">
+                    <div class="gs-qi-top">
+                        <span class="gs-qi-icon">${q.icon}</span>
+                        <span class="gs-qi-name">${q.name}</span>
+                        <span class="gs-qi-reward">+${q.reward}🪙</span>
                     </div>
-                    <div class="quest-reward">
-                        <span>⭐</span>
-                        <span>+${quest.reward}</span>
+                    <div class="gs-qi-desc">${q.desc}</div>
+                    <div class="gs-qi-bar-wrap">
+                        <div class="gs-qi-bar"><div class="gs-qi-fill" style="width:${pct}%"></div></div>
+                        <span class="gs-qi-count">${isDone ? '✓' : `${cur}/${q.target}`}</span>
                     </div>
-                </div>
-            </div>
-        `).join('');
+                </div>`;
+            });
+        }
+        el.innerHTML = html;
     }
-    
-    getQuestTypeLabel(type) {
-        const labels = {
-            'daily': 'Ежедневно',
-            'weekly': 'Неделя',
-            'challenge': 'Вызов'
-        };
-        return labels[type] || type;
-    }
-    
-    // ============================================
-    // Achievements Modal
-    // ============================================
-    createAchievementsModal() {
-        const btn = document.createElement('button');
-        btn.className = 'achievements-btn';
-        btn.innerHTML = '🏆';
-        btn.onclick = () => this.openAchievements();
-        document.body.appendChild(btn);
-        
-        const modal = document.createElement('div');
-        modal.className = 'achievements-modal';
-        modal.id = 'achievementsModal';
-        modal.innerHTML = `
-            <div class="achievements-content">
-                <button class="close-modal" onclick="gameSystem.closeAchievements()">×</button>
-                <div class="achievements-header">
-                    <h2>🏆 Достижения 🏆</h2>
-                    <div class="achievements-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">${this.achievements.length}</div>
-                            <div class="stat-label">Получено</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">${this.level}</div>
-                            <div class="stat-label">Уровень</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">${this.coins}</div>
-                            <div class="stat-label">Монет</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="achievements-grid" id="achievementsGrid"></div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        this.updateAchievementsGrid();
-    }
-    
-    updateAchievementsGrid() {
-        const grid = document.getElementById('achievementsGrid');
-        if (!grid) return;
-        
-        const allAchievements = [
-            { id: 'first_code', icon: '🚀', name: 'Первый шаг', description: 'Запустите первый код', reward: 100 },
-            { id: 'code_master', icon: '💻', name: 'Мастер кода', description: 'Запустите 50 программ', reward: 500 },
-            { id: 'reader', icon: '📚', name: 'Книжный червь', description: 'Прочитайте 10 параграфов', reward: 300 },
-            { id: 'speed_learner', icon: '⚡', name: 'Быстрый ученик', description: 'Завершите главу за день', reward: 1000 },
-            { id: 'perfectionist', icon: '✨', name: 'Перфекционист', description: 'Код без ошибок 20 раз', reward: 800 },
-            { id: 'night_owl', icon: '🦉', name: 'Сова', description: 'Учитесь после полуночи', reward: 200 },
-            { id: 'early_bird', icon: '🐦', name: 'Жаворонок', description: 'Учитесь до 6 утра', reward: 200 },
-            { id: 'week_streak', icon: '🔥', name: 'Неделя подряд', description: 'Учитесь 7 дней подряд', reward: 1500 },
-            { id: 'cpp_expert', icon: '🎓', name: 'Эксперт C++', description: 'Достигните 10 уровня', reward: 2000 },
-            { id: 'coin_collector', icon: '💰', name: 'Коллекционер', description: 'Соберите 5000 монет', reward: 500 },
-            { id: 'quest_hunter', icon: '🎯', name: 'Охотник за квестами', description: 'Выполните 20 квестов', reward: 1000 },
-            { id: 'legend', icon: '👑', name: 'Легенда', description: 'Получите все достижения', reward: 5000 }
-        ];
-        
-        grid.innerHTML = allAchievements.map(achievement => {
-            const unlocked = this.achievements.includes(achievement.id);
-            return `
-                <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}">
-                    <div class="achievement-icon">${achievement.icon}</div>
-                    <div class="achievement-name">${achievement.name}</div>
-                    <div class="achievement-description">${achievement.description}</div>
-                    <div class="achievement-reward">
-                        <span>⭐</span>
-                        <span>+${achievement.reward}</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-    
-    openAchievements() {
-        document.getElementById('achievementsModal').classList.add('active');
-    }
-    
-    closeAchievements() {
-        document.getElementById('achievementsModal').classList.remove('active');
-    }
-    
-    // ============================================
-    // Game Actions
-    // ============================================
+
+    // ── Economy ───────────────────────────────────────────────────────────────
     earnCoins(amount, reason = '') {
         this.coins += amount;
-        localStorage.setItem('cpp_coins', this.coins);
-        this.updateDisplay();
-        this.showNotification('💰 Монеты получены!', `+${amount} монет ${reason}`);
-        
-        // Coin animation
-        const coinCounter = document.querySelector('.coin-counter');
-        if (coinCounter) {
-            coinCounter.classList.add('coin-earned');
-            setTimeout(() => coinCounter.classList.remove('coin-earned'), 600);
-        }
+        GS.set('gs_coins', this.coins);
+        this._updateHUD();
+        this._toast(`+${amount} 🪙`, reason);
+        this._checkAchievement('coin_collector', this.coins >= 5000);
     }
-    
-    earnXP(amount, reason = '') {
+
+    earnKeys(amount, reason = '') {
+        this.keys += amount;
+        GS.set('gs_keys', this.keys);
+        this._updateHUD();
+        this._toast(`+${amount} 🗝️`, reason);
+    }
+
+    earnXP(amount) {
         this.xp += amount;
-        const xpNeeded = this.getXPForNextLevel();
-        
-        if (this.xp >= xpNeeded) {
-            this.levelUp();
+        const needed = this._xpNeeded();
+        if (this.xp >= needed) {
+            this.xp -= needed;
+            this.level++;
+            GS.set('gs_level', this.level);
+            this._toast(`🎉 Уровень ${this.level}!`, 'Новый уровень');
+            this.earnCoins(this.level * 50, 'за уровень');
+            if (this.level >= 5)  this._checkAchievement('level5', true);
+            if (this.level >= 10) this._checkAchievement('level10', true);
         }
-        
-        localStorage.setItem('cpp_xp', this.xp);
-        this.updateDisplay();
-        this.showNotification('⚡ Опыт получен!', `+${amount} XP ${reason}`);
+        GS.set('gs_xp', this.xp);
+        this._updateHUD();
     }
-    
-    levelUp() {
-        this.level++;
-        this.xp = 0;
-        localStorage.setItem('cpp_level', this.level);
-        this.showNotification('🎉 Новый уровень!', `Поздравляем! Вы достигли ${this.level} уровня!`);
-        this.earnCoins(this.level * 100, 'за новый уровень');
-        
-        // Visual effects
-        if (window.effects) {
-            effects.showLevelUp(this.level);
-        }
-        
-        // Check for level achievements
-        if (this.level === 10) {
-            this.unlockAchievement('cpp_expert');
-        }
-    }
-    
-    getXPForNextLevel() {
-        return this.level * 100;
-    }
-    
-    getXPPercentage() {
-        return (this.xp / this.getXPForNextLevel()) * 100;
-    }
-    
-    updateDisplay() {
-        // Update coin counter
-        const coinAmount = document.querySelector('.coin-amount');
-        if (coinAmount) coinAmount.textContent = this.coins;
-        
-        // Update XP bar
-        const xpLevel = document.querySelector('.xp-level');
-        const xpText = document.querySelector('.xp-text');
-        const xpFill = document.querySelector('.xp-fill');
-        
-        if (xpLevel) xpLevel.textContent = `Уровень ${this.level}`;
-        if (xpText) xpText.textContent = `${this.xp}/${this.getXPForNextLevel()} XP`;
-        if (xpFill) xpFill.style.width = `${this.getXPPercentage()}%`;
-    }
-    
-    // ============================================
-    // Quest System
-    // ============================================
-    updateQuest(questId, progress = 1) {
-        const quest = this.quests.find(q => q.id === questId);
-        if (!quest || quest.completed) return;
-        
-        quest.progress += progress;
-        
-        if (quest.progress >= quest.target) {
-            quest.completed = true;
-            this.earnCoins(quest.reward, 'за квест');
-            this.earnXP(quest.reward / 2, 'за квест');
-            this.showNotification('🎯 Квест выполнен!', quest.name);
-        }
-        
-        localStorage.setItem('cpp_quests', JSON.stringify(this.quests));
-        this.updateQuestsList();
-    }
-    
-    checkDailyReset() {
-        const lastReset = localStorage.getItem('cpp_last_reset');
-        const today = new Date().toDateString();
-        
-        if (lastReset !== today) {
-            // Reset daily quests
-            this.quests.forEach(quest => {
-                if (quest.type === 'daily') {
-                    quest.progress = 0;
-                    quest.completed = false;
-                }
-            });
-            localStorage.setItem('cpp_last_reset', today);
-            localStorage.setItem('cpp_quests', JSON.stringify(this.quests));
-        }
-    }
-    
-    // ============================================
-    // Achievement System
-    // ============================================
-    unlockAchievement(achievementId) {
-        if (this.achievements.includes(achievementId)) return;
-        
-        this.achievements.push(achievementId);
-        localStorage.setItem('cpp_achievements', JSON.stringify(this.achievements));
-        
-        const achievementData = {
-            'first_code': { name: 'Первый шаг', reward: 100, icon: '🚀' },
-            'code_master': { name: 'Мастер кода', reward: 500, icon: '💻' },
-            'reader': { name: 'Книжный червь', reward: 300, icon: '📚' },
-            'speed_learner': { name: 'Быстрый ученик', reward: 1000, icon: '⚡' },
-            'perfectionist': { name: 'Перфекционист', reward: 800, icon: '✨' },
-            'night_owl': { name: 'Сова', reward: 200, icon: '🦉' },
-            'early_bird': { name: 'Жаворонок', reward: 200, icon: '🐦' },
-            'week_streak': { name: 'Неделя подряд', reward: 1500, icon: '🔥' },
-            'cpp_expert': { name: 'Эксперт C++', reward: 2000, icon: '🎓' },
-            'coin_collector': { name: 'Коллекционер', reward: 500, icon: '💰' },
-            'quest_hunter': { name: 'Охотник за квестами', reward: 1000, icon: '🎯' },
-            'legend': { name: 'Легенда', reward: 5000, icon: '👑' }
-        };
-        
-        const achievement = achievementData[achievementId];
-        if (achievement) {
-            this.earnCoins(achievement.reward, 'за достижение');
-            this.showNotification('🏆 Достижение разблокировано!', achievement.name);
-            
-            // Visual effects
-            if (window.effects) {
-                effects.showAchievementUnlock(achievement.icon, achievement.name, achievement.reward);
+
+    // ── Quest progress ────────────────────────────────────────────────────────
+    trackEvent(eventId, amount = 1) {
+        const progress = GS.get('gs_quest_progress', {});
+        const done     = GS.get('gs_quest_done', []);
+
+        QUEST_DEFS.forEach(q => {
+            if (done.includes(q.id)) return;
+            // Map event → quest
+            const matches = (
+                (eventId === 'code_run'   && (q.id === 'daily_code' || q.id === 'weekly_code' || q.id === 'ch_code50')) ||
+                (eventId === 'read_min'   && (q.id === 'daily_read' || q.id === 'ch_read60')) ||
+                (eventId === 'quiz_done'  && (q.id === 'daily_quiz' || q.id === 'weekly_tests' || q.id === 'ch_tests10')) ||
+                (eventId === 'streak'     && (q.id === 'ch_streak3' || q.id === 'ch_streak7'))
+            );
+            if (!matches) return;
+
+            progress[q.id] = (progress[q.id] || 0) + amount;
+            if (progress[q.id] >= q.target) {
+                progress[q.id] = q.target;
+                done.push(q.id);
+                GS.set('gs_quest_done', done);
+                this.earnCoins(q.reward, `квест: ${q.name}`);
+                this.earnXP(q.xp);
+                this._toast(`🎯 Квест выполнен!`, q.name);
             }
+        });
+
+        GS.set('gs_quest_progress', progress);
+        this._renderQuests();
+    }
+
+    // ── Achievements ──────────────────────────────────────────────────────────
+    _checkAchievement(id, condition) {
+        if (!condition || this.achievements.includes(id)) return;
+        this.achievements.push(id);
+        GS.set('gs_achievements', this.achievements);
+        const def = ACHIEVEMENT_DEFS.find(a => a.id === id);
+        if (def) {
+            this.earnCoins(def.reward, `достижение: ${def.name}`);
+            this._toast(`🏆 ${def.name}`, def.desc);
         }
-        
-        this.updateAchievementsGrid();
+        // Check legend
+        if (ACHIEVEMENT_DEFS.every(a => this.achievements.includes(a.id)))
+            this._checkAchievement('legend', true);
     }
-    
-    // ============================================
-    // Notifications
-    // ============================================
-    showNotification(title, message) {
-        const existing = document.querySelector('.notification-toast');
-        if (existing) existing.remove();
-        
-        const notification = document.createElement('div');
-        notification.className = 'notification-toast';
-        notification.innerHTML = `
-            <div class="notification-icon">🎉</div>
-            <div class="notification-content">
-                <div class="notification-title">${title}</div>
-                <div class="notification-message">${message}</div>
-            </div>
-        `;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => notification.classList.add('show'), 100);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 500);
-        }, 3000);
+
+    _checkTimeAchievements() {
+        const h = new Date().getHours();
+        if (h >= 0 && h < 4)  this._checkAchievement('night_owl', true);
+        if (h >= 5 && h < 7)  this._checkAchievement('early_bird', true);
     }
-    
-    // ============================================
-    // Event Tracking
-    // ============================================
+
+    // ── Public event hooks ────────────────────────────────────────────────────
     onCodeRun() {
-        this.earnXP(10, 'за запуск кода');
-        this.earnCoins(5, 'за запуск кода');
-        this.updateQuest('daily_1');
-        this.updateQuest('challenge_1');
-        
-        // Check for first code achievement
-        const codeRuns = parseInt(localStorage.getItem('cpp_code_runs') || '0') + 1;
-        localStorage.setItem('cpp_code_runs', codeRuns);
-        
-        if (codeRuns === 1) {
-            this.unlockAchievement('first_code');
-        } else if (codeRuns === 50) {
-            this.unlockAchievement('code_master');
+        const runs = GS.get('gs_code_runs', 0) + 1;
+        GS.set('gs_code_runs', runs);
+        this.earnXP(10);
+        this.earnCoins(5, 'запуск кода');
+        this.trackEvent('code_run');
+        if (runs === 1)   this._checkAchievement('first_code', true);
+        if (runs >= 50)   this._checkAchievement('code50', true);
+        if (runs >= 100)  this._checkAchievement('code100', true);
+    }
+
+    onQuizComplete(pct) {
+        const total = GS.get('gs_quizzes_done', 0) + 1;
+        GS.set('gs_quizzes_done', total);
+        const coins = Math.round(pct * 0.5);
+        const xp    = Math.round(pct * 0.3);
+        this.earnCoins(coins, 'тест');
+        this.earnXP(xp);
+        this.trackEvent('quiz_done');
+        if (total === 1)   this._checkAchievement('first_quiz', true);
+        if (total >= 10)   this._checkAchievement('tests10', true);
+        if (total >= 25)   this._checkAchievement('tests25', true);
+        if (pct === 100)   this._checkAchievement('perfect_quiz', true);
+    }
+
+    onReadMinute() {
+        this.trackEvent('read_min');
+        const total = GS.get('gs_read_mins', 0) + 1;
+        GS.set('gs_read_mins', total);
+        if (total >= 60) this._checkAchievement('read60', true);
+    }
+
+    onStreakUpdate(streak) {
+        if (streak >= 3)  this._checkAchievement('streak3', true);
+        if (streak >= 7)  this._checkAchievement('streak7', true);
+        if (streak >= 14) this._checkAchievement('streak14', true);
+        if (streak >= 30) this._checkAchievement('streak30', true);
+        const progress = GS.get('gs_quest_progress', {});
+        progress['ch_streak3'] = Math.min(streak, 3);
+        progress['ch_streak7'] = Math.min(streak, 7);
+        GS.set('gs_quest_progress', progress);
+        this._renderQuests();
+    }
+
+    // ── Daily reset ───────────────────────────────────────────────────────────
+    _checkDailyReset() {
+        const last  = GS.get('gs_last_reset', '');
+        const today = new Date().toDateString();
+        if (last === today) return;
+        GS.set('gs_last_reset', today);
+        // Reset daily quest progress
+        const progress = GS.get('gs_quest_progress', {});
+        const done     = GS.get('gs_quest_done', []);
+        QUEST_DEFS.filter(q => q.type === 'daily').forEach(q => {
+            delete progress[q.id];
+            const i = done.indexOf(q.id);
+            if (i !== -1) done.splice(i, 1);
+        });
+        GS.set('gs_quest_progress', progress);
+        GS.set('gs_quest_done', done);
+    }
+
+    _checkWeeklyReset() {
+        const last  = GS.get('gs_last_week_reset', 0);
+        const now   = Date.now();
+        if (now - last < 7 * 86400000) return;
+        GS.set('gs_last_week_reset', now);
+        const progress = GS.get('gs_quest_progress', {});
+        const done     = GS.get('gs_quest_done', []);
+        QUEST_DEFS.filter(q => q.type === 'weekly').forEach(q => {
+            delete progress[q.id];
+            const i = done.indexOf(q.id);
+            if (i !== -1) done.splice(i, 1);
+        });
+        GS.set('gs_quest_progress', progress);
+        GS.set('gs_quest_done', done);
+    }
+
+    _checkDailyReward() {
+        // Auto-show panel hint if not claimed today
+        const claimed = GS.get('gs_daily_claimed', '');
+        const today   = new Date().toDateString();
+        if (claimed !== today) {
+            setTimeout(() => {
+                const btn = document.getElementById('gs-quests-btn');
+                if (btn) btn.classList.add('gs-pulse');
+            }, 1500);
         }
     }
-    
-    onPageRead() {
-        this.earnXP(5, 'за чтение');
-        this.updateQuest('daily_2');
-        
-        const pagesRead = parseInt(localStorage.getItem('cpp_pages_read') || '0') + 1;
-        localStorage.setItem('cpp_pages_read', pagesRead);
-        
-        if (pagesRead === 10) {
-            this.unlockAchievement('reader');
-        }
+
+    // ── Toast ─────────────────────────────────────────────────────────────────
+    _toast(title, msg) {
+        const t = document.createElement('div');
+        t.className = 'gs-toast';
+        t.innerHTML = `<strong>${title}</strong>${msg ? `<br><span>${msg}</span>` : ''}`;
+        document.body.appendChild(t);
+        requestAnimationFrame(() => t.classList.add('show'));
+        setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 2800);
+    }
+
+    // ── Quest init ────────────────────────────────────────────────────────────
+    _initQuests() { return QUEST_DEFS; }
+}
+
+// ── Reading time tracker ──────────────────────────────────────────────────────
+class ReadingTracker {
+    constructor(gs) {
+        this.gs        = gs;
+        this.active    = false;
+        this.lastTick  = 0;
+        this.pageKey   = 'gs_read_page_' + location.pathname.replace(/\W/g, '_');
+        this._bind();
+        this._tick();
+    }
+
+    _bind() {
+        const activate   = () => { this.active = true;  this.lastTick = Date.now(); };
+        const deactivate = () => { this.active = false; };
+        document.addEventListener('mousemove',   activate,   { passive: true });
+        document.addEventListener('keydown',     activate,   { passive: true });
+        document.addEventListener('scroll',      activate,   { passive: true });
+        document.addEventListener('visibilitychange', () => {
+            document.hidden ? deactivate() : activate();
+        });
+        // Deactivate after 30s of no movement
+        setInterval(() => {
+            if (this.active && Date.now() - this.lastTick > 30000) deactivate();
+        }, 5000);
+    }
+
+    _tick() {
+        setInterval(() => {
+            if (!this.active || document.hidden) return;
+            // Track per-page time
+            const pageMins = GS.get(this.pageKey, 0) + (1/60);
+            GS.set(this.pageKey, pageMins);
+            // Fire every full minute
+            const totalSecs = GS.get('gs_read_secs', 0) + 1;
+            GS.set('gs_read_secs', totalSecs);
+            if (totalSecs % 60 === 0) this.gs.onReadMinute();
+        }, 1000);
     }
 }
 
-// Initialize game system
+// ── Init ──────────────────────────────────────────────────────────────────────
 let gameSystem;
 document.addEventListener('DOMContentLoaded', () => {
     gameSystem = new GameSystem();
-    
-    // Track page read after 30 seconds
-    setTimeout(() => {
-        gameSystem.onPageRead();
-    }, 30000);
+    new ReadingTracker(gameSystem);
+
+    // Sync streak from localStorage user
+    const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+    if (user?.currentStreak) gameSystem.onStreakUpdate(user.currentStreak);
 });
+
+// Global helper for external callers (e.g. index.html player card)
+window.openQuestsPanel = () => {
+    if (gameSystem) gameSystem._toggleQuestsPanel(true);
+};

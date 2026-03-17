@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.5 Ввод и вывод: iostream — Курс C++</title>
+    <meta name="description" content="Стандартный ввод и вывод в C++: cout, cin, endl, операторы << и >>, буферизация.">
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.5</div>
+                <h1>Ввод и вывод: iostream</h1>
+
+                <p>
+                    Библиотека <code>&lt;iostream&gt;</code> предоставляет инструменты для
+                    взаимодействия с пользователем через консоль.
+                    <code>iostream</code> = <em>input/output stream</em>.
+                </p>
+
+                <h2 id="cout">1. std::cout — вывод</h2>
+
+                <p>
+                    <code>std::cout</code> (character output) выводит данные в стандартный поток вывода (консоль).
+                    Оператор <code>&lt;&lt;</code> передаёт данные в поток.
+                    Можно цеплять несколько значений подряд.
+                </p>
+
+                <div class="code-block" data-example="chapter-1/basics/iostream-basic.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — cout и cin</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="newline">2. Перевод строки: \n vs endl</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 \n предпочтительнее endl</div>
+                    <ul>
+                        <li><code>"\n"</code> — просто символ новой строки, быстро</li>
+                        <li><code>std::endl</code> — новая строка + принудительный сброс буфера (flush), медленнее</li>
+                        <li>Используйте <code>"\n"</code> в большинстве случаев</li>
+                        <li><code>std::endl</code> нужен только когда важно немедленно вывести данные</li>
+                    </ul>
+                </div>
+
+                <h2 id="cin">3. std::cin — ввод</h2>
+
+                <p>
+                    <code>std::cin</code> (character input) читает данные из стандартного потока ввода (клавиатура).
+                    Оператор <code>&gt;&gt;</code> извлекает данные из потока и записывает в переменную.
+                </p>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠️ cin и пробелы</div>
+                    <p>
+                        <code>std::cin &gt;&gt; x</code> пропускает пробелы и читает до следующего пробела/переноса.
+                        Для чтения строки с пробелами используйте <code>std::getline(std::cin, str)</code>.
+                    </p>
+                </div>
+
+                <h2 id="namespace">4. Зачем std::</h2>
+
+                <p>
+                    <code>std::</code> — это <span class="key-term">пространство имён</span> (namespace) стандартной библиотеки.
+                    Оно предотвращает конфликты имён. Можно написать <code>using namespace std;</code>,
+                    но в больших проектах это считается плохой практикой.
+                </p>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

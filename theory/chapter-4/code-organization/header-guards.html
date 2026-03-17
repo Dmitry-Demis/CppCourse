@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§3.5 Header guards — Курс C++</title>
+    <meta name="description" content="Header guards в C++: проблема двойного включения, #ifndef/#define/#endif, #pragma once.">
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава IV</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава IV — §4.5</div>
+                <h1>Header guards</h1>
+
+                <p>
+                    Если один заголовочный файл включается несколько раз (напрямую или транзитивно),
+                    его содержимое вставляется в код несколько раз. Это нарушает ODR.
+                    <span class="key-term">Header guards</span> предотвращают это.
+                </p>
+
+                <h2 id="problem">1. Проблема двойного включения</h2>
+
+                <p>
+                    Представь: <code>main.cpp</code> включает <code>a.h</code> и <code>b.h</code>,
+                    а оба они включают <code>math.h</code>. В итоге содержимое <code>math.h</code>
+                    вставляется дважды — ошибка переопределения.
+                </p>
+
+                <h2 id="solutions">2. Два способа защиты</h2>
+
+                <div class="code-block" data-example="chapter-3/code-organization/header-guard-pragma.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — header guards</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">📌 #pragma once vs #ifndef</div>
+                    <ul>
+                        <li>
+                            <code>#pragma once</code> — проще, одна строка, поддерживается всеми
+                            современными компиляторами (GCC, Clang, MSVC). Технически нестандартный,
+                            но де-факто стандарт.
+                        </li>
+                        <li>
+                            <code>#ifndef HEADER_H / #define HEADER_H / #endif</code> — стандартный способ,
+                            работает везде. Имя макроса должно быть уникальным — обычно
+                            <code>PROJECTNAME_FILENAME_H</code>.
+                        </li>
+                        <li>
+                            В новых проектах предпочтительнее <code>#pragma once</code> — меньше кода,
+                            нет риска опечатки в имени макроса.
+                        </li>
+                    </ul>
+                </div>
+
+                <h2 id="template">3. Шаблон заголовочного файла</h2>
+
+                <div class="code-block" data-example="chapter-3/code-organization/header-files-template.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">mymodule.h — полный шаблон</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initMobileMenu();
     initReadingProgress();
     initCopyCode();
+    initHeaderUser();
 
     // Загружаем structure один раз — используем везде
     const structure = await loadCourseStructure();
@@ -53,11 +54,11 @@ async function loadCourseStructure() {
     if (_structureCache) return _structureCache;
 
     try {
-        const res = await fetch(_siteRoot + 'course-structure.json');
+        const res = await fetch('/api/course-structure');
         _structureCache = await res.json();
         return _structureCache;
     } catch (err) {
-        console.error('Navigation: failed to load course-structure.json', err);
+        console.error('Navigation: failed to load course-structure', err);
         return null;
     }
 }
@@ -72,23 +73,18 @@ function buildCourseNav(structure) {
     const currentPath = normalizePath(window.location.pathname);
     nav.innerHTML = '';
 
-    // Находим главу, которой принадлежит текущая страница, для заголовка сайдбара
-    let activeChapter = structure.chapters[0];
-    outer: for (const ch of structure.chapters) {
-        for (const para of ch.paragraphs) {
-            if (isCurrentPage(currentPath, para.file, para.legacyFile)) { activeChapter = ch; break outer; }
-            for (const sec of (para.sections || [])) {
-                if (sec.file && isCurrentPage(currentPath, sec.file)) { activeChapter = ch; break outer; }
-            }
-        }
-    }
     const titleEl = document.querySelector('.sidebar-title');
-    if (titleEl) titleEl.textContent = `Глава ${activeChapter.number}. ${activeChapter.title}`;
+    if (titleEl) titleEl.textContent = 'Содержание курса';
 
     structure.chapters.forEach(chapter => {
         const chapterEl = document.createElement('li');
         chapterEl.className = 'sidebar-chapter';
-        chapterEl.innerHTML = `<span class="sidebar-chapter-title">Глава ${chapter.number}. ${chapter.title}</span>`;
+
+        // Заголовок главы
+        const chapterTitle = document.createElement('div');
+        chapterTitle.className = 'sidebar-chapter-title';
+        chapterTitle.textContent = `Глава ${chapter.number}. ${chapter.title}`;
+        chapterEl.appendChild(chapterTitle);
 
         const ul = document.createElement('ul');
         ul.className = 'sidebar-paragraphs';
@@ -119,13 +115,29 @@ function buildCourseNav(structure) {
 
             const progress  = getQuizProgress(para.id);
             const chapterNum = chapter.number;
+
+            // Суммарный % освоенности параграфа по всем тестам его секций
+            const testSections = sections.filter(s => s.hasTest && s.quizId);
+            let paraCompletionBadge = '';
+            if (testSections.length > 0) {
+                const scores = testSections.map(s => {
+                    try { const v = localStorage.getItem(`quiz_best_${s.quizId}`); return v !== null ? JSON.parse(v) : null; } catch { return null; }
+                });
+                const attempted = scores.filter(v => v !== null);
+                if (attempted.length > 0) {
+                    const avg = Math.round(attempted.reduce((s, v) => s + v, 0) / testSections.length);
+                    const cls = avg >= 70 ? 'pass' : 'warn';
+                    paraCompletionBadge = `<span class="para-completion-pct ${cls}">${avg}%</span>`;
+                }
+            }
+
             a.innerHTML = `
                 <span class="sidebar-para-number">§${chapterNum}.${para.number}</span>
                 <span class="sidebar-para-title">${para.title}</span>
                 <span class="sidebar-para-status">
                     ${isDone      ? '<span class="status-done">✓</span>'  : ''}
                     ${!isUnlocked ? '<span class="status-lock">🔒</span>' : ''}
-                    ${progress && !isDone ? `<span class="para-pct">${progress}%</span>` : ''}
+                    ${paraCompletionBadge}
                     ${sections.length > 0 ? `<span class="sidebar-para-arrow">${isExpanded ? '▾' : '▸'}</span>` : ''}
                 </span>`;
 
@@ -146,10 +158,16 @@ function buildCourseNav(structure) {
                     sa.href = section.file ? resolveHref(currentPath, section.file) : '#';
 
                     const sNum = section.number || `${chapterNum}.${para.number}.${sIdx + 1}`;
+                    let testBadge = '';
+                    if (section.hasTest && section.quizId) {
+                        const best = (() => { try { const v = localStorage.getItem(`quiz_best_${section.quizId}`); return v !== null ? JSON.parse(v) : null; } catch { return null; } })();
+                        const pctLabel = best !== null ? `<span class="sidebar-section-pct ${best >= 70 ? 'pass' : 'fail'}">${best}%</span>` : '';
+                        testBadge = `<span class="sidebar-section-test" title="Есть тест">✎</span>${pctLabel}`;
+                    }
                     sa.innerHTML = `
                         <span class="sidebar-section-number">${sNum}</span>
                         <span class="sidebar-section-title">${section.title}</span>
-                        ${section.hasTest ? '<span class="sidebar-section-test" title="Есть тест">✎</span>' : ''}`;
+                        ${testBadge}`;
 
                     sli.appendChild(sa);
                     subUl.appendChild(sli);
@@ -281,7 +299,25 @@ function buildParagraphNav(structure) {
 function initMobileMenu() {
     const btn     = document.querySelector('.mobile-menu-btn');
     const sidebar = document.querySelector('.sidebar');
-    if (!btn || !sidebar) return;
+    const headerNav = document.querySelector('.header-nav');
+
+    if (!btn) return;
+
+    // Landing page: no sidebar — toggle header-nav instead
+    if (!sidebar) {
+        if (!headerNav) return;
+        btn.addEventListener('click', () => {
+            const open = headerNav.classList.toggle('mobile-open');
+            btn.setAttribute('aria-expanded', open);
+        });
+        document.addEventListener('click', (e) => {
+            if (!headerNav.contains(e.target) && !btn.contains(e.target)) {
+                headerNav.classList.remove('mobile-open');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+        return;
+    }
 
     btn.addEventListener('click', () => {
         const open = sidebar.classList.toggle('open');
@@ -382,3 +418,34 @@ window.copyCode = function(btn) {
         setTimeout(() => btn.textContent = orig, 2000);
     });
 };
+
+// ------------------------------------------
+// HEADER USER INFO (streak + profile link)
+// ------------------------------------------
+function initHeaderUser() {
+    const nav = document.querySelector('.header-nav');
+    if (!nav) return;
+
+    const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+    if (!user) return;
+
+    // Remove existing profile link if any
+    nav.querySelectorAll('.header-profile-link').forEach(el => el.remove());
+
+    const streak = user.currentStreak ?? 0;
+    const a = document.createElement('a');
+    a.href = _siteRoot + 'profile.html';
+    a.className = 'header-profile-link';
+    a.innerHTML = streak > 0
+        ? `<span class="header-streak">🔥${streak}</span> ${user.firstName}`
+        : user.firstName;
+    a.style.cssText = 'display:inline-flex;align-items:center;gap:6px;';
+    nav.appendChild(a);
+}
+
+// Style for streak badge (injected once)
+(function() {
+    const style = document.createElement('style');
+    style.textContent = `.header-streak{background:rgba(250,179,135,.15);color:#fab387;border-radius:99px;padding:2px 8px;font-size:.8rem;font-weight:700;}`;
+    document.head.appendChild(style);
+}());

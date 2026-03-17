@@ -4,58 +4,72 @@
    ============================================ */
 
 :root {
-    /* === Color Palette - Subway Surfers Vibrant === */
-    --bg-primary: #0a0e27;
-    --bg-secondary: #141937;
-    --bg-tertiary: #1e2447;
-    --bg-card: #252d57;
-    --bg-card-hover: #2d3667;
-    --bg-overlay: rgba(0, 0, 0, 0.85);
+    /* === Color Palette — Indigo / Violet / Sky Blue === */
+    --bg-primary:    #0c0b1e;
+    --bg-secondary:  #110f2a;
+    --bg-tertiary:   #1a1838;
+    --bg-card:       #1e1c3a;
+    --bg-card-hover: #252348;
+    --bg-overlay:    rgba(0, 0, 0, 0.85);
 
     /* Borders */
-    --border-primary: #3d4a7a;
-    --border-secondary: #4f5d8f;
-    --border-accent: rgba(255, 215, 0, 0.5);
+    --border-primary:   #2e2b55;
+    --border-secondary: #3d3a6e;
+    --border-accent:    rgba(139, 120, 255, 0.5);
 
     /* Text */
-    --text-primary: #ffffff;
-    --text-secondary: #c7d2fe;
-    --text-tertiary: #94a3b8;
-    --text-heading: #ffffff;
-    --text-link: #FFD700;
+    --text-primary:  #eef0ff;
+    --text-secondary: #b8bfe8;
+    --text-tertiary:  #7a80a8;
+    --text-heading:   #ffffff;
+    --text-link:      #a78bfa;
 
-    /* Accent Colors - Vibrant Subway Surfers Style */
-    --accent-blue: #3A86FF;
-    --accent-blue-dim: rgba(58, 134, 255, 0.2);
-    --accent-purple: #8338EC;
-    --accent-purple-dim: rgba(131, 56, 236, 0.2);
-    --accent-violet: #C77DFF;
-    --accent-violet-dim: rgba(199, 125, 255, 0.2);
-    --accent-indigo: #7209B7;
-    --accent-indigo-dim: rgba(114, 9, 183, 0.2);
-    --accent-cyan: #06FFA5;
-    --accent-cyan-dim: rgba(6, 255, 165, 0.2);
-    
-    /* Status Colors - Bright & Vibrant */
-    --accent-green: #06FFA5;
-    --accent-green-dim: rgba(6, 255, 165, 0.2);
-    --accent-orange: #FF6B35;
-    --accent-orange-dim: rgba(255, 107, 53, 0.2);
-    --accent-red: #FB5607;
-    --accent-red-dim: rgba(251, 86, 7, 0.2);
-    --accent-yellow: #FFD700;
-    --accent-yellow-dim: rgba(255, 215, 0, 0.2);
-    --accent-pink: #FF006E;
-    --accent-pink-dim: rgba(255, 0, 110, 0.2);
+    /* Primary accents — violet → sky blue gradient family */
+    --accent-blue:       #7eb8f7;          /* soft sky blue */
+    --accent-blue-dim:   rgba(126,184,247, 0.15);
+    --accent-purple:     #7c5cbf;          /* mid violet */
+    --accent-purple-dim: rgba(124, 92,191, 0.18);
+    --accent-violet:     #a78bfa;          /* bright violet */
+    --accent-violet-dim: rgba(167,139,250, 0.15);
+    --accent-indigo:     #5b4fcf;          /* deep indigo */
+    --accent-indigo-dim: rgba( 91, 79,207, 0.2);
+    --accent-cyan:       #93c5fd;          /* pale sky */
+    --accent-cyan-dim:   rgba(147,197,253, 0.15);
+
+    /* Gradient shortcuts */
+    --grad-main:    linear-gradient(135deg, #7c5cbf 0%, #7eb8f7 100%);
+    --grad-vivid:   linear-gradient(135deg, #6d28d9 0%, #3b82f6 100%);
+    --grad-subtle:  linear-gradient(135deg, rgba(124,92,191,.25) 0%, rgba(126,184,247,.15) 100%);
+
+    /* Status */
+    --accent-green:      #6ee7b7;
+    --accent-green-dim:  rgba(110,231,183, 0.15);
+    --accent-orange:     #fbbf24;
+    --accent-orange-dim: rgba(251,191, 36, 0.15);
+    --accent-red:        #f87171;
+    --accent-red-dim:    rgba(248,113,113, 0.15);
+    --accent-yellow:     #fde68a;
+    --accent-yellow-dim: rgba(253,230,138, 0.15);
+    --accent-pink:       #e879f9;
+    --accent-pink-dim:   rgba(232,121,249, 0.15);
 
     /* Code highlighting */
-    --code-bg: #1e1e2e;
-    --code-border: #3d4354;
-    --code-keyword: #c792ea;
-    --code-string: #c3e88d;
-    --code-number: #f78c6c;
-    --code-comment: #697098;
-    --code-function: #82aaff;
+    --code-bg:       #13122a;
+    --code-border:   #2a2850;
+    --code-keyword:  #c084fc;
+    --code-string:   #86efac;
+    --code-number:   #fca5a5;
+    --code-comment:  #5a5880;
+    --code-function: #93c5fd;
+
+    /* Shadows — tinted indigo */
+    --shadow-sm: 0 1px 3px  rgba(10,8,40,.5);
+    --shadow-md: 0 4px 14px rgba(10,8,40,.55);
+    --shadow-lg: 0 8px 28px rgba(10,8,40,.65);
+    --shadow-xl: 0 16px 52px rgba(10,8,40,.75);
+    --shadow-glow-blue:   0 0 22px rgba(126,184,247,.25);
+    --shadow-glow-purple: 0 0 22px rgba(167,139,250,.25);
+    --shadow-glow-cyan:   0 0 22px rgba(147,197,253,.2);
 
     /* === Typography === */
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
@@ -110,14 +124,7 @@
     --radius-2xl: 24px;
     --radius-full: 9999px;
 
-    /* === Shadows === */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
-    --shadow-glow-blue: 0 0 20px rgba(129, 140, 248, 0.3);
-    --shadow-glow-purple: 0 0 20px rgba(167, 139, 250, 0.3);
-    --shadow-glow-cyan: 0 0 20px rgba(34, 211, 238, 0.3);
+
 
     /* === Transitions === */
     --transition-fast: 150ms ease;

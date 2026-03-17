@@ -348,6 +348,26 @@ class Quiz {
         if (passed && this.type === 'final') {
             localStorage.setItem(`final_passed_${this.quizId}`, '1');
         }
+
+        // Отправляем прогресс на сервер если пользователь залогинен
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        if (user && user.isuNumber) {
+            fetch('/api/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    isuNumber: user.isuNumber,
+                    chapterId: 'chapter-1',
+                    chapterTitle: 'Глава I: Фундаментальные типы данных',
+                    testId: this.quizId,
+                    testTitle: this.title,
+                    points: pct
+                })
+            })
+            .then(r => r.json())
+            .then(d => console.log('[Quiz] Progress saved:', d))
+            .catch(e => console.error('[Quiz] Failed to save progress:', e));
+        }
     }
 }
 

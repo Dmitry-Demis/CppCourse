@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.8 Литералы, операторы и выражения — Курс C++</title>
+    <meta name="description" content="Литералы, операторы и выражения в C++: арифметические операторы, приоритет, тип выражения.">
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.8</div>
+                <h1>Литералы, операторы и выражения</h1>
+
+                <p>
+                    Три фундаментальных строительных блока любого вычисления в C++.
+                </p>
+
+                <h2 id="literals">1. Литералы</h2>
+
+                <p>
+                    <span class="key-term">Литерал</span> — фиксированное значение, записанное прямо в коде.
+                    Компилятор знает его тип по синтаксису.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">📌 Виды литералов</div>
+                    <ul>
+                        <li><code>42</code> — целочисленный (<code>int</code>)</li>
+                        <li><code>42L</code> — целочисленный (<code>long</code>)</li>
+                        <li><code>3.14</code> — с плавающей точкой (<code>double</code>)</li>
+                        <li><code>3.14f</code> — с плавающей точкой (<code>float</code>)</li>
+                        <li><code>'A'</code> — символьный (<code>char</code>)</li>
+                        <li><code>"hello"</code> — строковый (<code>const char*</code>)</li>
+                        <li><code>true</code> / <code>false</code> — булев (<code>bool</code>)</li>
+                    </ul>
+                </div>
+
+                <h2 id="operators">2. Операторы</h2>
+
+                <p>
+                    <span class="key-term">Оператор</span> выполняет операцию над одним или несколькими
+                    <span class="key-term">операндами</span> и возвращает результат.
+                </p>
+
+                <div class="code-block" data-example="chapter-1/basics/literals-operators.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — литералы и операторы</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="expressions">3. Выражения</h2>
+
+                <p>
+                    <span class="key-term">Выражение</span> — комбинация литералов, переменных и операторов,
+                    которая вычисляется в единственное значение с определённым типом.
+                </p>
+
+                <div class="code-block" data-example="chapter-1/basics/expressions.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — выражения</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Инструкция vs выражение</div>
+                    <ul>
+                        <li><strong>Выражение</strong> вычисляется в значение: <code>x + 5</code></li>
+                        <li><strong>Инструкция</strong> выполняет действие и заканчивается <code>;</code>: <code>x = x + 5;</code></li>
+                        <li>Выражение + <code>;</code> = инструкция-выражение (expression statement)</li>
+                    </ul>
+                </div>
+
+                <h2 id="precedence">4. Приоритет операторов</h2>
+
+                <p>
+                    Как в математике: <code>*</code> и <code>/</code> выполняются раньше <code>+</code> и <code>-</code>.
+                    Скобки <code>()</code> меняют порядок вычисления.
+                    При сомнениях — используйте скобки явно.
+                </p>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

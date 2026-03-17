@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§5.2 Оператор if и блоки — Курс C++</title>
+    <meta name="description" content="Синтаксис if/else в C++, блоки, неявные блоки, область видимости переменных, if-else против if-if.">
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="index.html" class="active">Глава V</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава V — §5.2</div>
+                <h1>Оператор if и блоки</h1>
+
+                <p>
+                    <span class="key-term">Условный оператор</span> — это инструкция, которая решает,
+                    выполнять ли связанный с ней код. Самый базовый условный оператор в C++ — <code>if</code>.
+                </p>
+
+                <h2 id="syntax">1. Синтаксис if / else</h2>
+
+                <p>Базовая форма:</p>
+
+                <div class="info-card">
+                    <div class="info-card__title">📐 Синтаксис</div>
+                    <pre style="margin:0"><code class="language-cpp">if (условие)
+    инструкция_если_истина;
+
+if (условие)
+    инструкция_если_истина;
+else
+    инструкция_если_ложь;</code></pre>
+                </div>
+
+                <p>
+                    Если <code>условие</code> истинно — выполняется первая инструкция.
+                    Если ложно и есть <code>else</code> — выполняется вторая.
+                    Ровно одна из двух веток выполняется всегда.
+                </p>
+
+                <div class="code-block" data-example="chapter-4/control-flow/if-basic.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — базовый if/else</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="blocks">2. Блоки для нескольких инструкций</h2>
+
+                <p>
+                    После <code>if</code> или <code>else</code> можно написать только <em>одну</em> инструкцию.
+                    Чтобы выполнить несколько — нужен <span class="key-term">блок</span> <code>{ }</code>.
+                    Блок считается одной составной инструкцией.
+                </p>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠️ Ловушка отступов</div>
+                    <p>
+                        Отступ не влияет на логику. Только <code>{ }</code> объединяют инструкции в блок.
+                        Без блока вторая строка выполняется <em>всегда</em>, независимо от условия.
+                    </p>
+                </div>
+
+                <div class="code-block" data-example="chapter-4/control-flow/if-blocks.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — блоки в if/else</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="implicit-blocks">3. Неявные блоки и область видимости</h2>
+
+                <p>
+                    Даже без явных <code>{ }</code> компилятор неявно создаёт блок вокруг каждой ветки.
+                    Это значит, что переменная, объявленная внутри ветки <code>if</code>,
+                    <strong>уничтожается</strong> в конце этой ветки и недоступна снаружи.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Почему это не компилируется</div>
+                    <pre style="margin:0"><code class="language-cpp">if (true)
+    int x{ 5 };   // x живёт только внутри неявного блока
+else
+    int x{ 6 };   // другой x, тоже уничтожается
+
+std::cout &lt;&lt; x;   // ошибка: x не существует здесь</code></pre>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">✅ Лучшая практика</div>
+                    <p>
+                        Всегда используйте явные блоки <code>{ }</code> после <code>if</code> и <code>else</code>,
+                        особенно пока учитесь. Это предотвращает случайные ошибки при добавлении новых строк
+                        и обеспечивает совместимость с <code>if constexpr</code> (C++23).
+                    </p>
+                </div>
+
+                <h2 id="else-if-vs-if-if">4. if-else против if-if</h2>
+
+                <p>
+                    Ключевое различие: <code>if-else</code> выполняет код только после
+                    <em>первого</em> истинного условия. <code>if-if</code> проверяет
+                    <em>все</em> условия независимо.
+                </p>
+
+                <div class="code-block" data-example="chapter-4/control-flow/if-else-vs-if-if.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — if-else vs if-if</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Когда else не нужен</div>
+                    <p>
+                        Если каждая ветка заканчивается <code>return</code>, <code>else</code> не добавляет смысла —
+                        после первого <code>return</code> функция уже завершилась. Многие разработчики
+                        предпочитают убирать лишние <code>else</code> для чистоты кода:
+                    </p>
+                    <pre style="margin:0"><code class="language-cpp">// Оба варианта эквивалентны:
+if (a) return 'a';
+else if (b) return 'b';  // else здесь лишний
+
+if (a) return 'a';
+if (b) return 'b';       // чище</code></pre>
+                </div>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

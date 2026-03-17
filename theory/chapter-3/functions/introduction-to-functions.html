@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§2.1 Введение в функции — Курс C++</title>
+    <meta name="description" content="Что такое функции в C++, зачем они нужны, синтаксис объявления и определения, вызов функций.">
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава III</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава III — §3.1</div>
+                <h1>Введение в функции</h1>
+
+                <p>
+                    Программа на C++ — это набор инструкций, которые выполняются последовательно.
+                    Но по мере роста программы держать всё в <code>main()</code> становится неудобно.
+                    Функции позволяют разбить код на именованные блоки, которые можно вызывать многократно.
+                </p>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="what-is-function">1. Что такое функция</h2>
+
+                <p>
+                    <span class="key-term">Функция</span> — это именованная последовательность инструкций,
+                    которая выполняет определённую задачу. Функцию можно <em>вызвать</em> из любого места программы,
+                    и она выполнится, после чего управление вернётся обратно.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Зачем нужны функции</div>
+                    <ul>
+                        <li><strong>Повторное использование</strong> — написал один раз, вызываешь сколько угодно</li>
+                        <li><strong>Читаемость</strong> — код разбит на логические блоки с понятными именами</li>
+                        <li><strong>Тестируемость</strong> — каждую функцию можно проверить отдельно</li>
+                        <li><strong>Абстракция</strong> — скрываешь детали реализации за интерфейсом</li>
+                    </ul>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="syntax">2. Синтаксис функции</h2>
+
+                <p>Функция состоит из <em>заголовка</em> и <em>тела</em>. Базовый вызов и повторное использование:</p>
+
+                <div class="code-block" data-example="chapter-2/functions/intro-basic.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — первая функция</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="nested-calls">3. Вложенные вызовы</h2>
+
+                <p>
+                    Функции могут вызывать другие функции. Это основа построения сложных программ
+                    из простых блоков.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/intro-nested.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — вложенные вызовы</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="definition-vs-declaration">4. Определение и объявление</h2>
+
+                <p>
+                    В C++ важно различать два понятия:
+                </p>
+
+                <ul>
+                    <li>
+                        <span class="key-term">Определение</span> (definition) — полный код функции с телом.
+                        Компилятор генерирует машинный код.
+                    </li>
+                    <li>
+                        <span class="key-term">Объявление</span> (declaration / forward declaration) —
+                        только заголовок без тела, заканчивается <code>;</code>.
+                        Сообщает компилятору, что функция существует.
+                    </li>
+                </ul>
+
+                <div class="code-block" data-example="chapter-2/functions/intro-forward-decl.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — forward declaration</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠️ Порядок имеет значение</div>
+                    <p>
+                        Компилятор читает файл сверху вниз. Если вызвать функцию до её определения
+                        <em>и</em> без объявления — ошибка компиляции. Решения:
+                    </p>
+                    <ul>
+                        <li>Поместить определение функции <em>выше</em> места вызова</li>
+                        <li>Добавить forward declaration перед <code>main()</code></li>
+                    </ul>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="main-is-function">5. main() — тоже функция</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">📌 Правила для main()</div>
+                    <ul>
+                        <li>Должна быть ровно одна функция <code>main()</code> в программе</li>
+                        <li>Возвращает <code>int</code> — код завершения для ОС</li>
+                        <li><code>return 0;</code> можно опустить — компилятор добавит автоматически (C++11)</li>
+                        <li>Нельзя вызвать <code>main()</code> из другой функции (это UB)</li>
+                    </ul>
+                </div>
+
+                <div class="paragraph-nav"></div>
+
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+
+</body>
+</html>

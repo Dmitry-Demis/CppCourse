@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Глава V — Управление потоком — Курс C++</title>
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава V</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава V</div>
+                <h1>Управление потоком</h1>
+
+                <p>
+                    До этой главы программы выполнялись строго сверху вниз — одинаково при каждом запуске.
+                    Операторы управления потоком меняют это: программа может ветвиться, повторять блоки кода
+                    и реагировать на данные времени выполнения. Именно здесь начинается настоящее программирование.
+                </p>
+
+                <div class="chapter-sections">
+                    <a href="introduction-to-control-flow.html" class="section-card">
+                        <div class="section-card__number">§5.1</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Введение в управление потоком</div>
+                            <div class="section-card__desc">Путь выполнения, ветвление, категории операторов: условия, циклы, прыжки, исключения</div>
+                        </div>
+                    </a>
+                    <a href="if-statements.html" class="section-card">
+                        <div class="section-card__number">§5.2</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Оператор if и блоки</div>
+                            <div class="section-card__desc">Синтаксис if/else, блоки { }, неявные блоки, if-else vs if-if, область видимости</div>
+                        </div>
+                    </a>
+                    <a href="if-common-problems.html" class="section-card">
+                        <div class="section-card__number">§5.3</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Типичные ошибки с if</div>
+                            <div class="section-card__desc">Dangling else, уплощение вложенных if, null statement, = вместо ==</div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/gamification.js"></script>
+</body>
+</html>

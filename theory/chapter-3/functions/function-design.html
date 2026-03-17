@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§2.7 Проектирование функций — Курс C++</title>
+    <meta name="description" content="Как правильно проектировать функции в C++: принцип единственной ответственности, именование, декомпозиция задач.">
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава III</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава III — §3.7</div>
+                <h1>Проектирование функций</h1>
+
+                <p>
+                    Знать синтаксис функций — это половина дела. Важнее понять,
+                    <em>как</em> правильно их проектировать, чтобы код был читаемым,
+                    переиспользуемым и лёгким в поддержке.
+                </p>
+
+                <h2 id="srp">1. Принцип единственной ответственности</h2>
+
+                <p>
+                    Каждая функция должна делать <em>одно дело</em> и делать его хорошо.
+                    Если функцию трудно назвать одним словом — скорее всего, она делает слишком много.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">📌 Признаки хорошей функции</div>
+                    <ul>
+                        <li>Умещается на экране (≈ 20–30 строк)</li>
+                        <li>Имя — глагол или глагол+существительное: <code>calculateArea</code>, <code>printResult</code></li>
+                        <li>Делает одно дело: либо вычисляет, либо выводит — не оба сразу</li>
+                        <li>Параметров не слишком много (≤ 4–5 — сигнал задуматься)</li>
+                        <li>Не зависит от глобального состояния без необходимости</li>
+                    </ul>
+                </div>
+
+                <h2 id="decomposition">2. Декомпозиция задачи</h2>
+
+                <p>
+                    Хороший подход — сначала написать <code>main()</code> как последовательность
+                    вызовов функций с понятными именами, а потом реализовать каждую.
+                    Это называется <span class="key-term">top-down design</span>.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/design-refactor.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — декомпозиция</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="naming">3. Именование</h2>
+
+                <p>Имена функций должны отражать <em>что</em> функция делает, а не <em>как</em>:</p>
+
+                <ul>
+                    <li><code>getUserAge()</code> — хорошо, понятно что возвращает</li>
+                    <li><code>doStuff()</code> — плохо, ничего не говорит</li>
+                    <li><code>calculateAndPrintAndSave()</code> — плохо, три дела в одной</li>
+                    <li><code>isValid()</code>, <code>hasPermission()</code> — хорошо для bool-функций</li>
+                </ul>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Когда выносить код в функцию</div>
+                    <ul>
+                        <li>Код повторяется 2+ раза — выноси в функцию</li>
+                        <li>Блок кода требует комментария «что он делает» — это кандидат на функцию</li>
+                        <li>Функция стала длиннее экрана — разбей на части</li>
+                        <li>Хочешь протестировать логику отдельно — выноси в функцию</li>
+                    </ul>
+                </div>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

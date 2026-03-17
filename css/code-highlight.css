@@ -2,17 +2,17 @@
    CODE SYNTAX HIGHLIGHTING - Vibrant Colors
    ============================================ */
 
-/* Яркая цветовая схема для кода */
+/* Яркая цветовая схема для кода — indigo/violet theme */
 :root {
-    --code-bg: #1e1e2e;
-    --code-keyword: #FF6B9D;
-    --code-function: #FFD93D;
-    --code-string: #6BCF7F;
-    --code-number: #C792EA;
-    --code-comment: #7F8C98;
-    --code-type: #82AAFF;
-    --code-operator: #89DDFF;
-    --code-preprocessor: #FF9E64;
+    --code-bg:          #13122a;
+    --code-keyword:     #c084fc;
+    --code-function:    #93c5fd;
+    --code-string:      #86efac;
+    --code-number:      #fca5a5;
+    --code-comment:     #5a5880;
+    --code-type:        #a78bfa;
+    --code-operator:    #7eb8f7;
+    --code-preprocessor:#fbbf24;
 }
 
 /* Контейнер кода */

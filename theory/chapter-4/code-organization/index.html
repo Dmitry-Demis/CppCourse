@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Глава IV — Организация кода — Курс C++</title>
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава IV</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава IV</div>
+                <h1>Организация кода</h1>
+
+                <p>
+                    Реальные программы состоят из множества файлов. В этой главе разберём,
+                    как разбить проект на части: несколько <code>.cpp</code> файлов,
+                    заголовочные файлы, пространства имён и препроцессор.
+                </p>
+
+                <div class="chapter-sections">
+                    <a href="multiple-files.html" class="section-card">
+                        <div class="section-card__number">§4.1</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Программы из нескольких файлов</div>
+                            <div class="section-card__desc">Компиляция и линковка, forward declarations между файлами</div>
+                        </div>
+                    </a>
+                    <a href="namespaces.html" class="section-card">
+                        <div class="section-card__number">§4.2</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Пространства имён</div>
+                            <div class="section-card__desc">namespace, using, вложенные пространства имён, анонимные namespace</div>
+                        </div>
+                    </a>
+                    <a href="preprocessor.html" class="section-card">
+                        <div class="section-card__number">§4.3</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Препроцессор</div>
+                            <div class="section-card__desc">#define, #ifdef, #if, макросы и условная компиляция</div>
+                        </div>
+                    </a>
+                    <a href="header-files.html" class="section-card">
+                        <div class="section-card__number">§4.4</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Заголовочные файлы</div>
+                            <div class="section-card__desc">Что помещать в .h файлы, разделение объявлений и определений</div>
+                        </div>
+                    </a>
+                    <a href="header-guards.html" class="section-card">
+                        <div class="section-card__number">§4.5</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Header guards</div>
+                            <div class="section-card__desc">#pragma once и include guards — защита от двойного включения</div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/gamification.js"></script>
+
+</body>
+</html>

@@ -1,297 +1,186 @@
-// Online C++ Compiler using Compiler Explorer (Godbolt) API
+// ============================================
+// CppCompiler — inline compiler widget
+// Для каждого .code-block[data-example] редактор
+// рендерится сразу (не по кнопке).
+// Код подгружается с /api/examples/...
+// Подсветка через highlight.js (если подключён).
+// ============================================
+
+const CW_COMPILERS = [
+    { id: 'g1320',  label: 'GCC 13.2',   family: 'gcc'   },
+    { id: 'g1220',  label: 'GCC 12.2',   family: 'gcc'   },
+    { id: 'clang1600', label: 'Clang 16', family: 'clang' },
+    { id: 'clang1500', label: 'Clang 15', family: 'clang' },
+];
+
+const CW_STDS = ['c++23', 'c++20', 'c++17', 'c++14', 'c++11'];
+
 class CppCompiler {
-    constructor(containerId, initialCode = '') {
-        this.container = document.getElementById(containerId);
-        this.code = initialCode;
-        this.compiler = 'g132'; // GCC 13.2
-        this.arch = 'x86-64';
-        this.standard = 'c++17';
-        
-        if (this.container) {
-            this.render();
-        }
+    /**
+     * @param {string|HTMLElement} target  — ID контейнера или сам элемент
+     * @param {string} initialCode
+     * @param {object} opts  — { std: 'c++17', compiler: 'g1320' }
+     */
+    constructor(target, initialCode = '', opts = {}) {
+        this.container = typeof target === 'string'
+            ? document.getElementById(target)
+            : target;
+        this.code     = initialCode;
+        this.compiler = opts.compiler || CW_COMPILERS[0].id;
+        this.std      = opts.std      || 'c++17';
+        if (this.container) this._render();
     }
-    
-    render() {
+
+    _render() {
+        const compilerOptions = CW_COMPILERS.map(c =>
+            `<option value="${c.id}" ${c.id === this.compiler ? 'selected' : ''}>${c.label}</option>`
+        ).join('');
+
+        const stdOptions = CW_STDS.map(s =>
+            `<option value="${s}" ${s === this.std ? 'selected' : ''}>${s.toUpperCase()}</option>`
+        ).join('');
+
         this.container.innerHTML = `
-            <div class="compiler-widget">
-                <div class="compiler-header">
-                    <div class="compiler-title">
-                        <span>💻</span>
-                        <span>Онлайн компилятор C++</span>
-                    </div>
-                    <div class="compiler-controls">
-                        <select class="compiler-select" id="compiler-${this.container.id}">
-                            <optgroup label="GCC">
-                                <option value="g132" selected>GCC 13.2</option>
-                                <option value="g122">GCC 12.2</option>
-                                <option value="g114">GCC 11.4</option>
-                            </optgroup>
-                            <optgroup label="Clang">
-                                <option value="clang1600">Clang 16.0.0</option>
-                                <option value="clang1500">Clang 15.0.0</option>
-                                <option value="clang1400">Clang 14.0.0</option>
-                            </optgroup>
+            <div class="cw">
+                <div class="cw-header">
+                    <span class="cw-label">💻 Редактор</span>
+                    <div class="cw-controls">
+                        <select class="cw-select cw-select--compiler" title="Компилятор">
+                            ${compilerOptions}
                         </select>
-                        <select class="compiler-select" id="arch-${this.container.id}">
-                            <option value="x86-64" selected>x86-64</option>
-                            <option value="x86">x86 (32-bit)</option>
+                        <select class="cw-select cw-select--std" title="Стандарт C++">
+                            ${stdOptions}
                         </select>
-                        <select class="compiler-select" id="std-${this.container.id}">
-                            <option value="c++23">C++23</option>
-                            <option value="c++20">C++20</option>
-                            <option value="c++17" selected>C++17</option>
-                            <option value="c++14">C++14</option>
-                            <option value="c++11">C++11</option>
-                        </select>
-                        <button class="btn-compile" id="compile-${this.container.id}">
-                            ▶ Компилировать и запустить
-                        </button>
+                        <button class="cw-run" title="Запустить (Ctrl+Enter)">▶ Запустить</button>
                     </div>
                 </div>
-                
-                <div class="compiler-editor">
-                    <textarea id="code-${this.container.id}" spellcheck="false" class="code-editor">${this.escapeHtml(this.code)}</textarea>
-                </div>
-                
-                <div class="compiler-output">
-                    <div class="compiler-output-header">
-                        <span class="compiler-output-title">Вывод программы</span>
-                        <span class="compiler-output-status" id="status-${this.container.id}"></span>
-                    </div>
-                    <div class="compiler-output-content empty" id="output-${this.container.id}">
-                        Нажмите "Компилировать и запустить" для выполнения кода
-                    </div>
-                </div>
-                
-                <div class="compiler-info">
-                    <span class="compiler-info-icon">ℹ️</span>
-                    <span>Код компилируется на удалённом сервере Compiler Explorer (godbolt.org)</span>
-                </div>
-            </div>
-        `;
-        
-        this.attachEventListeners();
-    }
-    
-    attachEventListeners() {
-        const compileBtn = document.getElementById(`compile-${this.container.id}`);
-        const compilerSelect = document.getElementById(`compiler-${this.container.id}`);
-        const archSelect = document.getElementById(`arch-${this.container.id}`);
-        const stdSelect = document.getElementById(`std-${this.container.id}`);
-        const codeArea = document.getElementById(`code-${this.container.id}`);
-        
-        compileBtn.addEventListener('click', () => this.compile());
-        
-        compilerSelect.addEventListener('change', (e) => {
-            this.compiler = e.target.value;
-        });
-        
-        archSelect.addEventListener('change', (e) => {
-            this.arch = e.target.value;
-        });
-        
-        stdSelect.addEventListener('change', (e) => {
-            this.standard = e.target.value;
-        });
-        
-        codeArea.addEventListener('input', (e) => {
-            this.code = e.target.value;
-        });
-        
-        // Tab key support
-        codeArea.addEventListener('keydown', (e) => {
+                <textarea class="cw-editor" spellcheck="false">${this._esc(this.code)}</textarea>
+                <div class="cw-output cw-output--empty">Нажмите ▶ Запустить для выполнения кода</div>
+            </div>`;
+
+        const ta      = this.container.querySelector('.cw-editor');
+        const selComp = this.container.querySelector('.cw-select--compiler');
+        const selStd  = this.container.querySelector('.cw-select--std');
+        const btn     = this.container.querySelector('.cw-run');
+        const out     = this.container.querySelector('.cw-output');
+
+        selComp.addEventListener('change', e => { this.compiler = e.target.value; });
+        selStd.addEventListener('change',  e => { this.std      = e.target.value; });
+        ta.addEventListener('input',       e => { this.code     = e.target.value; });
+
+        ta.addEventListener('keydown', e => {
             if (e.key === 'Tab') {
                 e.preventDefault();
-                const start = e.target.selectionStart;
-                const end = e.target.selectionEnd;
-                e.target.value = e.target.value.substring(0, start) + '    ' + e.target.value.substring(end);
-                e.target.selectionStart = e.target.selectionEnd = start + 4;
+                const s = e.target.selectionStart, end = e.target.selectionEnd;
+                e.target.value = e.target.value.slice(0, s) + '    ' + e.target.value.slice(end);
+                e.target.selectionStart = e.target.selectionEnd = s + 4;
+                this.code = e.target.value;
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                this._compile(btn, out, ta);
             }
         });
+
+        btn.addEventListener('click', () => this._compile(btn, out, ta));
     }
-    
-    async compile() {
-        const compileBtn = document.getElementById(`compile-${this.container.id}`);
-        const statusEl = document.getElementById(`status-${this.container.id}`);
-        const outputEl = document.getElementById(`output-${this.container.id}`);
-        const codeArea = document.getElementById(`code-${this.container.id}`);
-        
-        // Update UI
-        compileBtn.disabled = true;
-        compileBtn.classList.add('compiling');
-        compileBtn.innerHTML = '<span class="spinner"></span> Компиляция...';
-        statusEl.className = 'compiler-output-status compiling';
-        statusEl.textContent = 'Компиляция...';
-        outputEl.className = 'compiler-output-content';
-        outputEl.textContent = 'Отправка кода на сервер...';
-        
+
+    async _compile(btn, out, ta) {
+        this.code = ta.value;
+        btn.disabled = true;
+        btn.textContent = '⏳ Компиляция…';
+        out.className = 'cw-output cw-output--running';
+        out.textContent = 'Отправка на сервер…';
+
         try {
-            const code = codeArea.value;
-            
-            // Compiler Explorer API
-            const response = await fetch('https://godbolt.org/api/compiler/' + this.compiler + '/compile', {
+            const res = await fetch(`https://godbolt.org/api/compiler/${this.compiler}/compile`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({
-                    source: code,
+                    source: this.code,
                     options: {
-                        userArguments: `-std=${this.standard} -O2`,
-                        compilerOptions: {
-                            executorRequest: true
-                        },
-                        filters: {
-                            execute: true
-                        },
-                        tools: [],
-                        libraries: []
+                        userArguments: `-std=${this.std} -O2`,
+                        compilerOptions: { executorRequest: true },
+                        filters: { execute: true },
+                        tools: [], libraries: []
                     },
                     lang: 'c++',
                     allowStoreCodeDebug: true
                 })
             });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            // Check for compilation errors
-            if (result.code !== 0) {
-                statusEl.className = 'compiler-output-status error';
-                statusEl.textContent = '❌ Ошибка компиляции';
-                outputEl.className = 'compiler-output-content error';
-                
-                let errorOutput = '';
-                
-                // Parse stderr for better error display
-                if (result.stderr && result.stderr.length > 0) {
-                    const errors = result.stderr.map(line => line.text).join('\n');
-                    
-                    // Try to parse and format errors
-                    const errorLines = errors.split('\n');
-                    let formattedErrors = [];
-                    
-                    for (let line of errorLines) {
-                        if (line.trim()) {
-                            // Highlight error/warning keywords
-                            if (line.includes('error:')) {
-                                formattedErrors.push('🔴 ' + line);
-                            } else if (line.includes('warning:')) {
-                                formattedErrors.push('⚠️  ' + line);
-                            } else if (line.includes('note:')) {
-                                formattedErrors.push('ℹ️  ' + line);
-                            } else {
-                                formattedErrors.push(line);
-                            }
-                        }
-                    }
-                    
-                    errorOutput = formattedErrors.join('\n');
-                } else if (result.stdout && result.stdout.length > 0) {
-                    errorOutput = result.stdout.map(line => line.text).join('\n');
-                } else {
-                    errorOutput = `Ошибка компиляции (код выхода: ${result.code})\n\nПроверьте синтаксис кода.`;
-                }
-                
-                outputEl.textContent = errorOutput;
+
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            if (window.gameSystem) gameSystem.onCodeRun();
+
+            if (data.code !== 0) {
+                const errors = (data.stderr || []).map(l => l.text).join('\n')
+                    || `Ошибка компиляции (код ${data.code})`;
+                out.className = 'cw-output cw-output--error';
+                out.textContent = errors;
             } else {
-                // Success - show execution output
-                statusEl.className = 'compiler-output-status success';
-                statusEl.textContent = '✓ Успешно';
-                outputEl.className = 'compiler-output-content';
-                
-                let output = '';
-                
-                // Get execution output
-                if (result.stdout && result.stdout.length > 0) {
-                    output = result.stdout.map(line => line.text).join('\n');
-                } else if (result.execResult && result.execResult.stdout) {
-                    output = result.execResult.stdout;
-                } else {
-                    output = '(программа выполнена успешно, вывод отсутствует)';
-                }
-                
-                outputEl.textContent = output;
+                const output = (data.stdout || []).map(l => l.text).join('\n')
+                    || data.execResult?.stdout
+                    || '(программа выполнена, вывод отсутствует)';
+                out.className = 'cw-output cw-output--ok';
+                out.textContent = output;
             }
-            
-        } catch (error) {
-            console.error('Compilation error:', error);
-            statusEl.className = 'compiler-output-status error';
-            statusEl.textContent = 'Ошибка';
-            outputEl.className = 'compiler-output-content error';
-            outputEl.textContent = `Ошибка подключения к серверу компиляции:\n${error.message}\n\nПопробуйте позже или проверьте подключение к интернету.`;
+        } catch (err) {
+            out.className = 'cw-output cw-output--error';
+            out.textContent = `Ошибка подключения:\n${err.message}`;
         } finally {
-            compileBtn.disabled = false;
-            compileBtn.classList.remove('compiling');
-            compileBtn.innerHTML = '▶ Компилировать и запустить';
+            btn.disabled = false;
+            btn.textContent = '▶ Запустить';
         }
     }
-    
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+
+    _esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 }
 
-// Helper function to create compiler from code block
-function createCompilerFromCodeBlock(codeBlockId, compilerId) {
-    const codeBlock = document.getElementById(codeBlockId);
-    if (!codeBlock) return;
+// ── Загрузка кода с сервера ───────────────────────────────────────────────────
 
-    const code = codeBlock.querySelector('code').textContent;
-
-    // Create compiler container after code block
-    const compilerContainer = document.createElement('div');
-    compilerContainer.id = compilerId;
-    codeBlock.parentNode.insertBefore(compilerContainer, codeBlock.nextSibling);
-
-    new CppCompiler(compilerId, code);
+async function _loadExampleCode(path) {
+    try {
+        const res = await fetch(`/api/examples/${path}`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.code;
+    } catch { return null; }
 }
 
-// ── Авто-кнопки «▶ Запустить» для каждого блока кода C++ ──
-function initAutoRunButtons() {
-    document.querySelectorAll('.code-block').forEach((block, i) => {
-        const codeEl = block.querySelector('pre code');
-        if (!codeEl) return;
+// ── Инициализация всех .code-block[data-example] ─────────────────────────────
+// Для каждого такого блока:
+//   1. Подгружаем код с сервера → вставляем в <pre><code> + подсвечиваем
+//   2. Сразу рендерим редактор CppCompiler под блоком
 
-        // Пропускаем не-C++ блоки (без class вообще или явно не cpp)
-        const cls = codeEl.className;
-        if (cls && !cls.includes('language-cpp') && !cls.includes('cpp') && !cls.includes('c++')) return;
+document.addEventListener('DOMContentLoaded', async () => {
+    const blocks = document.querySelectorAll('.code-block[data-example]');
 
-        // Не добавляем кнопку дважды
-        const actions = block.querySelector('.code-actions');
-        if (!actions || actions.querySelector('.btn-run')) return;
+    await Promise.all(Array.from(blocks).map(async (block, i) => {
+        const examplePath = block.dataset.example;
+        const codeEl      = block.querySelector('pre code');
+        const std         = block.dataset.std      || 'c++17';
+        const compiler    = block.dataset.compiler || CW_COMPILERS[0].id;
 
-        const code = codeEl.textContent;
-        const compilerId = `auto-compiler-${i}`;
+        // 1. Загружаем и подсвечиваем код в статическом блоке
+        let code = '';
+        if (codeEl) {
+            const fetched = await _loadExampleCode(examplePath);
+            if (fetched) {
+                code = fetched;
+                codeEl.textContent = fetched;
+                if (window.hljs) hljs.highlightElement(codeEl);
+            } else {
+                code = codeEl.textContent;
+            }
+        }
 
-        const btn = document.createElement('button');
-        btn.className = 'btn-code btn-run';
-        btn.textContent = '▶ Запустить';
-        btn.addEventListener('click', () => toggleAutoCompiler(block, code, compilerId, btn));
-        actions.appendChild(btn);
-    });
-}
-
-function toggleAutoCompiler(block, code, compilerId, btn) {
-    let container = document.getElementById(compilerId);
-    if (container) {
-        const hidden = container.style.display === 'none';
-        container.style.display = hidden ? '' : 'none';
-        btn.textContent = hidden ? '▼ Скрыть' : '▶ Запустить';
-        return;
-    }
-    container = document.createElement('div');
-    container.id = compilerId;
-    block.insertAdjacentElement('afterend', container);
-    btn.textContent = '▼ Скрыть';
-    new CppCompiler(compilerId, code);
-}
-
-document.addEventListener('DOMContentLoaded', () => initAutoRunButtons());
+        // 2. Рендерим редактор сразу под блоком
+        const wrapper = document.createElement('div');
+        wrapper.id = `cw-${i}-${examplePath.replace(/[^a-z0-9]/gi, '-')}`;
+        block.insertAdjacentElement('afterend', wrapper);
+        new CppCompiler(wrapper, code, { std, compiler });
+    }));
+});

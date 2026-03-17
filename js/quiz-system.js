@@ -512,6 +512,28 @@ class QuizSystem {
         
         const percentage = Math.round((this.score / testData.questions.length) * 100);
         
+        // Save progress to server if user is logged in
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        if (user) {
+            const points = Math.round(percentage / 10) * 10;
+            // Use absolute path to avoid issues when page is in subdirectory
+            fetch('/api/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    isuNumber: user.isuNumber,
+                    chapterId: 'chapter-1',
+                    chapterTitle: 'Глава I: Фундаментальные типы данных',
+                    points: points
+                })
+            })
+            .then(r => r.json())
+            .then(d => console.log('[Quiz] Progress saved:', d))
+            .catch(e => console.error('[Quiz] Failed to save progress:', e));
+        } else {
+            console.warn('[Quiz] No user in localStorage, progress not saved');
+        }
+
         // Show results
         this.showResults(testData, percentage);
     }

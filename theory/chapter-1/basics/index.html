@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Глава I — Основы C++ — Курс C++</title>
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I</div>
+                <h1>Основы C++</h1>
+
+                <p>
+                    Первые шаги в C++: структура программы, переменные, ввод/вывод,
+                    операторы и выражения. Всё, что нужно для написания первых программ.
+                </p>
+
+                <div class="chapter-sections">
+                    <a href="program-structure.html" class="section-card">
+                        <div class="section-card__number">§1.1</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Структура программы</div>
+                            <div class="section-card__desc">Функция main(), инструкции, препроцессорные директивы, порядок выполнения</div>
+                        </div>
+                    </a>
+                    <a href="comments.html" class="section-card">
+                        <div class="section-card__number">§1.2</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Комментарии</div>
+                            <div class="section-card__desc">Однострочные и многострочные комментарии, что и когда комментировать</div>
+                        </div>
+                    </a>
+                    <a href="variables-and-types.html" class="section-card">
+                        <div class="section-card__number">§1.3</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Переменные и типы данных</div>
+                            <div class="section-card__desc">Объявление переменных, основные типы: int, double, char, bool, string</div>
+                        </div>
+                    </a>
+                    <a href="initialization-and-assignment.html" class="section-card">
+                        <div class="section-card__number">§1.4</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Инициализация и присваивание</div>
+                            <div class="section-card__desc">Copy, direct, list инициализация, narrowing conversions, оператор =</div>
+                        </div>
+                    </a>
+                    <a href="iostream.html" class="section-card">
+                        <div class="section-card__number">§1.5</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Ввод и вывод: iostream</div>
+                            <div class="section-card__desc">std::cout, std::cin, операторы &lt;&lt; и &gt;&gt;, \n vs endl</div>
+                        </div>
+                    </a>
+                    <a href="uninitialized-variables.html" class="section-card">
+                        <div class="section-card__number">§1.6</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Неинициализированные переменные и UB</div>
+                            <div class="section-card__desc">Undefined behavior, почему это опасно, правило всегда инициализировать</div>
+                        </div>
+                    </a>
+                    <a href="keywords-and-naming.html" class="section-card">
+                        <div class="section-card__number">§1.7</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Ключевые слова и именование</div>
+                            <div class="section-card__desc">Зарезервированные слова, правила и соглашения об именовании идентификаторов</div>
+                        </div>
+                    </a>
+                    <a href="literals-operators-expressions.html" class="section-card">
+                        <div class="section-card__number">§1.8</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Литералы, операторы и выражения</div>
+                            <div class="section-card__desc">Виды литералов, арифметические операторы, выражения и их типы, приоритет</div>
+                        </div>
+                    </a>
+                    <a href="first-program.html" class="section-card">
+                        <div class="section-card__number">§1.9</div>
+                        <div class="section-card__body">
+                            <div class="section-card__title">Первая программа</div>
+                            <div class="section-card__desc">Процесс разработки от задачи до кода, итеративное улучшение, советы</div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/gamification.js"></script>
+</body>
+</html>

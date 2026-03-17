@@ -1,0 +1,1067 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1.2 Целочисленные типы — Курс C++</title>
+    <meta name="description" content="Целочисленные типы C++: int, short, long, long long, unsigned. Диапазоны, размеры, применение.">
+    <script src="../../../js/auth-guard.js"></script>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = { tex: { inlineMath:[['$','$'],['\\(','\\)']] }, svg:{fontCache:'global'} };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+
+    <style>
+        /* ── Per-type cards ── */
+        .int-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .int-type-card {
+            background: var(--surface, #1e1e2e);
+            border: 1px solid var(--border, #313244);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .int-type-card__header {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            padding: .75rem 1rem;
+            background: var(--surface-2, #181825);
+            border-bottom: 1px solid var(--border, #313244);
+        }
+        .int-type-card__name {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--accent-blue, #89b4fa);
+        }
+        .int-type-card__body {
+            padding: .9rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
+        .int-type-card__row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: .5rem;
+            font-size: .875rem;
+        }
+        .int-type-card__row-label { color: var(--text-muted, #6c7086); white-space: nowrap; flex-shrink: 0; }
+        .int-type-card__row-value { font-family: 'JetBrains Mono', monospace; color: var(--text, #cdd6f4); text-align: right; }
+        .int-type-card__use {
+            margin-top: .4rem;
+            padding-top: .6rem;
+            border-top: 1px solid var(--border, #313244);
+            font-size: .8rem;
+            color: var(--text-muted, #6c7086);
+            line-height: 1.5;
+        }
+        .int-type-card--short .int-type-card__header { border-left: 4px solid #a6e3a1; }
+        .int-type-card--int   .int-type-card__header { border-left: 4px solid #89b4fa; }
+        .int-type-card--long  .int-type-card__header { border-left: 4px solid #cba6f7; }
+        .int-type-card--ll    .int-type-card__header { border-left: 4px solid #f9e2af; }
+        .int-type-card--uint  .int-type-card__header { border-left: 4px solid #94e2d5; }
+
+        .std-badge--14 { background: #4a3f1a; color: #f9e2af; }
+        .std-badge--17 { background: #1e3a4f; color: #89dceb; }
+        .std-badge--20 { background: #2a1e4f; color: #cba6f7; }
+        .std-badge--23 { background: #3d1e3d; color: #f5c2e7; }
+
+        /* ── Test cards ── */
+        .int-tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .int-test-card {
+            background: var(--surface, #1e1e2e);
+            border: 1px solid var(--border, #313244);
+            border-radius: 10px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+        }
+        .int-test-card__icon { font-size: 1.5rem; }
+        .int-test-card__title { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent-blue, #89b4fa); }
+        .int-test-card__desc { font-size: .8rem; color: var(--text-muted, #6c7086); flex: 1; }
+        .btn-quiz-open {
+            margin-top: .4rem;
+            padding: .5rem 1rem;
+            background: var(--accent-blue, #89b4fa);
+            color: #1e1e2e;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: opacity .15s;
+        }
+        .btn-quiz-open:hover { opacity: .85; }
+        .int-test-final {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            background: linear-gradient(135deg, #1e1e2e, #2a1e4f);
+            border: 1px solid #cba6f7;
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0 2rem;
+            flex-wrap: wrap;
+        }
+        .int-test-final__title { font-size: 1rem; font-weight: 700; color: #cba6f7; margin-bottom: .3rem; }
+        .int-test-final__desc  { font-size: .85rem; color: var(--text-muted, #6c7086); }
+        .btn-quiz-open--final  { background: #cba6f7; white-space: nowrap; }
+
+        /* ── Modal overlay ── */
+        .quiz-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .quiz-modal-overlay.active { display: flex; }
+        .quiz-modal-box {
+            background: var(--surface, #1e1e2e);
+            border: 1px solid var(--border, #313244);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 680px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 2rem;
+        }
+        .quiz-modal-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted, #6c7086);
+            font-size: 1.2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: .25rem .5rem;
+            border-radius: 4px;
+        }
+        .quiz-modal-close:hover { color: var(--text, #cdd6f4); background: var(--surface-2, #181825); }
+        .quiz-modal-loading { text-align: center; padding: 3rem; color: var(--text-muted, #6c7086); }
+
+        /* ── Quiz inside modal ── */
+        .qm-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .5rem; }
+        .qm-title  { font-weight: 700; font-size: 1rem; color: var(--text, #cdd6f4); }
+        .qm-counter{ font-size: .85rem; color: var(--text-muted, #6c7086); }
+        .qm-progress { height: 5px; background: var(--surface-2, #181825); border-radius: 99px; margin-bottom: 1.5rem; }
+        .qm-progress-fill { height: 100%; background: linear-gradient(90deg, #89b4fa, #cba6f7); border-radius: 99px; transition: width .3s; }
+        .qm-type-badge { display: inline-block; font-size: .72rem; font-weight: 600; padding: .2rem .6rem; border-radius: 99px; margin-bottom: .75rem; background: #313244; color: #89b4fa; }
+        .qm-type--fill   { background: #2a1e4f; color: #cba6f7; }
+        .qm-type--multiple { background: #1e3a2a; color: #a6e3a1; }
+        .qm-type--code   { background: #3a2a1e; color: #f9e2af; }
+        .qm-question { font-size: 1rem; color: var(--text, #cdd6f4); margin-bottom: 1rem; line-height: 1.5; }
+        .qm-code { background: #181825; border-radius: 8px; padding: 1rem; font-size: .85rem; overflow-x: auto; margin-bottom: 1rem; }
+        .qm-answers { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+        .qm-answer {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .75rem 1rem;
+            background: #181825;
+            border: 2px solid #313244;
+            border-radius: 8px;
+            color: var(--text, #cdd6f4);
+            font-size: .9rem;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color .15s, background .15s;
+            width: 100%;
+        }
+        .qm-answer:hover:not(:disabled):not(label) { border-color: #89b4fa; background: #1e1e3a; }
+        .qm-answer--check { cursor: default; }
+        .qm-answer--check:hover { border-color: #313244; background: #181825; }
+        .qm-answer--correct { border-color: #a6e3a1 !important; background: #1e2e1e !important; }
+        .qm-answer--wrong   { border-color: #f38ba8 !important; background: #2e1e1e !important; }
+        .qm-answer:disabled { cursor: not-allowed; }
+        .qm-letter { min-width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; background: #313244; border-radius: 4px; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
+        .qm-fill { width: 100%; padding: .75rem 1rem; background: #181825; border: 2px solid #313244; border-radius: 8px; color: var(--text, #cdd6f4); font-size: .9rem; outline: none; }
+        .qm-fill:focus { border-color: #89b4fa; }
+        .qm-fill--ok  { border-color: #a6e3a1 !important; }
+        .qm-fill--err { border-color: #f38ba8 !important; }
+        .qm-feedback { display: flex; gap: .75rem; padding: .75rem 1rem; border-radius: 8px; margin-top: .5rem; font-size: .875rem; }
+        .qm-feedback--ok  { background: #1e2e1e; border: 1px solid #a6e3a1; }
+        .qm-feedback--err { background: #2e1e1e; border: 1px solid #f38ba8; }
+        .qm-fb-icon { font-size: 1.2rem; flex-shrink: 0; }
+        .qm-fb-pts  { display: inline-block; margin-top: .3rem; font-weight: 700; color: #f9e2af; }
+        .qm-footer  { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+        .qm-score   { font-size: .85rem; color: #f9e2af; }
+        .qm-actions { display: flex; gap: .5rem; }
+        .btn-qm { padding: .5rem 1.25rem; border: none; border-radius: 6px; font-weight: 600; font-size: .875rem; cursor: pointer; }
+        .btn-qm--check { background: #313244; color: #cdd6f4; }
+        .btn-qm--check:hover { background: #45475a; }
+        .btn-qm--next  { background: #89b4fa; color: #1e1e2e; }
+        .btn-qm--next:hover { opacity: .85; }
+        .qm-results { text-align: center; padding: 1rem 0; }
+        .qm-results-emoji { font-size: 3rem; margin-bottom: .5rem; }
+        .qm-results h2 { margin: 0 0 1.5rem; }
+        .qm-results-circle { position: relative; width: 120px; height: 120px; margin: 0 auto 1.5rem; }
+        .qm-results-circle svg { width: 100%; height: 100%; }
+        .qm-results-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; }
+        .qm-results-stats { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.5rem; }
+        .qm-stat-v { font-size: 1.5rem; font-weight: 700; color: #89b4fa; }
+        .qm-stat-l { font-size: .8rem; color: var(--text-muted, #6c7086); }
+        .qm-results-actions { display: flex; gap: .75rem; justify-content: center; }
+    </style>
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава II</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава II — §2.1.2</div>
+                <h1>Целочисленные типы</h1>
+
+                <p>
+                    Целочисленные типы — хребет большинства программ на C++: счётчики, индексы, идентификаторы,
+                    битовые маски. Стандарт гарантирует лишь <em>минимальные</em> размеры, поэтому важно знать,
+                    какой тип выбрать и чего ожидать на конкретной платформе.
+                </p>
+
+                <div class="iso-quote">
+                    <span class="iso-ref">[basic.fundamental] §6.7.1 — ISO/IEC 14882:2020</span>
+                    There are five standard signed integer types:
+                    <strong>signed char</strong>, <strong>short int</strong>, <strong>int</strong>,
+                    <strong>long int</strong>, and <strong>long long int</strong>.
+                    For each of the standard signed integer types, there exists a corresponding
+                    (but distinct) unsigned integer type.
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="overview-table">Обзор семейства целочисленных типов</h2>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Синонимы</th>
+                                <th>Мин. размер</th>
+                                <th>x86-64 (типично)</th>
+                                <th>Диапазон (signed)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>signed char</code></td>
+                                <td>—</td>
+                                <td>$8$ бит</td>
+                                <td>$1$ байт</td>
+                                <td class="cell-range">$-128$ … $127$</td>
+                            </tr>
+                            <tr>
+                                <td><code>short int</code></td>
+                                <td><code>short</code></td>
+                                <td>≥$16$ бит</td>
+                                <td>$2$ байта</td>
+                                <td class="cell-range">$-32\,768$ … $32\,767$</td>
+                            </tr>
+                            <tr>
+                                <td><code>int</code></td>
+                                <td><code>signed</code></td>
+                                <td>≥$16$ бит</td>
+                                <td>$4$ байта</td>
+                                <td class="cell-range">$-2\,147\,483\,648$ … $2\,147\,483\,647$</td>
+                            </tr>
+                            <tr>
+                                <td><code>long int</code></td>
+                                <td><code>long</code></td>
+                                <td>≥$32$ бита</td>
+                                <td>$8$ б (Linux) / $4$ б (Windows)</td>
+                                <td class="cell-range">платформенно-зависим</td>
+                            </tr>
+                            <tr>
+                                <td><code>long long int</code> <span class="std-badge std-badge--11">C++11</span></td>
+                                <td><code>long long</code></td>
+                                <td>≥$64$ бита</td>
+                                <td>$8$ байт</td>
+                                <td class="cell-range">$-9.22 \times 10^{18}$ … $9.22 \times 10^{18}$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Для каждого знакового типа существует беззнаковый аналог (<code>unsigned short</code>,
+                    <code>unsigned int</code> и т. д.), сдвигающий диапазон в положительную область и
+                    удваивающий максимум.
+                </p>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="per-type">Описание типов</h2>
+
+                <!-- ── short ── -->
+                <h3 id="type-short">short</h3>
+                <p>
+                    <span class="key-term">short</span> — наименьший «полноценный» целый тип (не считая
+                    <code>signed char</code>). Используется там, где важна экономия памяти: большие массивы,
+                    сетевые пакеты, аудио-сэмплы.
+                </p>
+
+                <div class="int-types-grid">
+                    <div class="int-type-card int-type-card--short">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">short</span>
+                            <span class="int-type-card__name" style="color:var(--text-muted,#6c7086)">/ signed short int</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (гарантия)</span>
+                                <span class="int-type-card__row-value">≥ $16$ бит</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">$2$ байта / $16$ бит</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">SHRT_MIN</span>
+                                <span class="int-type-card__row-value">$-32\,768$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">SHRT_MAX</span>
+                                <span class="int-type-card__row-value">$+32\,767$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс литерала</span>
+                                <span class="int-type-card__row-value">нет (неявное сужение)</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Аудио-сэмплы (PCM 16-bit), компактные массивы, сетевые поля фиксированного размера.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="int-type-card int-type-card--uint">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">unsigned short</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">$2$ байта / $16$ бит</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">MIN</span>
+                                <span class="int-type-card__row-value">$0$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">USHRT_MAX</span>
+                                <span class="int-type-card__row-value">$65\,535$</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Порты TCP/UDP ($0$–$65\,535$), пиксельные координаты, USB HID-отчёты.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block" data-example="chapter-1/integer-types/short.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — short</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <div class="section-quiz-prompt">
+                    <span class="section-quiz-prompt__text">Проверьте знания по <code>short</code></span>
+                    <button class="btn-quiz-open" onclick="openQuizModal('integers-short','Тест: тип short')">✎ Пройти тест →</button>
+                </div>
+
+                <!-- ── int ── -->
+                <h3 id="type-int">int</h3>
+                <p>
+                    <span class="key-term">int</span> — «естественный» целочисленный тип платформы.
+                    Стандарт гарантирует минимум $16$ бит, но на всех современных платформах он $32$-битный.
+                    Это тип по умолчанию для целочисленных литералов, счётчиков и арифметики.
+                </p>
+
+                <div class="int-types-grid">
+                    <div class="int-type-card int-type-card--int">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">int</span>
+                            <span class="int-type-card__name" style="color:var(--text-muted,#6c7086)">/ signed int</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (гарантия)</span>
+                                <span class="int-type-card__row-value">≥ $16$ бит</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">$4$ байта / $32$ бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">INT_MIN</span>
+                                <span class="int-type-card__row-value">$-2\,147\,483\,648$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">INT_MAX</span>
+                                <span class="int-type-card__row-value">$+2\,147\,483\,647$</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Счётчики циклов, индексы, флаги, возвращаемые значения функций.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="int-type-card int-type-card--uint">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">unsigned int</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">$4$ байта / $32$ бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">MIN</span>
+                                <span class="int-type-card__row-value">$0$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">UINT_MAX</span>
+                                <span class="int-type-card__row-value">$4\,294\,967\,295$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42u или 42U</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Битовые маски, хеш-значения, счётчики без отрицательных значений.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block" data-example="chapter-1/integer-types/int.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/14/17/20/23 — int</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <div class="section-quiz-prompt">
+                    <span class="section-quiz-prompt__text">Проверьте знания по <code>int</code></span>
+                    <button class="btn-quiz-open" onclick="openQuizModal('integers-int','Тест: тип int')">✎ Пройти тест →</button>
+                </div>
+
+                <!-- ── long ── -->
+                <h3 id="type-long">long</h3>
+                <p>
+                    <span class="key-term">long</span> — источник сюрпризов: его размер
+                    <strong>платформенно-зависим</strong>. На 64-битном Linux он 8 байт, на Windows — 4 байта.
+                    В переносимом коде предпочтите <code>int</code>, <code>long long</code> или <code>int64_t</code>.
+                </p>
+
+                <div class="int-types-grid">
+                    <div class="int-type-card int-type-card--long">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">long</span>
+                            <span class="int-type-card__name" style="color:var(--text-muted,#6c7086)">/ long int</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (гарантия)</span>
+                                <span class="int-type-card__row-value">≥ $32$ бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Linux x86-64</span>
+                                <span class="int-type-card__row-value">$8$ байт ($64$ бит)</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Windows x64</span>
+                                <span class="int-type-card__row-value">$4$ байта ($32$ бит)</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">LONG_MIN (64-bit)</span>
+                                <span class="int-type-card__row-value">$-9\,223\,372\,036\,854\,775\,808$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">LONG_MAX (64-bit)</span>
+                                <span class="int-type-card__row-value">$+9\,223\,372\,036\,854\,775\,807$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42L или 42l</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                POSIX API (off_t, pid_t). Избегайте в переносимом коде — используйте int64_t.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="int-type-card int-type-card--uint">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">unsigned long</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">MIN</span>
+                                <span class="int-type-card__row-value">$0$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Linux x86-64 MAX</span>
+                                <span class="int-type-card__row-value">$18\,446\,744\,073\,709\,551\,615$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Windows x64 MAX</span>
+                                <span class="int-type-card__row-value">$4\,294\,967\,295$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42UL</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                В старом POSIX-коде — size_t и системные типы.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Ловушка с long на разных платформах</div>
+                    <p>
+                        Никогда не предполагайте, что <code>long</code> — это 64 бита.
+                        На Windows x64 он 32-битный. Для гарантированного 64-битного типа
+                        используйте <code>long long</code> или <code>int64_t</code>.
+                    </p>
+                </div>
+
+                <div class="code-block" data-example="chapter-1/integer-types/long.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — long</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <div class="section-quiz-prompt">
+                    <span class="section-quiz-prompt__text">Проверьте знания по <code>long</code></span>
+                    <button class="btn-quiz-open" onclick="openQuizModal('integers-long','Тест: тип long')">✎ Пройти тест →</button>
+                </div>
+
+                <!-- ── long long ── -->
+                <h3 id="type-long-long">long long <span class="std-badge std-badge--11">C++11</span></h3>
+                <p>
+                    <span class="key-term">long long</span> — единственный тип, гарантирующий не менее $64$ бит
+                    на <em>любой</em> поддерживаемой платформе.
+                    Его диапазон: $-2^{63}$ до $2^{63}-1$ ≈ $\pm 9.2 \times 10^{18}$.
+                </p>
+
+                <div class="int-types-grid">
+                    <div class="int-type-card int-type-card--ll">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">long long</span>
+                            <span class="std-badge std-badge--11" style="margin-left:auto">C++11</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (гарантия)</span>
+                                <span class="int-type-card__row-value">≥ $64$ бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">$8$ байт / $64$ бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">LLONG_MIN</span>
+                                <span class="int-type-card__row-value">$-9\,223\,372\,036\,854\,775\,808$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">LLONG_MAX</span>
+                                <span class="int-type-card__row-value">$+9\,223\,372\,036\,854\,775\,807$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42LL или 42ll</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Unix timestamps, ID записей в БД, файловые смещения (&gt;$4$ ГБ), астрономические расчёты.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="int-type-card int-type-card--uint">
+                        <div class="int-type-card__header">
+                            <span class="int-type-card__name">unsigned long long</span>
+                        </div>
+                        <div class="int-type-card__body">
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Размер (x86-64)</span>
+                                <span class="int-type-card__row-value">$8$ байт / $64$ бита</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">MIN</span>
+                                <span class="int-type-card__row-value">$0$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">ULLONG_MAX</span>
+                                <span class="int-type-card__row-value">$18\,446\,744\,073\,709\,551\,615$</span>
+                            </div>
+                            <div class="int-type-card__row">
+                                <span class="int-type-card__row-label">Суффикс</span>
+                                <span class="int-type-card__row-value">42ULL</span>
+                            </div>
+                            <div class="int-type-card__use">
+                                Криптография, хеш-значения, $64$-битные битовые маски.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block" data-example="chapter-1/integer-types/long-long.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++11/14/20/23 — long long</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <div class="code-block" data-example="chapter-1/fundamental-types/integer-types-demo.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — целочисленные типы демонстрация</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="section-quiz-prompt">
+                    <span class="section-quiz-prompt__text">Проверьте знания по <code>long long</code></span>
+                    <button class="btn-quiz-open" onclick="openQuizModal('integers-longlong','Тест: тип long long')">✎ Пройти тест →</button>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">🔗 Продолжение темы</div>
+                    <p>
+                        В следующих разделах рассматриваются связанные аспекты целочисленных типов:
+                        <a href="signed-unsigned.html"><strong>§1.1.3 Знаковые и беззнаковые типы</strong></a>
+                        — модификаторы <code>signed</code>/<code>unsigned</code> и ловушки смешения;
+                        <a href="integer-overflow.html"><strong>§1.1.4 Переполнение</strong></a>
+                        — UB для знаковых vs wrap-around для беззнаковых;
+                        <a href="fixed-width-types.html"><strong>§1.1.5 Фиксированные размеры</strong></a>
+                        — <code>&lt;cstdint&gt;</code>, <code>std::numeric_limits</code>.
+                    </p>
+                </div>
+
+                <!-- Тесты по типам -->
+                <h2 id="tests">Проверьте знания</h2>
+                <p>После каждого типа — отдельный тест. В конце — итоговый тест по всему параграфу.</p>
+
+                <div class="int-tests-grid">
+                    <div class="int-test-card">
+                        <div class="int-test-card__icon">🔢</div>
+                        <div class="int-test-card__title">short</div>
+                        <div class="int-test-card__desc">10 вопросов: размер, диапазон, integer promotion, overflow</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('integers-short', 'Тест: тип short')">Пройти тест →</button>
+                    </div>
+                    <div class="int-test-card">
+                        <div class="int-test-card__icon">🔢</div>
+                        <div class="int-test-card__title">int</div>
+                        <div class="int-test-card__desc">10 вопросов: диапазон, UB, unsigned, применение</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('integers-int', 'Тест: тип int')">Пройти тест →</button>
+                    </div>
+                    <div class="int-test-card">
+                        <div class="int-test-card__icon">🔢</div>
+                        <div class="int-test-card__title">long</div>
+                        <div class="int-test-card__desc">10 вопросов: платформенные различия, LLP64 vs LP64</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('integers-long', 'Тест: тип long')">Пройти тест →</button>
+                    </div>
+                    <div class="int-test-card">
+                        <div class="int-test-card__icon">🔢</div>
+                        <div class="int-test-card__title">long long</div>
+                        <div class="int-test-card__desc">10 вопросов: 64-битный диапазон, суффиксы, C++11</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('integers-longlong', 'Тест: тип long long')">Пройти тест →</button>
+                    </div>
+                </div>
+
+                <div class="int-test-final">
+                    <div class="int-test-final__left">
+                        <div class="int-test-final__title">📋 Итоговый тест по параграфу</div>
+                        <div class="int-test-final__desc">20 вопросов по всем целочисленным типам: short, int, long, long long, signed/unsigned, overflow, fixed-width типы</div>
+                    </div>
+                    <button class="btn-quiz-open btn-quiz-open--final" onclick="openQuizModal('integers-paragraph', 'Целочисленные типы — итоговый тест')">Пройти итоговый тест →</button>
+                </div>
+
+                <!-- Модальное окно теста -->
+                <div id="quiz-modal-overlay" class="quiz-modal-overlay" onclick="closeQuizModal(event)">
+                    <div class="quiz-modal-box" id="quiz-modal-box">
+                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">✕</button>
+                        <div id="quiz-modal-content"></div>
+                    </div>
+                </div>
+
+                <!-- Навигация -->
+                <div class="paragraph-nav">
+                    <!-- navigation.js заполнит динамически из course-structure.json -->
+                </div>
+
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+    });
+
+    // ── Quiz Modal ────────────────────────────────────────────────────────────
+
+    let _activeQuiz = null;
+
+    async function openQuizModal(quizId, title) {
+        const overlay = document.getElementById('quiz-modal-overlay');
+        const content = document.getElementById('quiz-modal-content');
+
+        content.innerHTML = '<div class="quiz-modal-loading">Загрузка теста…</div>';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        try {
+            const res = await fetch(`/api/quiz/${quizId}`);
+            if (!res.ok) throw new Error('not found');
+            const data = await res.json();
+            _activeQuiz = new ModalQuiz(content, data);
+        } catch {
+            content.innerHTML = '<div class="quiz-modal-loading">Не удалось загрузить тест.</div>';
+        }
+    }
+
+    function closeQuizModal(e) {
+        if (e && e.target !== document.getElementById('quiz-modal-overlay')) return;
+        document.getElementById('quiz-modal-overlay').classList.remove('active');
+        document.body.style.overflow = '';
+        _activeQuiz = null;
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeQuizModal(null);
+    });
+
+    // ── ModalQuiz — рендерит тест внутри модалки ──────────────────────────────
+    class ModalQuiz {
+        constructor(container, data) {
+            this.container   = container;
+            this.quizId      = data.quizId;
+            this.title       = data.title;
+            this.passingScore = data.passingScore ?? 70;
+            this.questions   = this._shuffle([...data.questions]);
+            this.current     = 0;
+            this.answers     = {};
+            this.answered    = false;
+            this._render();
+        }
+
+        _render() {
+            if (this.current >= this.questions.length) { this._showResults(); return; }
+            const q   = this.questions[this.current];
+            const pct = Math.round(this.current / this.questions.length * 100);
+            this.answered = false;
+
+            this.container.innerHTML = `
+                <div class="qm-header">
+                    <div class="qm-title">${this.title}</div>
+                    <div class="qm-counter">${this.current + 1} / ${this.questions.length}</div>
+                </div>
+                <div class="qm-progress"><div class="qm-progress-fill" style="width:${pct}%"></div></div>
+                <div class="qm-body">
+                    <div class="qm-type-badge qm-type--${q.type}">${this._typeLabel(q.type)}</div>
+                    <div class="qm-question">${q.question}</div>
+                    ${q.code ? `<pre class="qm-code"><code class="language-cpp">${this._esc(q.code)}</code></pre>` : ''}
+                    <div class="qm-answers" id="qm-answers"></div>
+                    <div class="qm-feedback" id="qm-feedback" style="display:none"></div>
+                </div>
+                <div class="qm-footer">
+                    <div class="qm-score">⭐ ${Object.values(this.answers).reduce((s,a)=>s+a.pts,0)} очков</div>
+                    <div class="qm-actions">
+                        ${q.type === 'multiple' || q.type === 'fill'
+                            ? `<button class="btn-qm btn-qm--check" id="qm-check">Проверить</button>` : ''}
+                        <button class="btn-qm btn-qm--next" id="qm-next" style="display:none">
+                            ${this.current + 1 < this.questions.length ? 'Далее →' : 'Завершить →'}
+                        </button>
+                    </div>
+                </div>`;
+
+            this._renderAnswers(q);
+            this._attachListeners(q);
+            if (window.hljs) this.container.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+        }
+
+        _renderAnswers(q) {
+            const wrap = document.getElementById('qm-answers');
+            if (q.type === 'single' || q.type === 'code') {
+                wrap.innerHTML = q.answers.map((a, i) => `
+                    <button class="qm-answer" data-i="${i}">
+                        <span class="qm-letter">${String.fromCharCode(65+i)}</span>
+                        <span>${this._esc(a)}</span>
+                    </button>`).join('');
+            } else if (q.type === 'multiple') {
+                wrap.innerHTML = q.answers.map((a, i) => `
+                    <label class="qm-answer qm-answer--check">
+                        <input type="checkbox" data-i="${i}">
+                        <span class="qm-letter">${String.fromCharCode(65+i)}</span>
+                        <span>${this._esc(a)}</span>
+                    </label>`).join('');
+            } else if (q.type === 'fill') {
+                wrap.innerHTML = `<input class="qm-fill" id="qm-fill-input" placeholder="Введите ответ…" autocomplete="off" spellcheck="false">`;
+            }
+        }
+
+        _attachListeners(q) {
+            const check = document.getElementById('qm-check');
+            const next  = document.getElementById('qm-next');
+
+            if (q.type === 'single' || q.type === 'code') {
+                this.container.querySelectorAll('.qm-answer').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        if (this.answered) return;
+                        this.answered = true;
+                        this._submitSingle(q, parseInt(btn.dataset.i));
+                    });
+                });
+            }
+            if (q.type === 'multiple' && check) {
+                check.addEventListener('click', () => {
+                    if (this.answered) return;
+                    this.answered = true;
+                    const sel = [...this.container.querySelectorAll('.qm-answer input:checked')]
+                        .map(cb => parseInt(cb.dataset.i));
+                    this._submitMultiple(q, sel);
+                    check.style.display = 'none';
+                });
+            }
+            if (q.type === 'fill') {
+                const input = document.getElementById('qm-fill-input');
+                const doCheck = () => {
+                    if (this.answered) return;
+                    this.answered = true;
+                    this._submitFill(q, input?.value.trim() ?? '');
+                    if (check) check.style.display = 'none';
+                };
+                if (check) check.addEventListener('click', doCheck);
+                input?.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
+            }
+            if (next) next.addEventListener('click', () => { this.current++; this._render(); });
+        }
+
+        _submitSingle(q, idx) {
+            const ok  = idx === q.correct;
+            const pts = ok ? 10 : 0;
+            this.answers[this.current] = { ok, pts };
+            this.container.querySelectorAll('.qm-answer').forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) btn.classList.add('qm-answer--correct');
+                if (i === idx && !ok) btn.classList.add('qm-answer--wrong');
+            });
+            this._feedback(ok, q.explanation, pts);
+        }
+
+        _submitMultiple(q, sel) {
+            const correct = q.correct;
+            const allOk   = correct.every(i => sel.includes(i)) && sel.every(i => correct.includes(i));
+            const partial = correct.some(i => sel.includes(i));
+            const pts     = allOk ? 10 : partial ? 5 : 0;
+            this.answers[this.current] = { ok: allOk, pts };
+            this.container.querySelectorAll('.qm-answer').forEach((lbl, i) => {
+                lbl.querySelector('input').disabled = true;
+                if (correct.includes(i))              lbl.classList.add('qm-answer--correct');
+                if (sel.includes(i) && !correct.includes(i)) lbl.classList.add('qm-answer--wrong');
+            });
+            this._feedback(allOk, q.explanation, pts);
+        }
+
+        _submitFill(q, val) {
+            const accepted = Array.isArray(q.correct) ? q.correct : [q.correct];
+            const ok  = accepted.some(v => v.toLowerCase() === val.toLowerCase());
+            const pts = ok ? 10 : 0;
+            this.answers[this.current] = { ok, pts };
+            const input = document.getElementById('qm-fill-input');
+            if (input) { input.disabled = true; input.classList.add(ok ? 'qm-fill--ok' : 'qm-fill--err'); }
+            this._feedback(ok, q.explanation, pts, ok ? null : `Правильный ответ: <code>${accepted[0]}</code>`);
+        }
+
+        _feedback(ok, explanation, pts, extra = null) {
+            const fb = document.getElementById('qm-feedback');
+            if (!fb) return;
+            fb.style.display = 'flex';
+            fb.className = `qm-feedback qm-feedback--${ok ? 'ok' : 'err'}`;
+            fb.innerHTML = `
+                <span class="qm-fb-icon">${ok ? '✅' : '❌'}</span>
+                <div>
+                    <strong>${ok ? 'Правильно!' : 'Неверно'}</strong>
+                    <p>${explanation}</p>
+                    ${extra ? `<p>${extra}</p>` : ''}
+                    ${pts ? `<span class="qm-fb-pts">+${pts} очков</span>` : ''}
+                </div>`;
+            document.getElementById('qm-next').style.display = 'inline-flex';
+        }
+
+        _showResults() {
+            const total   = this.questions.length * 10;
+            const earned  = Object.values(this.answers).reduce((s, a) => s + a.pts, 0);
+            const pct     = Math.round(earned / total * 100);
+            const passed  = pct >= this.passingScore;
+            const correct = Object.values(this.answers).filter(a => a.ok).length;
+
+            this._saveProgress(pct, passed);
+            if (window.gameSystem) gameSystem.onQuizComplete(pct);
+
+            this.container.innerHTML = `
+                <div class="qm-results">
+                    <div class="qm-results-emoji">${pct >= 90 ? '🏆' : pct >= 70 ? '👍' : '📚'}</div>
+                    <h2>${passed ? 'Тест пройден!' : 'Попробуйте ещё раз'}</h2>
+                    <div class="qm-results-circle">
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-primary)" stroke-width="8"/>
+                            <circle cx="50" cy="50" r="42" fill="none"
+                                stroke="${passed ? '#a6e3a1' : '#f38ba8'}"
+                                stroke-width="8"
+                                stroke-dasharray="${pct * 2.639} 263.9"
+                                stroke-linecap="round"
+                                transform="rotate(-90 50 50)"/>
+                        </svg>
+                        <div class="qm-results-pct">${pct}%</div>
+                    </div>
+                    <div class="qm-results-stats">
+                        <div><div class="qm-stat-v">${earned}</div><div class="qm-stat-l">Очков</div></div>
+                        <div><div class="qm-stat-v">${correct}</div><div class="qm-stat-l">Правильных</div></div>
+                        <div><div class="qm-stat-v">${this.questions.length}</div><div class="qm-stat-l">Вопросов</div></div>
+                    </div>
+                    <div class="qm-results-actions">
+                        <button class="btn-qm btn-qm--check" onclick="openQuizModal('${this.quizId}','${this.title}')">Пройти снова</button>
+                        <button class="btn-qm btn-qm--next" onclick="closeQuizModal(null)">Закрыть</button>
+                    </div>
+                </div>`;
+        }
+
+        _saveProgress(pct, passed) {
+            // Save best score to localStorage for sidebar indicator
+            const lsKey = `quiz_best_${this.quizId}`;
+            const prev  = (() => { try { return JSON.parse(localStorage.getItem(lsKey) || '0'); } catch { return 0; } })();
+            if (pct > prev) localStorage.setItem(lsKey, JSON.stringify(pct));
+
+            const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+            if (!user?.isuNumber) return;
+            fetch('/api/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    isuNumber:    user.isuNumber,
+                    chapterId:    'chapter-1',
+                    chapterTitle: 'Глава I: Фундаментальные типы данных',
+                    testId:       this.quizId,
+                    testTitle:    this.title,
+                    points:       pct
+                })
+            }).catch(() => {});
+        }
+
+        _typeLabel(t) {
+            return { single:'Один ответ', multiple:'Несколько ответов', fill:'Введите ответ', code:'Что выведет код?' }[t] || t;
+        }
+        _esc(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+        _shuffle(a) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+    }
+    </script>
+
+</body>
+</html>

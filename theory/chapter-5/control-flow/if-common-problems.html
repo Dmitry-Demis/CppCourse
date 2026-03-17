@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§5.3 Типичные ошибки с if — Курс C++</title>
+    <meta name="description" content="Dangling else, уплощение вложенных if, null statement, присваивание вместо сравнения — типичные ошибки с оператором if в C++.">
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="index.html" class="active">Глава V</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава V — §5.3</div>
+                <h1>Типичные ошибки с if</h1>
+
+                <p>
+                    Оператор <code>if</code> прост в синтаксисе, но легко допустить ошибку,
+                    которая компилируется без предупреждений и даёт неверный результат.
+                    Разберём четыре самых распространённых случая.
+                </p>
+
+                <h2 id="dangling-else">1. Dangling else — «висячий else»</h2>
+
+                <p>
+                    При вложенных <code>if</code> без блоков возникает неоднозначность:
+                    к какому <code>if</code> относится <code>else</code>?
+                    Правило C++: <code>else</code> всегда привязывается к
+                    <strong>ближайшему незакрытому</strong> <code>if</code> в том же блоке.
+                </p>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠️ Dangling else</div>
+                    <pre style="margin:0"><code class="language-cpp">if (x >= 0)
+    if (x &lt;= 20)
+        std::cout &lt;&lt; "от 0 до 20\n";
+    else                          // привязан к (x &lt;= 20), не к (x >= 0)!
+        std::cout &lt;&lt; "отрицательное\n";  // BUG при x = 21</code></pre>
+                </div>
+
+                <div class="code-block" data-example="chapter-4/control-flow/dangling-else.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — dangling else и исправление</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="flatten">2. Уплощение вложенных if</h2>
+
+                <p>
+                    Глубокая вложенность — признак того, что логику можно переписать проще.
+                    Два способа уплощения: переставить условия в <code>else-if</code>
+                    или объединить их логическими операторами <code>&amp;&amp;</code> и <code>||</code>.
+                </p>
+
+                <div class="code-block" data-example="chapter-4/control-flow/flatten-nested.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — уплощение и логические операторы</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Правило</div>
+                    <p>
+                        Чем меньше уровней вложенности — тем меньше вероятность ошибки.
+                        Если видите три и более уровня <code>if</code> подряд — это сигнал к рефакторингу.
+                    </p>
+                </div>
+
+                <h2 id="null-statement">3. Null statement — пустой оператор</h2>
+
+                <p>
+                    <span class="key-term">Пустой оператор</span> — это просто <code>;</code> на отдельной строке.
+                    Он ничего не делает. Случайно поставить его после <code>if</code> — классическая ошибка:
+                    условный блок становится пустым, а следующая инструкция выполняется <em>всегда</em>.
+                </p>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠️ Лишняя точка с запятой</div>
+                    <pre style="margin:0"><code class="language-cpp">if (isAdmin());          // &lt;-- точка с запятой! if выполняет пустой оператор
+    deleteDatabase();    // выполняется ВСЕГДА, не условно</code></pre>
+                </div>
+
+                <h2 id="assign-vs-compare">4. Присваивание вместо сравнения</h2>
+
+                <p>
+                    <code>operator=</code> — присваивание, <code>operator==</code> — сравнение.
+                    Написать <code>=</code> вместо <code>==</code> в условии — ошибка, которая
+                    компилируется без ошибок, но работает неверно.
+                </p>
+
+                <div class="code-block" data-example="chapter-4/control-flow/null-statement-bug.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — null statement и = vs ==</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Yoda conditions</div>
+                    <p>
+                        Некоторые разработчики пишут константу слева: <code>if (0 == x)</code>.
+                        Тогда случайное <code>if (0 = x)</code> — ошибка компиляции, а не тихий баг.
+                        Современные компиляторы с <code>-Wall</code> предупреждают о <code>if (x = 0)</code>,
+                        поэтому «йода-условия» сейчас редкость.
+                    </p>
+                </div>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

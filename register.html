@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация — Курс C++</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <style>
+        .register-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-6);
+            background: var(--bg-primary);
+        }
+
+        .register-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: var(--space-8);
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .register-card h1 {
+            font-size: 1.75rem;
+            color: var(--text-heading);
+            margin-bottom: var(--space-2);
+        }
+
+        .register-card p.subtitle {
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-6);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: var(--space-2);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: var(--space-2);
+            transition: opacity 0.2s;
+        }
+
+        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .message {
+            margin-top: var(--space-4);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .message.success {
+            background: var(--accent-green-dim);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .message.error {
+            background: var(--accent-red-dim);
+            border: 1px solid var(--accent-red);
+            color: #ff8a70;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: var(--space-6);
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--text-primary); }
+    </style>
+</head>
+<body>
+    <div class="register-wrapper">
+        <div class="register-card">
+            <a href="index.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                На главную
+            </a>
+
+            <h1>Регистрация</h1>
+            <p class="subtitle">Введите свои данные для доступа к курсу</p>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="firstName">Имя</label>
+                    <input type="text" id="firstName" placeholder="Введите имя" required />
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Фамилия</label>
+                    <input type="text" id="lastName" placeholder="Введите фамилию" required />
+                </div>
+                <div class="form-group">
+                    <label for="isuNumber">Номер ИСУ</label>
+                    <input type="text" id="isuNumber" placeholder="Например: 123456" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Минимум 6 символов" required />
+                </div>
+                <div class="form-group">
+                    <label for="passwordConfirm">Подтвердите пароль</label>
+                    <input type="password" id="passwordConfirm" placeholder="Повторите пароль" required />
+                </div>
+                <button type="submit" class="btn-submit" id="submitBtn">Зарегистрироваться</button>
+            </form>
+
+            <div class="message" id="message"></div>
+            <div style="margin-top: var(--space-4); text-align: center; color: var(--text-tertiary); font-size: 0.875rem;">
+                Уже есть аккаунт? <a href="login.html" style="color: var(--accent-violet); text-decoration: none;">Войти</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const msg = document.getElementById('message');
+
+            btn.disabled = true;
+            msg.style.display = 'none';
+
+            const body = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                isuNumber: document.getElementById('isuNumber').value.trim(),
+                password: document.getElementById('password').value
+            };
+
+            const confirm = document.getElementById('passwordConfirm').value;
+            if (body.password !== confirm) {
+                msg.style.display = 'block';
+                msg.className = 'message error';
+                msg.textContent = 'Пароли не совпадают';
+                btn.disabled = false;
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await res.json();
+                msg.style.display = 'block';
+
+                if (res.ok) {
+                    msg.className = 'message success';
+                    msg.textContent = data.message + ' Перенаправление на вход...';
+                    document.getElementById('registerForm').reset();
+                    setTimeout(() => window.location.href = 'login.html', 1500);
+                } else {
+                    msg.className = 'message error';
+                    msg.textContent = data.message;
+                }
+            } catch {
+                msg.style.display = 'block';
+                msg.className = 'message error';
+                msg.textContent = 'Ошибка соединения с сервером';
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

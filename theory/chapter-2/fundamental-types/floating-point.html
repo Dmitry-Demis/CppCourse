@@ -1,0 +1,395 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1.3 Типы с плавающей точкой — Курс C++</title>
+    <meta name="description" content="float, double, long double в C++. IEEE 754, точность, NaN, Infinity, epsilon, сравнение вещественных чисел.">
+
+    <script>
+        MathJax = { tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$']] }, svg:{fontCache:'global'} };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава II</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav">
+                    <!-- navigation.js заполнит динамически -->
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава II — §2.1.6</div>
+                <h1>Типы с плавающей точкой</h1>
+
+                <p>
+                    Типы с плавающей точкой предназначены для <span class="key-term">вещественных чисел</span>:
+                    дробных величин, физических параметров, координат. В отличие от целых чисел они дают
+                    <em>приближённое</em> представление — и понимание этой особенности критически важно
+                    для корректного кода.
+                </p>
+
+                <!-- ══════════════════════════════════════════════════ -->
+                <h2 id="ieee754">1. Стандарт IEEE 754</h2>
+
+                <p>
+                    Большинство платформ реализуют типы с плавающей точкой согласно стандарту
+                    <span class="key-term">IEEE 754-2008</span>. Число хранится в виде:
+                </p>
+
+                <p style="text-align:center; font-size:1.1em; margin:var(--space-6) 0;">
+                    $$\text{значение} = (-1)^s \times m \times 2^e$$
+                </p>
+
+                <p>
+                    Где $s$ — знак (1 бит), $m$ — мантисса, $e$ — экспонента.
+                    Фиксированное число битов определяет точность и диапазон каждого типа.
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Стандарт</th>
+                                <th>Размер</th>
+                                <th>Десятичных знаков</th>
+                                <th>Суффикс</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>float</code></td>
+                                <td>IEEE 754 binary32</td>
+                                <td>4 байта</td>
+                                <td class="cell-highlight">~7</td>
+                                <td><code>3.14f</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>double</code></td>
+                                <td>IEEE 754 binary64</td>
+                                <td>8 байт</td>
+                                <td class="cell-highlight">~15–16</td>
+                                <td><code>3.14</code> (без суффикса)</td>
+                            </tr>
+                            <tr>
+                                <td><code>long double</code></td>
+                                <td>платформенный</td>
+                                <td>10–16 байт</td>
+                                <td class="cell-highlight">~18–19</td>
+                                <td><code>3.14L</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="iso-quote">
+                    <span class="iso-ref">[basic.fundamental] §6.7.1 — ISO/IEC 14882</span>
+                    There are three floating-point types: float, double, and long double.
+                    The type double provides at least as much precision as float,
+                    and the type long double provides at least as much precision as double.
+                </div>
+
+                <div class="note-card">
+                    <div class="note-card__title">📌 double — тип по умолчанию</div>
+                    <p>
+                        Литерал <code>3.14</code> без суффикса имеет тип <code>double</code>.
+                        Суффикс <code>f</code> делает его <code>float</code>, суффикс <code>L</code> — <code>long double</code>.
+                        На практике <code>double</code> является основным выбором.
+                    </p>
+                </div>
+
+                <!-- ── Точность ── -->
+                <h2 id="precision">2. Точность и ошибки округления</h2>
+
+                <p>
+                    Большинство десятичных дробей <em>не могут быть точно представлены</em> в двоичной
+                    системе. Число <code>0.1</code> в двоичном — бесконечная дробь; компьютер
+                    округляет её до ближайшего представимого значения:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+
+int main() {
+    float  f{0.1f + 0.2f};
+    double d{0.1  + 0.2};
+
+    std::cout &lt;&lt; std::setprecision(20);
+    std::cout &lt;&lt; "float  0.1+0.2 = " &lt;&lt; f &lt;&lt; '\n';
+    std::cout &lt;&lt; "double 0.1+0.2 = " &lt;&lt; d &lt;&lt; '\n';
+    std::cout &lt;&lt; "double 0.3     = " &lt;&lt; 0.3 &lt;&lt; '\n';
+
+    // Прямое сравнение ненадёжно!
+    std::cout &lt;&lt; std::boolalpha;
+    std::cout &lt;&lt; "(d == 0.3): " &lt;&lt; (d == 0.3) &lt;&lt; '\n'; // false!
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠ Никогда не используйте == для сравнения вещественных чисел</div>
+                    <p>
+                        Из-за ошибок округления <code>a == b</code> может вернуть <code>false</code>
+                        даже для математически равных значений. Используйте сравнение через эпсилон:
+                    </p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;cmath&gt;
+
+// Абсолютное сравнение — для чисел близких к нулю
+bool nearlyEqual(double a, double b, double eps = 1e-9) {
+    return std::abs(a - b) &lt; eps;
+}
+
+// Относительное — для больших чисел
+bool relativelyEqual(double a, double b, double relTol = 1e-9) {
+    return std::abs(a - b) &lt;= relTol * std::max(std::abs(a), std::abs(b));
+}
+
+int main() {
+    double a{0.1 + 0.2};
+    double b{0.3};
+
+    // ❌ Не делайте так:
+    // if (a == b) ...
+
+    // ✅ Правильно:
+    if (nearlyEqual(a, b)) { /* равны с точностью до 1e-9 */ }
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ── Машинный эпсилон ── -->
+                <h2 id="epsilon">3. Машинный эпсилон и numeric_limits</h2>
+
+                <p>
+                    <span class="key-term">Машинный эпсилон</span> — наименьшее $\varepsilon > 0$ такое,
+                    что $1.0 + \varepsilon \neq 1.0$. Характеризует относительную точность типа.
+                </p>
+
+                <div class="type-specs">
+                    <div class="type-spec">
+                        <span class="type-spec-label">float epsilon</span>
+                        <span class="type-spec-value">~1.19 × 10⁻⁷</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">double epsilon</span>
+                        <span class="type-spec-value">~2.22 × 10⁻¹⁶</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">float digits10</span>
+                        <span class="type-spec-value">7</span>
+                    </div>
+                    <div class="type-spec">
+                        <span class="type-spec-label">double digits10</span>
+                        <span class="type-spec-value">15</span>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    std::cout &lt;&lt; "float  eps     = " &lt;&lt; std::numeric_limits&lt;float&gt;::epsilon()   &lt;&lt; '\n';
+    std::cout &lt;&lt; "double eps     = " &lt;&lt; std::numeric_limits&lt;double&gt;::epsilon()  &lt;&lt; '\n';
+    std::cout &lt;&lt; "float  max     = " &lt;&lt; std::numeric_limits&lt;float&gt;::max()       &lt;&lt; '\n';
+    std::cout &lt;&lt; "double max     = " &lt;&lt; std::numeric_limits&lt;double&gt;::max()      &lt;&lt; '\n';
+    std::cout &lt;&lt; "float  digits  = " &lt;&lt; std::numeric_limits&lt;float&gt;::digits10    &lt;&lt; '\n';
+    std::cout &lt;&lt; "double digits  = " &lt;&lt; std::numeric_limits&lt;double&gt;::digits10   &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div class="code-block" data-example="chapter-1/fundamental-types/floating-point-demo.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — float/double демонстрация</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <!-- ── Специальные значения ── -->
+                <h2 id="special-values">4. Специальные значения IEEE 754</h2>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Значение</th><th>Как получить</th><th>Проверка</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>+Infinity</code></td><td><code>1.0 / 0.0</code></td><td><code>std::isinf(x) &amp;&amp; x&gt;0</code></td></tr>
+                            <tr><td><code>-Infinity</code></td><td><code>-1.0 / 0.0</code></td><td><code>std::isinf(x) &amp;&amp; x&lt;0</code></td></tr>
+                            <tr><td><code>NaN</code></td><td><code>0.0/0.0</code>, <code>sqrt(-1)</code></td><td><code>std::isnan(x)</code> — NaN≠NaN!</td></tr>
+                            <tr><td><code>-0.0</code></td><td>underflow с отриц. знаком</td><td><code>std::signbit(x)</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cmath&gt;
+#include &lt;limits&gt;
+
+int main() {
+    double inf{std::numeric_limits&lt;double&gt;::infinity()};
+    double nan{std::numeric_limits&lt;double&gt;::quiet_NaN()};
+
+    std::cout &lt;&lt; std::boolalpha;
+    std::cout &lt;&lt; "1/0       = " &lt;&lt; (1.0/0.0)     &lt;&lt; '\n'; // inf
+    std::cout &lt;&lt; "inf+1     = " &lt;&lt; (inf + 1)      &lt;&lt; '\n'; // inf
+    std::cout &lt;&lt; "inf-inf   = " &lt;&lt; (inf - inf)     &lt;&lt; '\n'; // nan
+
+    // NaN не равен самому себе — уникальное свойство IEEE 754
+    std::cout &lt;&lt; "nan==nan  = " &lt;&lt; (nan == nan)    &lt;&lt; '\n'; // false!
+    std::cout &lt;&lt; "isnan(nan)= " &lt;&lt; std::isnan(nan) &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; "isinf(inf)= " &lt;&lt; std::isinf(inf) &lt;&lt; '\n'; // true
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Когда использовать какой тип</div>
+                    <p>
+                        • <strong>double</strong> — основной выбор; достаточная точность для большинства задач.<br>
+                        • <strong>float</strong> — когда важны память или скорость (GPU, большие массивы).<br>
+                        • <strong>long double</strong> — высокоточные математические вычисления.
+                    </p>
+                </div>
+
+                <!-- Мини-тест -->
+                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
+                <p>10 вопросов по типам с плавающей точкой.</p>
+                <div id="quiz-float"></div>
+
+                <!-- Навигация -->
+                <div class="paragraph-nav">
+                    <!-- navigation.js заполнит динамически из course-structure.json -->
+                </div>
+
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', function () {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof floatingPointQuestions !== 'undefined') {
+            new Quiz('quiz-float', floatingPointQuestions, {
+                quizId: 'float-mini',
+                title: 'Мини-тест: типы с плавающей точкой',
+                type: 'mini'
+            });
+        }
+    });
+    </script>
+
+</body>
+</html>

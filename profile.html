@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль — Курс C++</title>
+    <script src="js/auth-guard.js"></script>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/gamification.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+        /* ── Page ── */
+        .profile-page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: calc(var(--header-height) + var(--space-8)) var(--space-5) var(--space-16);
+        }
+        .profile-topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: var(--space-8);
+        }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--text-tertiary); text-decoration: none; font-size: 0.875rem;
+            transition: color .2s;
+        }
+        .back-link:hover { color: var(--text-primary); text-decoration: none; }
+        .logout-btn {
+            background: none; border: 1px solid var(--border-primary);
+            color: var(--text-tertiary); padding: 0.4rem 1rem;
+            border-radius: 8px; cursor: pointer; font-size: 0.875rem; transition: all .2s;
+        }
+        .logout-btn:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+        /* ── Glass card mixin ── */
+        .glass {
+            background: linear-gradient(135deg, rgba(30,28,58,.92) 0%, rgba(22,20,50,.92) 100%);
+            border: 1px solid rgba(167,139,250,.18);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+        }
+
+        /* ── Hero card ── */
+        .hero-card {
+            position: relative; overflow: hidden;
+            padding: var(--space-8);
+            margin-bottom: var(--space-5);
+        }
+        .hero-card::before {
+            content: '';
+            position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 90% 70% at -5% -10%, rgba(91,79,207,.28) 0%, transparent 55%),
+                radial-gradient(ellipse 60% 50% at 105% 110%, rgba(59,130,246,.15) 0%, transparent 55%);
+        }
+        .hero-top {
+            position: relative;
+            display: flex; align-items: flex-start; gap: var(--space-5); flex-wrap: wrap;
+        }
+        .hero-avatar {
+            width: 88px; height: 88px; border-radius: 50%; flex-shrink: 0;
+            background: var(--grad-main);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.4rem;
+            box-shadow: 0 0 0 3px rgba(167,139,250,.3), 0 8px 24px rgba(91,79,207,.3);
+        }
+        .hero-meta { flex: 1; min-width: 180px; }
+        .hero-name { font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1.15; }
+        .hero-sub  { color: var(--text-tertiary); font-size: 0.82rem; margin-top: 4px; }
+        .hero-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600;
+        }
+        .badge-level  { background: rgba(167,139,250,.15); color: #a78bfa; border: 1px solid rgba(167,139,250,.3); }
+        .badge-streak { background: rgba(126,184,247,.1);  color: #7eb8f7; border: 1px solid rgba(126,184,247,.25); }
+        .badge-record { background: rgba(253,230,138,.08); color: #fde68a; border: 1px solid rgba(253,230,138,.18); }
+
+        .hero-pts-block {
+            text-align: right; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+        }
+        .hero-pts-val { font-size: 2.2rem; font-weight: 900; color: #fde68a; line-height: 1; }
+        .hero-pts-lbl { font-size: 0.72rem; color: var(--text-tertiary); }
+
+        /* XP bar */
+        .hero-xp-wrap { position: relative; margin-top: var(--space-5); }
+        .hero-xp-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 6px; }
+        .hero-xp-track { height: 8px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
+        .hero-xp-fill  { height: 100%; background: var(--grad-main); border-radius: 99px; width: 0; transition: width .8s ease; }
+
+        /* ── Stats grid ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+        }
+        .stat-card {
+            padding: var(--space-4) var(--space-3);
+            text-align: center;
+            opacity: 0;
+            transition: border-color .2s, transform .2s, box-shadow .2s;
+            cursor: default;
+        }
+        .stat-card:hover {
+            border-color: rgba(167,139,250,.35);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(91,79,207,.15);
+        }
+        .stat-icon { font-size: 1.4rem; margin-bottom: 6px; }
+        .stat-val  { font-size: 1.4rem; font-weight: 800; color: #fff; line-height: 1; }
+        .stat-lbl  { font-size: 0.68rem; color: var(--text-tertiary); margin-top: 4px; letter-spacing: .02em; }
+
+        /* ── Section heading ── */
+        .sec-heading {
+            font-size: 0.72rem; font-weight: 700; color: var(--text-tertiary);
+            text-transform: uppercase; letter-spacing: .1em;
+            margin-bottom: var(--space-4);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sec-heading::after { content: ''; flex: 1; height: 1px; background: rgba(167,139,250,.12); }
+
+        /* ── Chapter blocks ── */
+        .chapters-list { display: flex; flex-direction: column; gap: var(--space-4); }
+        .chapter-block { overflow: hidden; opacity: 0; transition: border-color .2s, box-shadow .2s; }
+        .chapter-block:hover { border-color: rgba(167,139,250,.3); box-shadow: 0 4px 20px rgba(91,79,207,.12); }
+
+        .chapter-header {
+            display: flex; align-items: center; gap: var(--space-4);
+            padding: var(--space-4) var(--space-5);
+        }
+        .chapter-icon {
+            width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+            background: var(--grad-subtle, rgba(124,92,191,.15));
+            border: 1px solid rgba(167,139,250,.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+        }
+        .chapter-info { flex: 1; min-width: 0; }
+        .chapter-name { font-weight: 700; color: var(--text-primary); font-size: 0.95rem; }
+        .chapter-meta { color: var(--text-tertiary); font-size: 0.78rem; margin-top: 2px; }
+
+        /* Chapter progress bar */
+        .chapter-progress-wrap { margin-top: 6px; display: flex; align-items: center; gap: 8px; }
+        .chapter-progress-track {
+            flex: 1; height: 4px;
+            background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden;
+        }
+        .chapter-progress-fill { height: 100%; background: var(--grad-main); border-radius: 99px; transition: width .6s ease; }
+        .chapter-progress-pct { font-size: 0.68rem; color: var(--text-tertiary); white-space: nowrap; }
+
+        .chapter-pts { font-size: 1rem; font-weight: 800; color: #fde68a; white-space: nowrap; flex-shrink: 0; }
+        .chapter-pts.zero { color: var(--text-tertiary); font-weight: 400; font-size: 0.85rem; }
+
+        /* ── Tests section ── */
+        .tests-wrap {
+            border-top: 1px solid rgba(167,139,250,.08);
+            padding: var(--space-3) var(--space-5) var(--space-4);
+            display: flex; flex-direction: column; gap: var(--space-1);
+        }
+        .para-label {
+            font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .08em; color: var(--text-tertiary);
+            padding: var(--space-2) 0 var(--space-1);
+        }
+        .test-row {
+            display: flex; align-items: center; gap: var(--space-3);
+            border-radius: 10px; padding: 0.5rem 0.75rem;
+            text-decoration: none; color: inherit;
+            transition: background .15s, transform .12s;
+            cursor: default;
+            background: rgba(255,255,255,.03);
+        }
+        a.test-row { cursor: pointer; }
+        a.test-row:hover {
+            background: rgba(167,139,250,.08);
+            transform: translateX(4px);
+            text-decoration: none;
+        }
+        .test-row.not-started { opacity: 0.4; }
+
+        .test-dot {
+            width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .test-dot.pass { background: rgba(110,231,183,.15); color: #6ee7b7; }
+        .test-dot.fail { background: rgba(248,113,113,.12); color: #f87171; }
+        .test-dot.none { background: rgba(255,255,255,.05); color: var(--text-tertiary); font-size: 0.9rem; }
+
+        .test-info { flex: 1; min-width: 0; }
+        .test-title { font-size: 0.85rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .test-id    { font-size: 0.67rem; color: var(--text-tertiary); font-family: monospace; margin-top: 1px; }
+
+        .test-meta  { font-size: 0.68rem; color: var(--text-tertiary); white-space: nowrap; }
+        .test-score {
+            font-size: 0.8rem; font-weight: 700;
+            padding: 2px 8px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+        }
+        .test-score.pass { background: rgba(110,231,183,.12); color: #6ee7b7; }
+        .test-score.fail { background: rgba(251,191,36,.1);   color: #fbbf24; }
+
+        /* ── Empty / loading ── */
+        .empty-state { text-align: center; padding: var(--space-16); color: var(--text-tertiary); }
+        .empty-icon  { font-size: 3rem; margin-bottom: var(--space-3); }
+    </style>
+</head>
+<body>
+<div class="profile-page">
+    <div class="profile-topbar">
+        <a href="index.html" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            На главную
+        </a>
+        <button class="logout-btn" onclick="logout()">Выйти</button>
+    </div>
+    <div id="profileContent">
+        <div class="empty-state"><div class="empty-icon">⏳</div><p>Загрузка...</p></div>
+    </div>
+</div>
+
+<script>
+const GS = { get: (k,d) => { try { const v=localStorage.getItem(k); return v===null?d:JSON.parse(v); } catch{return d;} } };
+
+const LEVEL_DATA = [
+    { level:1, min:0,    title:'Новичок',     icon:'🌱' },
+    { level:2, min:100,  title:'Ученик',      icon:'📘' },
+    { level:3, min:250,  title:'Практикант',  icon:'⚙️' },
+    { level:4, min:500,  title:'Программист', icon:'💻' },
+    { level:5, min:1000, title:'Эксперт',     icon:'🔬' },
+    { level:6, min:2000, title:'Мастер C++',  icon:'👑' },
+];
+const CHAPTER_ICONS = ['🔢','📦','➕','🔀','⚙️','🧩','🔗','📐'];
+
+function getLevel(pts) { return [...LEVEL_DATA].reverse().find(l => pts >= l.min) || LEVEL_DATA[0]; }
+function logout() { localStorage.removeItem('cpp_user'); window.location.href = 'login.html'; }
+
+async function loadProfile() {
+    const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+    if (!user) { window.location.href = 'login.html'; return; }
+    try {
+        const [profileRes, courseRes] = await Promise.all([
+            fetch(`/api/profile/${user.isuNumber}`),
+            fetch('/api/course-structure')
+        ]);
+        if (!profileRes.ok) { window.location.href = 'login.html'; return; }
+        const [profile, course] = await Promise.all([profileRes.json(), courseRes.json()]);
+        renderProfile(profile, course.chapters || []);
+    } catch(e) {
+        console.error(e);
+        document.getElementById('profileContent').innerHTML =
+            '<div class="empty-state"><div class="empty-icon">❌</div><p>Ошибка загрузки</p></div>';
+    }
+}
+
+function renderProfile(data, chapters) {
+    const gsLevel  = GS.get('gs_level', 1);
+    const gsXp     = GS.get('gs_xp', 0);
+    const coins    = GS.get('gs_coins', 0);
+    const keys     = GS.get('gs_keys', 0);
+    const readMins = GS.get('gs_read_mins', 0);
+    const codeRuns = GS.get('gs_code_runs', 0);
+    const quizDone = GS.get('gs_quizzes_done', 0);
+    const achCount = GS.get('gs_achievements', []).length;
+    const needed   = gsLevel * 120;
+    const xpPct    = Math.min(gsXp / needed * 100, 100);
+    const readHrs  = Math.floor(readMins / 60);
+    const readMin  = readMins % 60;
+    const lvl      = getLevel(data.totalPoints);
+
+    const chapterMap = {};
+    (data.chapters || []).forEach(c => {
+        chapterMap[c.chapterId] = {
+            points: c.points, testsPassed: c.testsPassed,
+            tests: Object.fromEntries((c.tests || []).map(t => [t.testId, t]))
+        };
+    });
+
+    const sectionFileMap = {};
+    chapters.forEach(ch => (ch.paragraphs || []).forEach(para =>
+        (para.sections || []).forEach(sec => { if (sec.quizId && sec.file) sectionFileMap[sec.quizId] = sec.file; })
+    ));
+
+    const chaptersHtml = chapters.map((ch, idx) => {
+        const chProg = chapterMap[ch.id];
+        const chPts  = chProg ? chProg.points : 0;
+        const icon   = CHAPTER_ICONS[idx] || '📖';
+
+        const sectionQuizIds = new Set();
+        (ch.paragraphs || []).forEach(p => (p.sections || []).forEach(s => { if (s.quizId) sectionQuizIds.add(s.quizId); }));
+
+        // Считаем суммарный % освоенности главы
+        const allTestSections = [];
+        (ch.paragraphs || []).forEach(p => (p.sections || []).forEach(s => { if (s.hasTest && s.quizId) allTestSections.push(s.quizId); }));
+        let chapterPct = 0;
+        if (allTestSections.length > 0) {
+            const scores = allTestSections.map(qid => {
+                try { const v = localStorage.getItem(`quiz_best_${qid}`); return v !== null ? JSON.parse(v) : 0; } catch { return 0; }
+            });
+            chapterPct = Math.round(scores.reduce((a, b) => a + b, 0) / allTestSections.length);
+        }
+
+        const paraRows = (ch.paragraphs || []).map(para => {
+            const rows = (para.sections || [])
+                .filter(s => s.hasTest && s.quizId)
+                .map(s => buildTestRow(s.title, s.quizId, chProg, sectionFileMap[s.quizId]))
+                .join('');
+            if (!rows) return '';
+            return `<div class="para-label">${para.title}</div>${rows}`;
+        }).join('');
+
+        const extraRows = chProg
+            ? Object.keys(chProg.tests).filter(id => !sectionQuizIds.has(id))
+                .map(id => buildTestRow(chProg.tests[id].testTitle, id, chProg, null)).join('')
+            : '';
+        const extraBlock = extraRows ? `<div class="para-label">Дополнительные тесты</div>${extraRows}` : '';
+
+        const progressBar = allTestSections.length > 0 ? `
+            <div class="chapter-progress-wrap">
+                <div class="chapter-progress-track">
+                    <div class="chapter-progress-fill" style="width:${chapterPct}%"></div>
+                </div>
+                <span class="chapter-progress-pct">${chapterPct}%</span>
+            </div>` : '';
+
+        return `<div class="chapter-block glass">
+            <div class="chapter-header">
+                <div class="chapter-icon">${icon}</div>
+                <div class="chapter-info">
+                    <div class="chapter-name">${ch.title}</div>
+                    <div class="chapter-meta">${chProg ? `Тестов пройдено: ${chProg.testsPassed}` : 'Ещё не начато'}</div>
+                    ${progressBar}
+                </div>
+                <div class="chapter-pts ${chPts ? '' : 'zero'}">${chPts ? chPts + ' ⭐' : '—'}</div>
+            </div>
+            ${(paraRows || extraBlock) ? `<div class="tests-wrap">${paraRows}${extraBlock}</div>` : ''}
+        </div>`;
+    }).join('');
+
+    document.getElementById('profileContent').innerHTML = `
+        <div class="hero-card glass" id="hero-card">
+            <div class="hero-top">
+                <div class="hero-avatar" id="hero-avatar">${lvl.icon}</div>
+                <div class="hero-meta">
+                    <div class="hero-name">${data.firstName} ${data.lastName}</div>
+                    <div class="hero-sub">ИСУ: ${data.isuNumber} · С нами с ${new Date(data.registeredAt).toLocaleDateString('ru')}</div>
+                    <div class="hero-badges">
+                        <span class="badge badge-level">${lvl.icon} Ур.${lvl.level} · ${lvl.title}</span>
+                        <span class="badge badge-streak">🔥 ${data.currentStreak} дн.</span>
+                        <span class="badge badge-record">🏆 Рекорд ${data.maxStreak} дн.</span>
+                    </div>
+                </div>
+                <div class="hero-pts-block">
+                    <div class="hero-pts-val" id="pts-counter">0</div>
+                    <div class="hero-pts-lbl">очков за тесты</div>
+                </div>
+            </div>
+            <div class="hero-xp-wrap">
+                <div class="hero-xp-labels">
+                    <span>Ур.${gsLevel} · ${gsXp} XP</span>
+                    <span>до Ур.${gsLevel+1}: ${needed - gsXp} XP</span>
+                </div>
+                <div class="hero-xp-track"><div class="hero-xp-fill" id="hero-xp-fill"></div></div>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card glass"><div class="stat-icon">🪙</div><div class="stat-val" id="sc-coins">0</div><div class="stat-lbl">Монеты</div></div>
+            <div class="stat-card glass"><div class="stat-icon">🗝️</div><div class="stat-val" id="sc-keys">0</div><div class="stat-lbl">Ключи</div></div>
+            <div class="stat-card glass"><div class="stat-icon">📖</div><div class="stat-val">${readHrs > 0 ? readHrs+'ч ' : ''}${readMin}м</div><div class="stat-lbl">Чтение</div></div>
+            <div class="stat-card glass"><div class="stat-icon">💻</div><div class="stat-val" id="sc-code">0</div><div class="stat-lbl">Запусков</div></div>
+            <div class="stat-card glass"><div class="stat-icon">✎</div><div class="stat-val" id="sc-quiz">0</div><div class="stat-lbl">Тестов</div></div>
+            <div class="stat-card glass"><div class="stat-icon">🏅</div><div class="stat-val" id="sc-ach">0</div><div class="stat-lbl">Достижений</div></div>
+        </div>
+
+        <div class="sec-heading">Прогресс по курсу</div>
+        <div class="chapters-list" id="chapters-list">${chaptersHtml}</div>`;
+
+    // Animations
+    if (window.gsap) {
+        gsap.from('#hero-card',   { opacity:0, y:24, duration:.6, ease:'power2.out' });
+        gsap.from('#hero-avatar', { scale:0, duration:.45, delay:.15, ease:'back.out(1.7)' });
+        gsap.to('#hero-xp-fill',  { width: xpPct+'%', duration:1, delay:.35, ease:'power2.out' });
+        gsap.to({ v:0 }, { v: data.totalPoints, duration:1.1, delay:.25, ease:'power2.out',
+            onUpdate: function() { const el=document.getElementById('pts-counter'); if(el) el.textContent=Math.round(this.targets()[0].v); }
+        });
+        gsap.from('#stats-grid .stat-card', { opacity:0, y:16, stagger:.06, duration:.45, delay:.4, ease:'power2.out',
+            onComplete: () => {
+                counter('sc-coins', coins); counter('sc-keys', keys);
+                counter('sc-code', codeRuns); counter('sc-quiz', quizDone); counter('sc-ach', achCount);
+            }
+        });
+        gsap.from('#chapters-list .chapter-block', { opacity:0, x:-16, stagger:.08, duration:.45, delay:.7, ease:'power2.out' });
+    } else {
+        document.getElementById('hero-xp-fill').style.width = xpPct+'%';
+        document.getElementById('pts-counter').textContent = data.totalPoints;
+        ['sc-coins','sc-keys','sc-code','sc-quiz','sc-ach'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = {
+                'sc-coins': coins, 'sc-keys': keys, 'sc-code': codeRuns,
+                'sc-quiz': quizDone, 'sc-ach': achCount
+            }[id];
+        });
+        document.querySelectorAll('.stat-card,.chapter-block').forEach(el => el.style.opacity='1');
+    }
+}
+
+function counter(id, target) {
+    const el = document.getElementById(id);
+    if (!el || !window.gsap) return;
+    gsap.to({ v:0 }, { v:target, duration:.7, ease:'power2.out',
+        onUpdate: function() { el.textContent = Math.round(this.targets()[0].v); }
+    });
+}
+
+function buildTestRow(title, quizId, chProg, sectionFile) {
+    const t   = chProg?.tests?.[quizId];
+    const tag  = sectionFile ? 'a' : 'div';
+    const href = sectionFile ? ` href="${sectionFile}"` : '';
+    if (t) {
+        const pass = t.bestScore >= 70;
+        return `<${tag} class="test-row"${href}>
+            <div class="test-dot ${pass?'pass':'fail'}">${pass?'✓':'✗'}</div>
+            <div class="test-info">
+                <div class="test-title">${t.testTitle || title}</div>
+                <div class="test-id">${quizId}</div>
+            </div>
+            <div class="test-meta">${t.attempts} попыт. · ${new Date(t.lastAttempt).toLocaleDateString('ru')}</div>
+            <div class="test-score ${pass?'pass':'fail'}">${t.bestScore}%</div>
+        </${tag}>`;
+    }
+    return `<div class="test-row not-started">
+        <div class="test-dot none">○</div>
+        <div class="test-info"><div class="test-title">${title}</div><div class="test-id">${quizId}</div></div>
+        <div class="test-meta">не пройден</div>
+        <div class="test-score" style="color:var(--text-tertiary)">—</div>
+    </div>`;
+}
+
+loadProfile();
+</script>
+</body>
+</html>

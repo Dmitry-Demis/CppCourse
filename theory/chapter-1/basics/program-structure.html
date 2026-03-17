@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1 Структура программы — Курс C++</title>
+    <meta name="description" content="Структура программы на C++: функция main, инструкции, препроцессорные директивы, порядок выполнения.">
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.1</div>
+                <h1>Структура программы</h1>
+
+                <p>
+                    Прежде чем писать код, нужно понять, из чего состоит программа на C++.
+                    Каждая программа — это набор <span class="key-term">инструкций</span> (statements),
+                    которые компилятор превращает в машинный код.
+                </p>
+
+                <h2 id="statements">1. Инструкции</h2>
+
+                <p>
+                    <span class="key-term">Инструкция</span> — это наименьшая самостоятельная единица вычисления.
+                    Большинство инструкций заканчиваются точкой с запятой <code>;</code>.
+                    Программа выполняет инструкции последовательно, сверху вниз.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">📌 Типы инструкций</div>
+                    <ul>
+                        <li><strong>Инструкции объявления</strong> — создают переменные: <code>int x = 5;</code></li>
+                        <li><strong>Инструкции выражений</strong> — вычисляют значение: <code>x = x + 1;</code></li>
+                        <li><strong>Инструкции вывода</strong> — выводят данные: <code>std::cout &lt;&lt; x;</code></li>
+                        <li><strong>Инструкции возврата</strong> — завершают функцию: <code>return 0;</code></li>
+                    </ul>
+                </div>
+
+                <h2 id="main-function">2. Функция main()</h2>
+
+                <p>
+                    Каждая программа на C++ должна содержать функцию <code>main()</code> —
+                    это <span class="key-term">точка входа</span>, с которой начинается выполнение.
+                    Когда программа запускается, ОС вызывает <code>main()</code>.
+                </p>
+
+                <div class="code-block" data-example="chapter-1/basics/program-structure.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — структура программы</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="preprocessor">3. Препроцессорные директивы</h2>
+
+                <p>
+                    Строки, начинающиеся с <code>#</code>, — это директивы препроцессора.
+                    Они обрабатываются <em>до</em> компиляции.
+                    Самая частая — <code>#include</code>, которая вставляет содержимое другого файла.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 #include &lt;iostream&gt;</div>
+                    <p>
+                        Подключает стандартную библиотеку ввода/вывода.
+                        Без неё <code>std::cout</code> и <code>std::cin</code> недоступны.
+                        Угловые скобки <code>&lt;&gt;</code> означают системный заголовочный файл.
+                    </p>
+                </div>
+
+                <h2 id="return-value">4. Возвращаемое значение main()</h2>
+
+                <p>
+                    <code>main()</code> возвращает <code>int</code> — код завершения для операционной системы.
+                    <code>return 0</code> означает «программа завершилась успешно».
+                    Любое ненулевое значение сигнализирует об ошибке.
+                </p>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠️ Начиная с C++11</div>
+                    <p>
+                        Если в <code>main()</code> нет явного <code>return</code>,
+                        компилятор автоматически добавляет <code>return 0;</code>.
+                        Для других функций это правило не действует.
+                    </p>
+                </div>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

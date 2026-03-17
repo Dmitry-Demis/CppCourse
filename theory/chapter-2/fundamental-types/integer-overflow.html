@@ -1,0 +1,382 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.1.4 Переполнение целых чисел — Курс C++</title>
+    <meta name="description" content="Переполнение целочисленных типов в C++: UB для знаковых, wrap-around для беззнаковых, безопасные паттерны и __builtin_add_overflow.">
+
+    <script>
+        MathJax = { tex: { inlineMath:[['$','$'],['\\(','\\)']] }, svg:{fontCache:'global'} };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+
+    <style>
+        .std-badge--14 { background: #4a3f1a; color: #f9e2af; }
+        .std-badge--17 { background: #1e3a4f; color: #89dceb; }
+        .std-badge--20 { background: #2a1e4f; color: #cba6f7; }
+
+        .overflow-visual {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.25rem 0;
+            padding: 1rem;
+            background: var(--surface, #1e1e2e);
+            border: 1px solid var(--border, #313244);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: .875rem;
+            overflow-x: auto;
+        }
+        .overflow-visual .arrow { color: var(--text-muted, #6c7086); }
+        .overflow-visual .val   { padding: .25rem .6rem; border-radius: 4px; }
+        .overflow-visual .val--ok  { background: rgba(166,227,161,.15); color: #a6e3a1; }
+        .overflow-visual .val--bad { background: rgba(243,139,168,.15); color: #f38ba8; }
+    </style>
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава II</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава II — §2.1.4</div>
+                <h1>Переполнение целых чисел</h1>
+
+                <p>
+                    Целые числа хранятся в фиксированном числе битов. Если результат вычисления
+                    выходит за пределы диапазона типа — происходит <span class="key-term">переполнение</span>.
+                    Поведение зависит от того, знаковый тип или беззнаковый — и разница принципиальная.
+                </p>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="signed-overflow">1. Знаковое переполнение — UB</h2>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">🔴 Переполнение signed — неопределённое поведение (Undefined Behaviour)</div>
+                    <p>
+                        Стандарт C++ явно указывает: переполнение <em>знакового</em> целого — это
+                        <strong>UB</strong>. Компилятор не обязан ничего делать — он вправе
+                        сгенерировать любой код, удалить «невозможные» ветки или устроить crash.
+                    </p>
+                    <p>
+                        Оптимизаторы <strong>активно используют</strong> этот факт: они предполагают,
+                        что UB никогда не случается, и на этой основе упрощают код.
+                        Это делает переполнение signed особенно коварным: оно может работать
+                        в debug-сборке и молча ломаться в release.
+                    </p>
+                </div>
+
+                <div class="overflow-visual">
+                    <span class="val val--ok">INT_MAX = 2 147 483 647</span>
+                    <span class="arrow">+1 →</span>
+                    <span class="val val--bad">?? (UB)</span>
+                    <span class="arrow">≠</span>
+                    <span class="val val--bad">−2 147 483 648</span>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — signed overflow (UB)</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int main() {
+    int max{std::numeric_limits&lt;int&gt;::max()};
+
+    // ❌ UB: компилятор может делать что угодно
+    // int overflow = max + 1;
+
+    // Реальный пример: компилятор может УБРАТЬ эту проверку!
+    // if (max + 1 > max) — оптимизатор знает, что overflow UB,
+    // значит max + 1 > max всегда "истина" → убирает else ветку
+
+    // ✅ Безопасно: проверяем ДО операции
+    if (max &lt; std::numeric_limits&lt;int&gt;::max()) {
+        int result{max + 1};  // теперь безопасно, мы проверили
+        std::cout &lt;&lt; result &lt;&lt; '\n';
+    } else {
+        std::cout &lt;&lt; "Переполнение предотвращено!\n";
+    }
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="unsigned-overflow">2. Беззнаковое переполнение — wrap-around</h2>
+
+                <p>
+                    Для беззнаковых типов переполнение строго <em>определено</em> стандартом:
+                    результат берётся по модулю $2^n$, где $n$ — число бит типа.
+                    Это называется <span class="key-term">wrap-around</span> (обёртка вокруг нуля).
+                </p>
+
+                <div class="overflow-visual">
+                    <span class="val val--ok">UINT_MAX = 4 294 967 295</span>
+                    <span class="arrow">+1 →</span>
+                    <span class="val val--ok">0 (определено!)</span>
+                </div>
+
+                <div class="overflow-visual">
+                    <span class="val val--ok">0u</span>
+                    <span class="arrow">−1 →</span>
+                    <span class="val val--ok">4 294 967 295 (определено!)</span>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — unsigned wrap-around</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;cstdint&gt;
+
+int main() {
+    // Unsigned: wrap-around строго определён
+    unsigned int u{std::numeric_limits&lt;unsigned int&gt;::max()};
+    ++u;  // 4294967295 + 1 = 0  (mod 2^32)
+    std::cout &lt;&lt; "unsigned wrap: " &lt;&lt; u &lt;&lt; '\n';  // 0
+
+    unsigned int z{0u};
+    --z;  // 0 - 1 = UINT_MAX  (mod 2^32)
+    std::cout &lt;&lt; "unsigned underflow: " &lt;&lt; z &lt;&lt; '\n';  // 4294967295
+
+    // uint8_t — ещё нагляднее (0..255)
+    uint8_t byte{255u};
+    ++byte;
+    std::cout &lt;&lt; "uint8_t wrap: " &lt;&lt; (int)byte &lt;&lt; '\n';  // 0
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="safe-patterns">3. Безопасные паттерны проверки переполнения</h2>
+
+                <h3 id="pre-check">3.1 Проверка перед операцией</h3>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — предварительная проверка</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+// Безопасное сложение int: возвращает false при переполнении
+bool safe_add(int a, int b, int&amp; result) {
+    if (b &gt; 0 &amp;&amp; a &gt; std::numeric_limits&lt;int&gt;::max() - b) return false;
+    if (b &lt; 0 &amp;&amp; a &lt; std::numeric_limits&lt;int&gt;::min() - b) return false;
+    result = a + b;
+    return true;
+}
+
+int main() {
+    int res{};
+    int x{2'000'000'000};
+    int y{2'000'000'000};
+
+    if (safe_add(x, y, res))
+        std::cout &lt;&lt; "OK: " &lt;&lt; res &lt;&lt; '\n';
+    else
+        std::cout &lt;&lt; "Переполнение! " &lt;&lt; x &lt;&lt; " + " &lt;&lt; y &lt;&lt; '\n';
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h3 id="builtin-overflow">3.2 Intrinsic-функции GCC/Clang</h3>
+
+                <p>
+                    GCC и Clang предоставляют встроенные функции для атомарной проверки переполнения.
+                    Они генерируют эффективный машинный код, используя флаги процессора:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — __builtin_*_overflow (GCC/Clang)</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int x{2'000'000'000};
+    int y{2'000'000'000};
+    int result{};
+
+    // __builtin_add_overflow: вернёт true при переполнении
+    if (__builtin_add_overflow(x, y, &amp;result)) {
+        std::cout &lt;&lt; "Overflow detected!\n";
+    } else {
+        std::cout &lt;&lt; "result = " &lt;&lt; result &lt;&lt; '\n';
+    }
+
+    long long a{9'000'000'000LL};
+    long long b{9'000'000'000LL};
+    long long c{};
+    if (__builtin_add_overflow(a, b, &amp;c))
+        std::cout &lt;&lt; "long long overflow!\n";
+    else
+        std::cout &lt;&lt; "long long ok: " &lt;&lt; c &lt;&lt; '\n';
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h3 id="wide-type">3.3 Расширение через более широкий тип</h3>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — расширение через long long</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+
+int safe_mul(int a, int b) {
+    long long result{(long long)a * b};  // вычисляем в long long
+    if (result &lt; std::numeric_limits&lt;int&gt;::min() ||
+        result &gt; std::numeric_limits&lt;int&gt;::max()) {
+        std::cout &lt;&lt; "Overflow in mul!\n";
+        return 0; // или throw
+    }
+    return (int)result;
+}
+
+int main() {
+    std::cout &lt;&lt; safe_mul(100'000, 100'000) &lt;&lt; '\n';  // overflow
+    std::cout &lt;&lt; safe_mul(1'000, 1'000) &lt;&lt; '\n';      // 1000000 — OK
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                <div class="code-block" data-example="chapter-1/fundamental-types/integer-overflow-demo.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — переполнение демонстрация</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="compiler-flags">4. Флаги компилятора для обнаружения</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">🛠 Флаги для поиска переполнений</div>
+                    <ul>
+                        <li><code>-fsanitize=signed-integer-overflow</code> — runtime-детектор для signed UB</li>
+                        <li><code>-fsanitize=unsigned-integer-overflow</code> — для unsigned wrap-around</li>
+                        <li><code>-ftrapv</code> — вызывает SIGABRT при signed overflow (debug)</li>
+                        <li><code>-Wconversion</code>, <code>-Wsign-conversion</code> — предупреждения при компиляции</li>
+                    </ul>
+                    <p>Используйте UBSan (<code>-fsanitize=undefined</code>) в тестах — он поймает большинство проблем с переполнением.</p>
+                </div>
+
+                <!-- Навигация -->
+                <div class="paragraph-nav">
+                    <!-- navigation.js заполнит динамически из course-structure.json -->
+                </div>
+
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', function () {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+    });
+    </script>
+
+</body>
+</html>

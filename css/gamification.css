@@ -1,624 +1,201 @@
 /* ============================================
-   GAMIFICATION SYSTEM - Subway Surfers Style
+   GAMIFICATION — HUD, Quests, Toasts
    ============================================ */
 
-/* Яркие цвета как в Subway Surfers */
-:root {
-    --game-yellow: #FFD700;
-    --game-orange: #FF6B35;
-    --game-pink: #FF006E;
-    --game-purple: #8338EC;
-    --game-blue: #3A86FF;
-    --game-green: #06FFA5;
-    --game-red: #FB5607;
-    
-    --coin-gold: #FFD700;
-    --coin-shadow: #FFA500;
-    --xp-bar-bg: rgba(255, 255, 255, 0.1);
-    --xp-bar-fill: linear-gradient(90deg, #FFD700, #FF6B35, #FF006E);
-}
-
-/* ============================================
-   GAME HUD (Heads-Up Display)
-   ============================================ */
-.game-hud {
+/* ── HUD bar (top-right) ── */
+#gs-hud {
     position: fixed;
-    top: 80px;
-    right: 20px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    animation: slideInRight 0.6s ease-out;
+    top: 68px;
+    right: 16px;
+    z-index: 900;
 }
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Счётчик монет */
-.coin-counter {
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    padding: 12px 20px;
-    border-radius: 50px;
+.gs-hud-inner {
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
-    animation: pulse 2s ease-in-out infinite;
+    background: var(--bg-card, #1e1c3a);
+    border: 1px solid var(--border-primary, #2e2b55);
+    border-radius: 99px;
+    padding: 6px 14px;
+    box-shadow: 0 4px 20px rgba(10,8,40,.5);
+    font-size: .85rem;
 }
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.coin-icon {
-    width: 32px;
-    height: 32px;
-    background: radial-gradient(circle at 30% 30%, #FFF, #FFD700);
-    border-radius: 50%;
+.gs-coins { color: var(--accent-yellow, #fde68a); font-weight: 700; white-space: nowrap; }
+.gs-xp-wrap {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
-    animation: rotate 3s linear infinite;
+    gap: 6px;
+    font-size: .78rem;
+    color: var(--text-secondary, #b8bfe8);
+}
+.gs-xp-label { font-weight: 700; color: var(--accent-violet, #a78bfa); white-space: nowrap; }
+.gs-xp-bar {
+    width: 80px;
+    height: 6px;
+    background: rgba(255,255,255,.1);
+    border-radius: 99px;
+    overflow: hidden;
+}
+.gs-xp-fill {
+    height: 100%;
+    background: var(--grad-main, linear-gradient(90deg, #7c5cbf, #7eb8f7));
+    border-radius: 99px;
+    transition: width .4s;
+}
+.gs-xp-val { white-space: nowrap; }
+.gs-quests-btn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 6px;
+    transition: background .15s;
+    line-height: 1;
+}
+.gs-quests-btn:hover { background: rgba(255,255,255,.08); }
+.gs-quests-btn.gs-pulse { animation: gs-pulse 1s ease-in-out infinite; }
+@keyframes gs-pulse {
+    0%,100% { transform: scale(1); }
+    50%      { transform: scale(1.3); }
 }
 
-@keyframes rotate {
-    from { transform: rotateY(0deg); }
-    to { transform: rotateY(360deg); }
+/* ── Quests panel ── */
+#gs-panel {
+    position: fixed;
+    top: 110px;
+    right: 16px;
+    width: 300px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: var(--bg-card, #1e1c3a);
+    border: 1px solid var(--border-primary, #2e2b55);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(10,8,40,.6);
+    z-index: 899;
+    display: none;
+    flex-direction: column;
 }
+#gs-panel.open { display: flex; }
 
-.coin-amount {
-    font-size: 24px;
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-/* XP Bar */
-.xp-container {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    padding: 15px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-.xp-header {
+.gs-panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
-}
-
-.xp-level {
-    font-size: 18px;
-    font-weight: 800;
-    background: linear-gradient(135deg, #FFD700, #FF6B35);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.xp-text {
-    font-size: 14px;
-    color: rgba(255,255,255,0.8);
-}
-
-.xp-bar {
-    width: 200px;
-    height: 12px;
-    background: var(--xp-bar-bg);
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-}
-
-.xp-fill {
-    height: 100%;
-    background: var(--xp-bar-fill);
-    border-radius: 10px;
-    transition: width 0.5s ease-out;
-    position: relative;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-.xp-fill::after {
-    content: '';
-    position: absolute;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-primary, #2e2b55);
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--text-heading, #eef0ff);
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.3), transparent);
-    border-radius: 10px 10px 0 0;
+    background: var(--bg-card, #1e1c3a);
+    z-index: 1;
 }
-
-/* ============================================
-   QUESTS PANEL
-   ============================================ */
-.quests-panel {
-    position: fixed;
-    left: 20px;
-    top: 80px;
-    width: 320px;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    z-index: 999;
-    animation: slideInLeft 0.6s ease-out;
+.gs-panel-close {
+    background: none; border: none;
+    color: var(--text-secondary, #b8bfe8);
+    cursor: pointer; font-size: 1rem; padding: 2px 6px;
+    border-radius: 4px;
 }
+.gs-panel-close:hover { background: rgba(255,255,255,.08); }
 
-@keyframes slideInLeft {
-    from {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-.quests-header {
-    background: linear-gradient(135deg, #8338EC 0%, #3A86FF 100%);
-    padding: 16px 20px;
-    border-radius: 16px 16px 0 0;
+/* Daily reward */
+.gs-daily {
     display: flex;
     align-items: center;
-    gap: 12px;
-    box-shadow: 0 4px 20px rgba(131, 56, 236, 0.4);
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(167,139,250,.07);
+    border-bottom: 1px solid var(--border-primary, #2e2b55);
+    font-size: .85rem;
+    color: var(--accent-violet, #a78bfa);
 }
-
-.quests-icon {
-    font-size: 28px;
-    animation: bounce 1s ease-in-out infinite;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-.quests-title {
-    font-size: 20px;
-    font-weight: 800;
+.gs-daily.claimed { color: var(--text-secondary, #b8bfe8); }
+.gs-claim-btn {
+    background: var(--grad-main, linear-gradient(135deg,#7c5cbf,#7eb8f7));
     color: #fff;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-.quests-list {
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
-    border-radius: 0 0 16px 16px;
-    padding: 12px;
-}
-
-.quest-item {
-    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    border: 2px solid rgba(255,255,255,0.2);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.quest-item:hover {
-    transform: translateX(5px);
-    border-color: var(--game-yellow);
-    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
-}
-
-.quest-item.completed {
-    background: linear-gradient(135deg, rgba(6, 255, 165, 0.2), rgba(6, 255, 165, 0.1));
-    border-color: var(--game-green);
-}
-
-.quest-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-
-.quest-type {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.quest-type.daily {
-    background: linear-gradient(135deg, #FF6B35, #FF006E);
-    color: #fff;
-}
-
-.quest-type.weekly {
-    background: linear-gradient(135deg, #8338EC, #3A86FF);
-    color: #fff;
-}
-
-.quest-type.challenge {
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    color: #000;
-}
-
-.quest-name {
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-    flex: 1;
-}
-
-.quest-description {
-    font-size: 13px;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 10px;
-}
-
-.quest-progress {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.quest-bar {
-    flex: 1;
-    height: 8px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.quest-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--game-green), var(--game-blue));
-    border-radius: 10px;
-    transition: width 0.5s ease-out;
-}
-
-.quest-reward {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--game-yellow);
-}
-
-/* ============================================
-   ACHIEVEMENTS MODAL
-   ============================================ */
-.achievements-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #FFD700, #FF6B35);
     border: none;
-    font-size: 36px;
-    cursor: pointer;
-    box-shadow: 0 6px 30px rgba(255, 215, 0, 0.5);
-    transition: all 0.3s ease;
-    z-index: 1001;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-.achievements-btn:hover {
-    transform: scale(1.1) rotate(10deg);
-    box-shadow: 0 8px 40px rgba(255, 215, 0, 0.7);
-}
-
-.achievements-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.3s ease;
-}
-
-.achievements-modal.active {
-    display: flex;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.achievements-content {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 24px;
-    padding: 40px;
-    max-width: 900px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    animation: scaleIn 0.4s ease;
-}
-
-@keyframes scaleIn {
-    from {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.achievements-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.achievements-header h2 {
-    font-size: 42px;
-    font-weight: 900;
-    background: linear-gradient(135deg, #FFD700, #FF6B35, #FF006E);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 10px;
-}
-
-.achievements-stats {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 20px;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 32px;
-    font-weight: 900;
-    color: var(--game-yellow);
-}
-
-.stat-label {
-    font-size: 14px;
-    color: rgba(255,255,255,0.6);
-    text-transform: uppercase;
-}
-
-.achievements-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.achievement-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    border: 2px solid rgba(255,255,255,0.2);
-    border-radius: 16px;
-    padding: 20px;
-    text-align: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.achievement-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-    transform: rotate(45deg);
-    transition: all 0.6s ease;
-}
-
-.achievement-card:hover::before {
-    left: 100%;
-}
-
-.achievement-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--game-yellow);
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
-}
-
-.achievement-card.locked {
-    opacity: 0.5;
-    filter: grayscale(1);
-}
-
-.achievement-card.unlocked {
-    border-color: var(--game-green);
-    animation: unlockPulse 0.6s ease;
-}
-
-@keyframes unlockPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.achievement-icon {
-    font-size: 64px;
-    margin-bottom: 12px;
-    display: inline-block;
-    animation: wiggle 2s ease-in-out infinite;
-}
-
-@keyframes wiggle {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    75% { transform: rotate(5deg); }
-}
-
-.achievement-name {
-    font-size: 16px;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: .78rem;
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity .15s;
 }
+.gs-claim-btn:hover { opacity: .85; }
 
-.achievement-description {
-    font-size: 13px;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 10px;
+/* Quest groups */
+.gs-quest-group-title {
+    padding: 8px 16px 4px;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-secondary, #b8bfe8);
 }
-
-.achievement-reward {
-    display: inline-flex;
+.gs-quest-item {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    transition: background .15s;
+}
+.gs-quest-item:hover { background: rgba(167,139,250,.05); }
+.gs-quest-item.done { opacity: .55; }
+.gs-qi-top {
+    display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #000;
+    margin-bottom: 2px;
 }
-
-.close-modal {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    border: 2px solid rgba(255,255,255,0.3);
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.close-modal:hover {
-    background: var(--game-red);
-    border-color: var(--game-red);
-    transform: rotate(90deg);
-}
-
-/* ============================================
-   COIN ANIMATION (when earned)
-   ============================================ */
-@keyframes coinEarned {
-    0% {
-        transform: scale(0) rotate(0deg);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.5) rotate(180deg);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1) rotate(360deg);
-        opacity: 1;
-    }
-}
-
-.coin-earned {
-    animation: coinEarned 0.6s ease-out;
-}
-
-/* ============================================
-   NOTIFICATION TOAST
-   ============================================ */
-.notification-toast {
-    position: fixed;
-    top: 100px;
-    right: -400px;
-    width: 350px;
-    background: linear-gradient(135deg, #8338EC, #3A86FF);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 10px 40px rgba(131, 56, 236, 0.5);
-    z-index: 3000;
-    transition: right 0.5s ease;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.notification-toast.show {
-    right: 20px;
-}
-
-.notification-icon {
-    font-size: 48px;
-}
-
-.notification-content {
+.gs-qi-icon { font-size: 1rem; flex-shrink: 0; }
+.gs-qi-name { flex: 1; font-size: .85rem; font-weight: 600; color: var(--text-heading, #eef0ff); }
+.gs-qi-reward { font-size: .75rem; color: var(--accent-yellow, #fde68a); white-space: nowrap; }
+.gs-qi-desc { font-size: .75rem; color: var(--text-secondary, #b8bfe8); margin-bottom: 6px; }
+.gs-qi-bar-wrap { display: flex; align-items: center; gap: 6px; }
+.gs-qi-bar {
     flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,.08);
+    border-radius: 99px;
+    overflow: hidden;
 }
-
-.notification-title {
-    font-size: 18px;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 4px;
+.gs-qi-fill {
+    height: 100%;
+    background: var(--grad-main, linear-gradient(90deg,#7c5cbf,#7eb8f7));
+    border-radius: 99px;
+    transition: width .3s;
 }
+.gs-qi-count { font-size: .72rem; color: var(--text-secondary, #b8bfe8); white-space: nowrap; }
 
-.notification-message {
-    font-size: 14px;
-    color: rgba(255,255,255,0.9);
+/* ── Toast notifications ── */
+.gs-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-card, #1e1c3a);
+    border: 1px solid var(--border-primary, #2e2b55);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: .875rem;
+    color: var(--text-heading, #eef0ff);
+    box-shadow: 0 8px 24px rgba(10,8,40,.6);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity .3s, transform .3s;
+    text-align: center;
+    pointer-events: none;
+    max-width: 280px;
 }
+.gs-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.gs-toast strong { color: var(--accent-violet, #a78bfa); }
+.gs-toast span { color: var(--text-secondary, #b8bfe8); font-size: .8rem; }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 768px) {
-    .game-hud {
-        top: 60px;
-        right: 10px;
-        scale: 0.9;
-    }
-    
-    .quests-panel {
-        left: 10px;
-        top: 60px;
-        width: 280px;
-    }
-    
-    .achievements-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 30px;
-        bottom: 20px;
-        right: 20px;
-    }
-    
-    .achievements-content {
-        padding: 20px;
-        margin: 20px;
-    }
-    
-    .achievements-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 15px;
-    }
+/* ── Mobile ── */
+@media (max-width: 640px) {
+    #gs-hud { top: auto; bottom: 16px; right: 16px; }
+    #gs-panel { top: auto; bottom: 70px; right: 16px; max-height: 60vh; }
+    .gs-xp-bar { width: 50px; }
 }

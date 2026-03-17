@@ -22,6 +22,11 @@ body {
     line-height: var(--lh-normal);
     color: var(--text-primary);
     background-color: var(--bg-primary);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(91,79,207,.35) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 10%,  rgba(124,92,191,.2) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 60% at 50% 100%, rgba(59,130,246,.12) 0%, transparent 60%);
+    background-attachment: fixed;
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -44,8 +49,8 @@ body {
 
 /* === Selection === */
 ::selection {
-    background: var(--accent-blue-dim);
-    color: var(--accent-blue);
+    background: var(--accent-violet-dim);
+    color: var(--accent-violet);
 }
 
 /* === Typography === */
@@ -233,7 +238,7 @@ tr:last-child td {
 .text-accent { color: var(--accent-blue); }
 .text-muted { color: var(--text-tertiary); }
 .text-gradient {
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    background: var(--grad-main, linear-gradient(135deg, #7c5cbf, #7eb8f7));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

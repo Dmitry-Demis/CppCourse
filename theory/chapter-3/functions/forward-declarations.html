@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§2.6 Forward declarations и ODR — Курс C++</title>
+    <meta name="description" content="Forward declarations в C++: объявление vs определение, One Definition Rule (ODR), порядок компиляции.">
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава III</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава III — §3.6</div>
+                <h1>Forward declarations и ODR</h1>
+
+                <p>
+                    Компилятор читает файл сверху вниз. Если функция вызывается до её определения —
+                    нужно заранее сообщить компилятору о её существовании.
+                    Для этого используется <span class="key-term">forward declaration</span>.
+                </p>
+
+                <h2 id="problem">1. Проблема порядка</h2>
+
+                <p>
+                    Без объявления вызов функции до её определения — ошибка компиляции.
+                    Forward declaration решает это: указываем заголовок функции (без тела) перед первым использованием.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/forward-decl-problem.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — forward declaration</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="odr">2. One Definition Rule (ODR)</h2>
+
+                <p>
+                    <span class="key-term">ODR</span> — одно из фундаментальных правил C++:
+                    каждая функция или переменная может быть <em>определена</em> ровно один раз.
+                    Объявлений (declarations) может быть сколько угодно — они не создают код.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/forward-decl-odr.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — ODR</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">📌 Объявление vs Определение</div>
+                    <ul>
+                        <li><strong>Объявление</strong> — сообщает компилятору об имени и типе. Не генерирует код. Можно повторять.</li>
+                        <li><strong>Определение</strong> — содержит тело функции или инициализатор переменной. Генерирует код. Только одно на программу.</li>
+                        <li>Каждое определение является объявлением, но не наоборот.</li>
+                    </ul>
+                </div>
+
+                <h2 id="why-matters">3. Зачем это важно</h2>
+
+                <p>
+                    В реальных проектах функции разбиваются по нескольким файлам.
+                    Forward declarations (обычно в <code>.h</code> заголовочных файлах) позволяют
+                    одному файлу использовать функции из другого. Подробнее — в Главе 3.
+                </p>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

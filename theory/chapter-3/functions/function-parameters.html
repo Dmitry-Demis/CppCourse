@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§2.4 Параметры и аргументы — Курс C++</title>
+    <meta name="description" content="Параметры и аргументы функций в C++: передача по значению, по ссылке, по const-ссылке, значения по умолчанию, перегрузка.">
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+
+    <style>
+        .std-badge {
+            display: inline-block; font-size: .7rem; font-weight: 700;
+            padding: .15rem .45rem; border-radius: 4px; vertical-align: middle; margin-left: .35rem;
+        }
+        .std-badge--17 { background: #1e3a4f; color: #89dceb; }
+
+        .param-table {
+            width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9rem;
+        }
+        .param-table th, .param-table td {
+            padding: .6rem .9rem;
+            border: 1px solid var(--border, #313244);
+            text-align: left;
+        }
+        .param-table th {
+            background: var(--surface, #1e1e2e);
+            color: var(--text-muted, #cdd6f4);
+        }
+        .param-table tr:nth-child(even) td { background: rgba(255,255,255,.03); }
+    </style>
+</head>
+<body>
+
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава III</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава III — §3.4</div>
+                <h1>Параметры и аргументы функций</h1>
+
+                <p>
+                    Функции становятся по-настоящему полезными, когда могут принимать данные извне.
+                    Для этого используются <span class="key-term">параметры</span> и <span class="key-term">аргументы</span>.
+                </p>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="params-vs-args">1. Параметры vs аргументы</h2>
+
+                <ul>
+                    <li>
+                        <span class="key-term">Параметр</span> — переменная в <em>определении</em> функции.
+                        Это «слот», который будет заполнен при вызове.
+                    </li>
+                    <li>
+                        <span class="key-term">Аргумент</span> — конкретное значение, переданное при <em>вызове</em>.
+                        Оно копируется в параметр.
+                    </li>
+                </ul>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="pass-by-value">2. Передача по значению</h2>
+
+                <p>
+                    По умолчанию аргументы передаются <span class="key-term">по значению</span> —
+                    создаётся <em>копия</em>. Изменения параметра внутри функции не влияют на оригинал.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/params-by-value.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — передача по значению</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="pass-by-ref">3. Передача по ссылке</h2>
+
+                <p>
+                    Чтобы функция могла изменить переданную переменную, используется
+                    <span class="key-term">передача по ссылке</span> — параметр объявляется с <code>&amp;</code>.
+                    Тогда параметр — это псевдоним оригинала, а не копия.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/params-by-ref.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — передача по ссылке</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="const-ref">4. Передача по const-ссылке</h2>
+
+                <p>
+                    Для больших объектов (строки, векторы, структуры) копирование дорого.
+                    Передача по <code>const&amp;</code> позволяет избежать копии, но запрещает изменение.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/params-const-ref.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — const-ссылка</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Способ</th>
+                            <th>Синтаксис</th>
+                            <th>Копия?</th>
+                            <th>Изменяет оригинал?</th>
+                            <th>Когда использовать</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>По значению</td>
+                            <td><code>int x</code></td>
+                            <td>Да</td>
+                            <td>Нет</td>
+                            <td>Примитивы, маленькие типы</td>
+                        </tr>
+                        <tr>
+                            <td>По ссылке</td>
+                            <td><code>int&amp; x</code></td>
+                            <td>Нет</td>
+                            <td>Да</td>
+                            <td>Нужно изменить аргумент</td>
+                        </tr>
+                        <tr>
+                            <td>По const-ссылке</td>
+                            <td><code>const int&amp; x</code></td>
+                            <td>Нет</td>
+                            <td>Нет</td>
+                            <td>Большие объекты только для чтения</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="default-args">5. Значения по умолчанию</h2>
+
+                <p>
+                    Параметрам можно задать <span class="key-term">значения по умолчанию</span>.
+                    Если аргумент не передан — используется значение по умолчанию.
+                    Параметры с умолчаниями должны идти <em>после</em> параметров без умолчаний.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/params-default.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — значения по умолчанию</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="overloading">6. Перегрузка функций</h2>
+
+                <p>
+                    В C++ можно иметь несколько функций с одним именем, но разными параметрами —
+                    это называется <span class="key-term">перегрузка</span> (overloading).
+                    Компилятор выбирает нужную версию по типам аргументов.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/params-overload.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — перегрузка функций</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <h2 id="structured-bindings">
+                    7. Возврат нескольких значений
+                    <span class="std-badge std-badge--17">C++17</span>
+                </h2>
+
+                <p>
+                    Функция может вернуть только одно значение, но с C++17 удобно использовать
+                    <code>std::pair</code> / <code>std::tuple</code> вместе со
+                    <span class="key-term">structured bindings</span> для удобной распаковки.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/params-structured-bindings.cpp" data-std="c++17">
+                    <div class="code-header">
+                        <span class="code-lang">C++17 — structured bindings</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <div class="paragraph-nav"></div>
+
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+
+</body>
+</html>

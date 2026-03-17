@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§2.5 Локальная область видимости — Курс C++</title>
+    <meta name="description" content="Локальные переменные в C++: область видимости, время жизни, shadowing. Почему локальные переменные лучше глобальных.">
+
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава III</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава III — §3.5</div>
+                <h1>Локальная область видимости</h1>
+
+                <p>
+                    Переменные, объявленные внутри функции, называются <span class="key-term">локальными</span>.
+                    Они существуют только пока выполняется функция и недоступны снаружи.
+                </p>
+
+                <h2 id="local-vars">1. Локальные переменные</h2>
+
+                <p>
+                    <span class="key-term">Область видимости</span> (scope) — часть программы, где имя переменной
+                    доступно. Локальная переменная видна только внутри блока <code>{ }</code>, в котором объявлена.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/local-scope-basic.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — локальные переменные</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="lifetime">2. Время жизни</h2>
+
+                <p>
+                    <span class="key-term">Время жизни</span> (lifetime) — период от создания переменной до её уничтожения.
+                    Локальная переменная создаётся при входе в блок и уничтожается при выходе.
+                    Каждый вызов функции создаёт <em>новые</em> экземпляры локальных переменных.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/local-scope-lifetime.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — время жизни</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="shadowing">3. Shadowing — перекрытие имён</h2>
+
+                <p>
+                    Если локальная переменная имеет то же имя, что и переменная во внешней области —
+                    она её <span class="key-term">перекрывает</span> (shadowing). Это легальный C++,
+                    но часто источник путаницы. Компиляторы предупреждают об этом с <code>-Wshadow</code>.
+                </p>
+
+                <div class="code-block" data-example="chapter-2/functions/local-scope-shadowing.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — shadowing</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠️ Глобальные переменные — с осторожностью</div>
+                    <p>
+                        Глобальные переменные доступны из любой функции, что делает программу трудно
+                        предсказуемой. Предпочитай передавать данные через параметры и возвращать через
+                        <code>return</code>. Глобальные переменные — крайний случай.
+                    </p>
+                </div>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>

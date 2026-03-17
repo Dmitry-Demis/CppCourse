@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <script src="../../../js/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§1.9 Первая программа — Курс C++</title>
+    <meta name="description" content="Разработка первой программы на C++: от задачи к коду, пошаговый процесс, отладка и улучшение.">
+    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава I</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава I — §1.9</div>
+                <h1>Первая программа</h1>
+
+                <p>
+                    Пришло время применить всё, что мы изучили, и написать полноценную программу.
+                    Разберём процесс разработки от задачи до рабочего кода.
+                </p>
+
+                <h2 id="process">1. Процесс разработки</h2>
+
+                <p>
+                    Хороший программист не сразу пишет код. Сначала нужно понять задачу,
+                    потом спроектировать решение, и только потом реализовать его.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">📌 Шаги разработки</div>
+                    <ol>
+                        <li><strong>Понять задачу</strong> — что программа должна делать?</li>
+                        <li><strong>Спроектировать решение</strong> — какие данные нужны, какие шаги?</li>
+                        <li><strong>Написать код</strong> — реализовать шаги</li>
+                        <li><strong>Скомпилировать</strong> — исправить синтаксические ошибки</li>
+                        <li><strong>Протестировать</strong> — проверить на разных входных данных</li>
+                        <li><strong>Улучшить</strong> — рефакторинг, оптимизация</li>
+                    </ol>
+                </div>
+
+                <h2 id="example">2. Пример: сумма двух чисел</h2>
+
+                <p>
+                    Задача: написать программу, которая запрашивает два числа у пользователя
+                    и выводит их сумму.
+                </p>
+
+                <div class="code-block" data-example="chapter-1/basics/first-program.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — первая программа</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="iteration">3. Итеративное улучшение</h2>
+
+                <p>
+                    Не пытайтесь написать идеальный код с первого раза.
+                    Начните с простого рабочего решения, затем улучшайте его.
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Советы начинающему</div>
+                    <ul>
+                        <li>Компилируйте часто — не пишите 100 строк без проверки</li>
+                        <li>Тестируйте на граничных значениях: 0, отрицательные числа</li>
+                        <li>Читайте сообщения об ошибках — компилятор указывает на строку</li>
+                        <li>Используйте осмысленные имена переменных</li>
+                        <li>Добавляйте комментарии к неочевидным местам</li>
+                    </ul>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">⚠️ Частая ошибка новичков</div>
+                    <p>
+                        Попытка написать всю программу сразу, а потом исправить все ошибки.
+                        Лучше: написал 5–10 строк → скомпилировал → исправил → продолжил.
+                    </p>
+                </div>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+</body>
+</html>
