@@ -57,60 +57,21 @@
                     перегрузки и современных возможностей C++11–C++23.
                 </p>
 
-                <div class="chapter-sections">
-                    <a href="introduction-to-functions.html" class="section-card">
-                        <div class="section-card__number">§3.1</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Введение в функции</div>
-                            <div class="section-card__desc">Что такое функция, синтаксис, вызов, определение vs объявление</div>
-                        </div>
-                    </a>
-                    <a href="function-return-values.html" class="section-card">
-                        <div class="section-card__number">§3.2</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Возвращаемые значения</div>
-                            <div class="section-card__desc">return, типы возврата, trailing return type, [[nodiscard]]</div>
-                        </div>
-                    </a>
-                    <a href="void-functions.html" class="section-card">
-                        <div class="section-card__number">§3.3</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Void-функции</div>
-                            <div class="section-card__desc">Функции без возврата, ранний выход, побочные эффекты</div>
-                        </div>
-                    </a>
-                    <a href="function-parameters.html" class="section-card">
-                        <div class="section-card__number">§3.4</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Параметры и аргументы</div>
-                            <div class="section-card__desc">Передача по значению, ссылке, const-ссылке, значения по умолчанию, перегрузка</div>
-                        </div>
-                    </a>
-                    <a href="local-scope.html" class="section-card">
-                        <div class="section-card__number">§3.5</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Локальная область видимости</div>
-                            <div class="section-card__desc">Область видимости переменных, время жизни, shadowing</div>
-                        </div>
-                    </a>
-                    <a href="forward-declarations.html" class="section-card">
-                        <div class="section-card__number">§3.6</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Forward declarations и ODR</div>
-                            <div class="section-card__desc">Предварительные объявления, правило одного определения</div>
-                        </div>
-                    </a>
-                    <a href="function-design.html" class="section-card">
-                        <div class="section-card__number">§3.7</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Проектирование функций</div>
-                            <div class="section-card__desc">Принципы хорошего дизайна: DRY, единственная ответственность, рефакторинг</div>
-                        </div>
-                    </a>
+                <div class="chapter-sections" id="sections-grid">
+                    <div class="chapter-sections-loading">Загрузка...</div>
                 </div>
+
+                <div class="paragraph-nav"></div>
 
             </div>
         </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
     </div>
 
     <footer class="site-footer">
@@ -118,7 +79,36 @@
     </footer>
 
     <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
     <script src="../../../js/gamification.js"></script>
+    <script>
+    async function buildSectionsGrid() {
+        const grid = document.getElementById('sections-grid');
+        if (!grid) return;
+        try {
+            const res = await fetch('/api/course-structure');
+            const data = await res.json();
+            const chapter = data.chapters.find(c => c.id === 'chapter-3');
+            if (!chapter) return;
+            let counter = 0;
+            const sections = chapter.paragraphs.flatMap(p => p.sections || []);
+            grid.innerHTML = sections.map(s => {
+                counter++;
+                return `<a href="/${s.file}" class="section-card">
+                    <div class="section-card__number">§3.${counter}</div>
+                    <div class="section-card__body">
+                        <div class="section-card__title">${s.title}</div>
+                        <div class="section-card__desc">${s.description || ''}</div>
+                    </div>
+                    <span class="section-card__arrow">→</span>
+                </a>`;
+            }).join('');
+        } catch (e) {
+            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции.</p>';
+        }
+    }
+    buildSectionsGrid();
+    </script>
 
 </body>
 </html>

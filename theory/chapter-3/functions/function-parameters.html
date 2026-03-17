@@ -5,7 +5,7 @@
     <meta name="created" content="2025-03-17">
     <script src="../../../js/auth-guard.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>§2.4 Параметры и аргументы — Курс C++</title>
+    <title>Параметры и аргументы — Курс C++</title>
     <meta name="description" content="Параметры и аргументы функций в C++: передача по значению, по ссылке, по const-ссылке, значения по умолчанию, перегрузка.">
 
     <link rel="stylesheet" href="../../../css/variables.css">
@@ -79,7 +79,7 @@
         <main class="main-content">
             <div class="chapter-content">
 
-                <div class="section-badge">Глава III — §3.4</div>
+                <div class="section-badge">Глава III</div>
                 <h1>Параметры и аргументы функций</h1>
 
                 <p>
@@ -109,7 +109,7 @@
                     создаётся <em>копия</em>. Изменения параметра внутри функции не влияют на оригинал.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/params-by-value.cpp">
+                <div class="code-block" data-example="chapter-3/functions/params-by-value.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — передача по значению</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -128,7 +128,7 @@
                     Тогда параметр — это псевдоним оригинала, а не копия.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/params-by-ref.cpp">
+                <div class="code-block" data-example="chapter-3/functions/params-by-ref.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — передача по ссылке</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -146,7 +146,7 @@
                     Передача по <code>const&amp;</code> позволяет избежать копии, но запрещает изменение.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/params-const-ref.cpp">
+                <div class="code-block" data-example="chapter-3/functions/params-const-ref.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — const-ссылка</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -200,7 +200,7 @@
                     Параметры с умолчаниями должны идти <em>после</em> параметров без умолчаний.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/params-default.cpp">
+                <div class="code-block" data-example="chapter-3/functions/params-default.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — значения по умолчанию</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -219,7 +219,7 @@
                     Компилятор выбирает нужную версию по типам аргументов.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/params-overload.cpp">
+                <div class="code-block" data-example="chapter-3/functions/params-overload.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — перегрузка функций</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -241,7 +241,7 @@
                     <span class="key-term">structured bindings</span> для удобной распаковки.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/params-structured-bindings.cpp" data-std="c++17">
+                <div class="code-block" data-example="chapter-3/functions/params-structured-bindings.cpp" data-std="c++17">
                     <div class="code-header">
                         <span class="code-lang">C++17 — structured bindings</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>

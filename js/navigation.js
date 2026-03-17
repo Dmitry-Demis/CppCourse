@@ -80,103 +80,92 @@ function buildCourseNav(structure) {
         const chapterEl = document.createElement('li');
         chapterEl.className = 'sidebar-chapter';
 
-        // Заголовок главы
+        // Determine if any page in this chapter is active
+        const allChapterFiles = chapter.paragraphs.flatMap(p =>
+            [p.file, p.legacyFile, ...(p.sections || []).map(s => s.file)].filter(Boolean)
+        );
+        const isChapterActive = allChapterFiles.some(f => isCurrentPage(currentPath, f));
+        const isChapterOpen = isChapterActive; // collapsed by default unless active
+
+        // Заголовок главы — стрелка сворачивает, текст переходит на страницу главы
         const chapterTitle = document.createElement('div');
-        chapterTitle.className = 'sidebar-chapter-title';
-        chapterTitle.textContent = `Глава ${chapter.number}. ${chapter.title}`;
+        chapterTitle.className = 'sidebar-chapter-title' + (isChapterOpen ? ' open' : '');
+
+        // Find chapter index file (first paragraph's index.html)
+        const firstPara = chapter.paragraphs[0];
+        const chapterIndexFile = firstPara?.file || null;
+
+        const labelEl = document.createElement('span');
+        labelEl.className = 'sidebar-chapter-label';
+        labelEl.textContent = `Глава ${chapter.number}. ${chapter.title}`;
+        if (chapterIndexFile) {
+            labelEl.style.cursor = 'pointer';
+            labelEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                location.href = resolveHref(currentPath, chapterIndexFile);
+            });
+        }
+
+        const arrowEl = document.createElement('span');
+        arrowEl.className = 'sidebar-chapter-arrow';
+        arrowEl.textContent = isChapterOpen ? '▾' : '▸';
+        arrowEl.style.cursor = 'pointer';
+
+        chapterTitle.appendChild(labelEl);
+        chapterTitle.appendChild(arrowEl);
+        chapterTitle.style.cursor = 'default';
         chapterEl.appendChild(chapterTitle);
 
         const ul = document.createElement('ul');
-        ul.className = 'sidebar-paragraphs';
+        ul.className = 'sidebar-paragraphs' + (isChapterOpen ? ' open' : '');
+
+        arrowEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = ul.classList.toggle('open');
+            chapterTitle.classList.toggle('open', open);
+            arrowEl.textContent = open ? '▾' : '▸';
+        });
+
+        let sectionCounter = 0; // global counter across all paragraphs in chapter
 
         chapter.paragraphs.forEach((para, idx) => {
-            const isUnlocked   = isParagraphUnlocked(chapter.paragraphs, idx);
-            const isParaActive = isCurrentPage(currentPath, para.file, para.legacyFile);
-            const sections     = para.sections || [];
-
-            const activeSectionIdx = sections.findIndex(s => s.file && isCurrentPage(currentPath, s.file));
-            const isExpanded = isParaActive || activeSectionIdx !== -1;
-            const isDone     = isParagraphDone(para.id);
-
-            const li = document.createElement('li');
-            li.className = 'sidebar-para-item' + (isExpanded ? ' expanded' : '');
-
-            const a = document.createElement('a');
-            a.className = 'sidebar-para-link' +
-                (isParaActive ? ' active' : '') +
-                (isDone       ? ' done'   : '') +
-                (!isUnlocked  ? ' locked' : '');
-
-            a.href = isUnlocked ? resolveHref(currentPath, para.file) : '#';
-            if (!isUnlocked) {
-                a.title = 'Пройдите итоговый тест предыдущего параграфа';
-                a.addEventListener('click', e => { e.preventDefault(); showLockedNotice(); });
-            }
-
-            const progress  = getQuizProgress(para.id);
+            const isUnlocked = isParagraphUnlocked(chapter.paragraphs, idx);
+            const sections   = para.sections || [];
             const chapterNum = chapter.number;
 
-            // Суммарный % освоенности параграфа по всем тестам его секций
-            const testSections = sections.filter(s => s.hasTest && s.quizId);
-            let paraCompletionBadge = '';
-            if (testSections.length > 0) {
-                const scores = testSections.map(s => {
-                    try { const v = localStorage.getItem(`quiz_best_${s.quizId}`); return v !== null ? JSON.parse(v) : null; } catch { return null; }
-                });
-                const attempted = scores.filter(v => v !== null);
-                if (attempted.length > 0) {
-                    const avg = Math.round(attempted.reduce((s, v) => s + v, 0) / testSections.length);
-                    const cls = avg >= 70 ? 'pass' : 'warn';
-                    paraCompletionBadge = `<span class="para-completion-pct ${cls}">${avg}%</span>`;
-                }
-            }
+            sections.forEach((section, sIdx) => {
+                sectionCounter++;
+                const isSectionActive = section.file && isCurrentPage(currentPath, section.file);
+                const sli = document.createElement('li');
+                sli.className = 'sidebar-section-item';
 
-            a.innerHTML = `
-                <span class="sidebar-para-number">§${chapterNum}.${para.number}</span>
-                <span class="sidebar-para-title">${para.title}</span>
-                <span class="sidebar-para-status">
-                    ${isDone      ? '<span class="status-done">✓</span>'  : ''}
-                    ${!isUnlocked ? '<span class="status-lock">🔒</span>' : ''}
-                    ${paraCompletionBadge}
-                    ${sections.length > 0 ? `<span class="sidebar-para-arrow">${isExpanded ? '▾' : '▸'}</span>` : ''}
-                </span>`;
+                const sa = document.createElement('a');
+                sa.className = 'sidebar-section-link' + (isSectionActive ? ' active' : '');
 
-            li.appendChild(a);
-
-            // Подменю секций
-            if (sections.length > 0) {
-                const subUl = document.createElement('ul');
-                subUl.className = 'sidebar-sections' + (isExpanded ? ' open' : '');
-
-                sections.forEach((section, sIdx) => {
-                    const isSectionActive = sIdx === activeSectionIdx;
-                    const sli = document.createElement('li');
-                    sli.className = 'sidebar-section-item';
-
-                    const sa = document.createElement('a');
-                    sa.className = 'sidebar-section-link' + (isSectionActive ? ' active' : '');
+                if (!isUnlocked) {
+                    sa.href = '#';
+                    sa.className += ' locked';
+                    sa.title = 'Пройдите итоговый тест предыдущего параграфа';
+                    sa.addEventListener('click', e => { e.preventDefault(); showLockedNotice(); });
+                } else {
                     sa.href = section.file ? resolveHref(currentPath, section.file) : '#';
+                }
 
-                    const sNum = section.number || `${chapterNum}.${para.number}.${sIdx + 1}`;
-                    let testBadge = '';
-                    if (section.hasTest && section.quizId) {
-                        const best = (() => { try { const v = localStorage.getItem(`quiz_best_${section.quizId}`); return v !== null ? JSON.parse(v) : null; } catch { return null; } })();
-                        const pctLabel = best !== null ? `<span class="sidebar-section-pct ${best >= 70 ? 'pass' : 'fail'}">${best}%</span>` : '';
-                        testBadge = `<span class="sidebar-section-test" title="Есть тест">✎</span>${pctLabel}`;
-                    }
-                    sa.innerHTML = `
-                        <span class="sidebar-section-number">${sNum}</span>
-                        <span class="sidebar-section-title">${section.title}</span>
-                        ${testBadge}`;
+                const sNum = `§${chapterNum}.${sectionCounter}`;
+                let testBadge = '';
+                if (section.hasTest && section.quizId) {
+                    const best = (() => { try { const v = localStorage.getItem(`quiz_best_${section.quizId}`); return v !== null ? JSON.parse(v) : null; } catch { return null; } })();
+                    const pctLabel = best !== null ? `<span class="sidebar-section-pct ${best >= 70 ? 'pass' : 'fail'}">${best}%</span>` : '';
+                    testBadge = `<span class="sidebar-section-test" title="Есть тест">✎</span>${pctLabel}`;
+                }
+                sa.innerHTML = `
+                    <span class="sidebar-section-number">${sNum}</span>
+                    <span class="sidebar-section-title">${section.title}</span>
+                    ${testBadge}`;
 
-                    sli.appendChild(sa);
-                    subUl.appendChild(sli);
-                });
-
-                li.appendChild(subUl);
-            }
-
-            ul.appendChild(li);
+                sli.appendChild(sa);
+                ul.appendChild(sli);
+            });
         });
 
         chapterEl.appendChild(ul);
@@ -197,16 +186,18 @@ function buildSectionNav(structure) {
     // Строим плоский список всех секций всех параграфов всех глав
     const allSections = [];
     for (const chapter of structure.chapters) {
+        let sectionCounter = 0;
         for (const para of chapter.paragraphs) {
-            for (const section of (para.sections || [])) {
+            (para.sections || []).forEach((section) => {
+                sectionCounter++;
                 allSections.push({
                     ...section,
+                    sectionNum : `§${chapter.number}.${sectionCounter}`,
                     chapterNum : chapter.number,
-                    paraNum    : para.number,
                     paraFile   : para.file,
                     paraTitle  : para.title
                 });
-            }
+            });
         }
     }
 
@@ -221,7 +212,7 @@ function buildSectionNav(structure) {
     const prevHtml = prev
         ? `<a href="${resolveHref(currentPath, prev.file)}" class="nav-prev">
                <span class="nav-dir">← Назад</span>
-               <span class="nav-name">${prev.number} ${prev.title}</span>
+               <span class="nav-name">${prev.sectionNum} ${prev.title}</span>
            </a>`
         : current.paraFile
             ? `<a href="${resolveHref(currentPath, current.paraFile)}" class="nav-prev">
@@ -234,7 +225,7 @@ function buildSectionNav(structure) {
     const nextHtml = next
         ? `<a href="${resolveHref(currentPath, next.file)}" class="nav-next">
                <span class="nav-dir">Далее →</span>
-               <span class="nav-name">${next.number} ${next.title}</span>
+               <span class="nav-name">${next.sectionNum} ${next.title}</span>
            </a>`
         : current.paraFile
             ? `<a href="${resolveHref(currentPath, current.paraFile)}" class="nav-next">

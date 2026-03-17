@@ -6,6 +6,7 @@
     <script src="../../../js/auth-guard.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Глава I — Основы C++ — Курс C++</title>
+    <meta name="description" content="Первые шаги в C++: структура программы, переменные, ввод/вывод, операторы и выражения.">
     <link rel="stylesheet" href="../../../css/variables.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
@@ -30,6 +31,11 @@
                 <a href="../../../index.html">Главная</a>
                 <a href="#" class="active">Глава I</a>
             </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
         </div>
     </header>
 
@@ -43,90 +49,66 @@
 
         <main class="main-content">
             <div class="chapter-content">
-
                 <div class="section-badge">Глава I</div>
                 <h1>Основы C++</h1>
-
-                <p>
-                    Первые шаги в C++: структура программы, переменные, ввод/вывод,
-                    операторы и выражения. Всё, что нужно для написания первых программ.
-                </p>
-
-                <div class="chapter-sections">
-                    <a href="program-structure.html" class="section-card">
-                        <div class="section-card__number">§1.1</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Структура программы</div>
-                            <div class="section-card__desc">Функция main(), инструкции, препроцессорные директивы, порядок выполнения</div>
-                        </div>
-                    </a>
-                    <a href="comments.html" class="section-card">
-                        <div class="section-card__number">§1.2</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Комментарии</div>
-                            <div class="section-card__desc">Однострочные и многострочные комментарии, что и когда комментировать</div>
-                        </div>
-                    </a>
-                    <a href="variables-and-types.html" class="section-card">
-                        <div class="section-card__number">§1.3</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Переменные и типы данных</div>
-                            <div class="section-card__desc">Объявление переменных, основные типы: int, double, char, bool, string</div>
-                        </div>
-                    </a>
-                    <a href="initialization-and-assignment.html" class="section-card">
-                        <div class="section-card__number">§1.4</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Инициализация и присваивание</div>
-                            <div class="section-card__desc">Copy, direct, list инициализация, narrowing conversions, оператор =</div>
-                        </div>
-                    </a>
-                    <a href="iostream.html" class="section-card">
-                        <div class="section-card__number">§1.5</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Ввод и вывод: iostream</div>
-                            <div class="section-card__desc">std::cout, std::cin, операторы &lt;&lt; и &gt;&gt;, \n vs endl</div>
-                        </div>
-                    </a>
-                    <a href="uninitialized-variables.html" class="section-card">
-                        <div class="section-card__number">§1.6</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Неинициализированные переменные и UB</div>
-                            <div class="section-card__desc">Undefined behavior, почему это опасно, правило всегда инициализировать</div>
-                        </div>
-                    </a>
-                    <a href="keywords-and-naming.html" class="section-card">
-                        <div class="section-card__number">§1.7</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Ключевые слова и именование</div>
-                            <div class="section-card__desc">Зарезервированные слова, правила и соглашения об именовании идентификаторов</div>
-                        </div>
-                    </a>
-                    <a href="literals-operators-expressions.html" class="section-card">
-                        <div class="section-card__number">§1.8</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Литералы, операторы и выражения</div>
-                            <div class="section-card__desc">Виды литералов, арифметические операторы, выражения и их типы, приоритет</div>
-                        </div>
-                    </a>
-                    <a href="first-program.html" class="section-card">
-                        <div class="section-card__number">§1.9</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Первая программа</div>
-                            <div class="section-card__desc">Процесс разработки от задачи до кода, итеративное улучшение, советы</div>
-                        </div>
-                    </a>
+                <p>Первые шаги в C++: структура программы, переменные, ввод/вывод, операторы и выражения. Всё, что нужно для написания первых программ.</p>
+                <div class="chapter-sections" id="sections-grid">
+                    <div class="chapter-sections-loading">Загрузка...</div>
                 </div>
-
+                <div class="paragraph-nav"></div>
             </div>
         </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
     </div>
 
-    <footer class="site-footer">
-        <p>Интерактивный курс по языку программирования C++</p>
-    </footer>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
 
     <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
     <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+
+    async function buildSectionsGrid() {
+        const grid = document.getElementById('sections-grid');
+        if (!grid) return;
+        try {
+            const res = await fetch('/api/course-structure');
+            const data = await res.json();
+            const chapter = data.chapters.find(c => c.id === 'chapter-1');
+            if (!chapter) return;
+
+            let counter = 0;
+            const sections = chapter.paragraphs.flatMap(p => p.sections || []);
+            grid.innerHTML = sections.map(s => {
+                counter++;
+                return `<a href="/${s.file}" class="section-card">
+                    <div class="section-card__number">§1.${counter}</div>
+                    <div class="section-card__body">
+                        <div class="section-card__title">${s.title}</div>
+                        <div class="section-card__desc">${s.description || ''}</div>
+                    </div>
+                    <span class="section-card__arrow">→</span>
+                </a>`;
+            }).join('');
+        } catch (e) {
+            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции.</p>';
+        }
+    }
+    buildSectionsGrid();
+    </script>
 </body>
 </html>

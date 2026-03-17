@@ -53,32 +53,21 @@
                     и реагировать на данные времени выполнения. Именно здесь начинается настоящее программирование.
                 </p>
 
-                <div class="chapter-sections">
-                    <a href="introduction-to-control-flow.html" class="section-card">
-                        <div class="section-card__number">§5.1</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Введение в управление потоком</div>
-                            <div class="section-card__desc">Путь выполнения, ветвление, категории операторов: условия, циклы, прыжки, исключения</div>
-                        </div>
-                    </a>
-                    <a href="if-statements.html" class="section-card">
-                        <div class="section-card__number">§5.2</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Оператор if и блоки</div>
-                            <div class="section-card__desc">Синтаксис if/else, блоки { }, неявные блоки, if-else vs if-if, область видимости</div>
-                        </div>
-                    </a>
-                    <a href="if-common-problems.html" class="section-card">
-                        <div class="section-card__number">§5.3</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Типичные ошибки с if</div>
-                            <div class="section-card__desc">Dangling else, уплощение вложенных if, null statement, = вместо ==</div>
-                        </div>
-                    </a>
+                <div class="chapter-sections" id="sections-grid">
+                    <div class="chapter-sections-loading">Загрузка...</div>
                 </div>
+
+                <div class="paragraph-nav"></div>
 
             </div>
         </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
     </div>
 
     <footer class="site-footer">
@@ -86,6 +75,35 @@
     </footer>
 
     <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
     <script src="../../../js/gamification.js"></script>
+    <script>
+    async function buildSectionsGrid() {
+        const grid = document.getElementById('sections-grid');
+        if (!grid) return;
+        try {
+            const res = await fetch('/api/course-structure');
+            const data = await res.json();
+            const chapter = data.chapters.find(c => c.id === 'chapter-5');
+            if (!chapter) return;
+            let counter = 0;
+            const sections = chapter.paragraphs.flatMap(p => p.sections || []);
+            grid.innerHTML = sections.map(s => {
+                counter++;
+                return `<a href="/${s.file}" class="section-card">
+                    <div class="section-card__number">§5.${counter}</div>
+                    <div class="section-card__body">
+                        <div class="section-card__title">${s.title}</div>
+                        <div class="section-card__desc">${s.description || ''}</div>
+                    </div>
+                    <span class="section-card__arrow">→</span>
+                </a>`;
+            }).join('');
+        } catch (e) {
+            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции.</p>';
+        }
+    }
+    buildSectionsGrid();
+    </script>
 </body>
 </html>

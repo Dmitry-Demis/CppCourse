@@ -5,7 +5,7 @@
     <meta name="created" content="2025-03-17">
     <script src="../../../js/auth-guard.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>§2.2 Возвращаемые значения — Курс C++</title>
+    <title>Возвращаемые значения — Курс C++</title>
     <meta name="description" content="Возвращаемые значения функций в C++: return, типы возврата, [[nodiscard]], trailing return type (C++11).">
 
     <link rel="stylesheet" href="../../../css/variables.css">
@@ -67,7 +67,7 @@
         <main class="main-content">
             <div class="chapter-content">
 
-                <div class="section-badge">Глава III — §3.2</div>
+                <div class="section-badge">Глава III</div>
                 <h1>Возвращаемые значения функций</h1>
 
                 <p>
@@ -83,7 +83,7 @@
                     Тип возвращаемого значения указывается перед именем функции.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/return-basic.cpp">
+                <div class="code-block" data-example="chapter-3/functions/return-basic.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — простая функция с возвратом</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -101,7 +101,7 @@
                     Код после <code>return</code> не выполняется — это удобно для раннего выхода.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/return-early.cpp">
+                <div class="code-block" data-example="chapter-3/functions/return-early.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — ранний выход</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -116,7 +116,7 @@
 
                 <p>Функция может возвращать любой тип C++: числа, строки, булевы значения и т.д.</p>
 
-                <div class="code-block" data-example="chapter-2/functions/return-types.cpp">
+                <div class="code-block" data-example="chapter-3/functions/return-types.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — разные типы возврата</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -137,7 +137,7 @@
                     (тип возврата после стрелки <code>-&gt;</code>). Особенно полезен с шаблонами и <code>auto</code>.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/return-trailing.cpp" data-std="c++17">
+                <div class="code-block" data-example="chapter-3/functions/return-trailing.cpp" data-std="c++17">
                     <div class="code-header">
                         <span class="code-lang">C++11 — trailing return type</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -159,7 +159,7 @@
                     В C++20 можно добавить строку-пояснение: <code>[[nodiscard("причина")]]</code>.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/return-nodiscard.cpp" data-std="c++17">
+                <div class="code-block" data-example="chapter-3/functions/return-nodiscard.cpp" data-std="c++17">
                     <div class="code-header">
                         <span class="code-lang">C++17 — [[nodiscard]]</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>

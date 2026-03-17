@@ -37,7 +37,7 @@
 
             <nav class="header-nav">
                 <a href="index.html" class="active">Главная</a>
-                <a href="theory/chapter-1/fundamental-types/introduction-to-fundamental-data-types.html">Глава I</a>
+                <a href="theory/chapter-1/basics/index.html">Глава I</a>
                 <a href="achievements.html">🏆 Достижения</a>
                 <a href="register.html">Регистрация</a>
                 <a href="login.html" id="navAuthLink">Вход</a>
@@ -84,7 +84,7 @@
                     </p>
 
                     <div class="hero-actions">
-                        <a href="theory/chapter-1/fundamental-types/introduction-to-fundamental-data-types.html" class="btn btn--primary">
+                        <a href="theory/chapter-1/basics/index.html" class="btn btn--primary">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                             Начать обучение
                         </a>
@@ -248,7 +248,7 @@
                     : (firstPara?.file || '#');
 
                 const sectionsHtml = allSections.slice(0, 6).map(s =>
-                    `<a class="chapter-section-link" href="${s.file || '#'}" onclick="event.stopPropagation()">
+                    `<a class="chapter-section-link" href="/${s.file || '#'}" onclick="event.stopPropagation()">
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3" fill="currentColor" opacity=".5"/></svg>
                         ${s.title}
                     </a>`
@@ -258,7 +258,7 @@
                 card.className = 'chapter-card';
                 card.style.setProperty('--card-color', color);
                 card.style.cursor = 'pointer';
-                card.addEventListener('click', () => { location.href = chapterIndex; });
+                card.addEventListener('click', () => { location.href = '/' + chapterIndex; });
                 card.innerHTML = `
                     <span class="card-number">Глава ${chapter.number}</span>
                     <h3>${chapter.title}</h3>

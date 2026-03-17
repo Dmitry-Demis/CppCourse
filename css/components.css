@@ -401,6 +401,72 @@
     margin: 0;
 }
 
+/* === Section Cards (chapter index pages) === */
+.chapter-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: var(--space-6) 0;
+}
+
+.section-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-left: 3px solid var(--accent-blue);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.section-card:hover {
+    border-left-color: var(--accent-cyan);
+    background: var(--bg-tertiary);
+    transform: translateX(4px);
+    text-decoration: none;
+}
+
+.section-card__number {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    color: var(--accent-blue);
+    flex-shrink: 0;
+    min-width: 40px;
+}
+
+.section-card__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.section-card__title {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-semibold);
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.section-card__desc {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.section-card__arrow {
+    color: var(--text-tertiary);
+    font-size: var(--fs-sm);
+    flex-shrink: 0;
+    transition: color var(--transition-fast);
+}
+
+.section-card:hover .section-card__arrow { color: var(--accent-cyan); }
+
 @media (max-width: 640px) {
     .info-grid {
         grid-template-columns: 1fr;

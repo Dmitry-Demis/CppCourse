@@ -5,7 +5,7 @@
     <meta name="created" content="2025-03-17">
     <script src="../../../js/auth-guard.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>§2.6 Forward declarations и ODR — Курс C++</title>
+    <title>Forward declarations и ODR — Курс C++</title>
     <meta name="description" content="Forward declarations в C++: объявление vs определение, One Definition Rule (ODR), порядок компиляции.">
 
     <link rel="stylesheet" href="../../../css/variables.css">
@@ -54,7 +54,7 @@
         <main class="main-content">
             <div class="chapter-content">
 
-                <div class="section-badge">Глава III — §3.6</div>
+                <div class="section-badge">Глава III</div>
                 <h1>Forward declarations и ODR</h1>
 
                 <p>
@@ -70,7 +70,7 @@
                     Forward declaration решает это: указываем заголовок функции (без тела) перед первым использованием.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/forward-decl-problem.cpp">
+                <div class="code-block" data-example="chapter-3/functions/forward-decl-problem.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — forward declaration</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -86,7 +86,7 @@
                     Объявлений (declarations) может быть сколько угодно — они не создают код.
                 </p>
 
-                <div class="code-block" data-example="chapter-2/functions/forward-decl-odr.cpp">
+                <div class="code-block" data-example="chapter-3/functions/forward-decl-odr.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — ODR</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>

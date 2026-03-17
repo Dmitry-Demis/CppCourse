@@ -305,15 +305,29 @@
     text-transform: uppercase;
     letter-spacing: 0.12em;
     opacity: 0.85;
+    user-select: none;
 }
+.sidebar-chapter-title:hover { opacity: 1; }
+.sidebar-chapter-label { flex: 1; }
+.sidebar-chapter-arrow { font-size: 0.65rem; color: var(--text-tertiary); flex-shrink: 0; }
 
 .sidebar-paragraphs {
     list-style: none;
     padding: 0;
     margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
 }
+.sidebar-paragraphs.open { max-height: 2000px; }
 
 .sidebar-para-item { position: relative; }
+
+/* Row = link + toggle button side by side */
+.sidebar-para-row {
+    display: flex;
+    align-items: stretch;
+}
 
 .sidebar-para-link {
     display: flex;
@@ -321,34 +335,29 @@
     gap: var(--space-2);
     padding: var(--space-2) var(--space-5);
     text-decoration: none;
-    font-size: var(--fs-sm);
-    color: var(--text-secondary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     border-left: 2px solid transparent;
     transition: all var(--transition-fast);
+    flex: 1;
+    min-width: 0;
 }
 .sidebar-para-link:hover {
-    color: var(--text-primary);
+    color: var(--text-secondary);
     background: var(--bg-tertiary);
     border-left-color: var(--border-secondary);
     text-decoration: none;
 }
 .sidebar-para-link.active {
-    color: var(--accent-blue);
-    background: var(--accent-blue-dim);
-    border-left-color: var(--accent-blue);
-    font-weight: var(--fw-semibold);
+    color: var(--accent-purple);
+    background: rgba(167,139,250,.08);
+    border-left-color: var(--accent-purple);
 }
 .sidebar-para-link.done { color: var(--accent-green); }
 .sidebar-para-link.locked { opacity: 0.5; cursor: not-allowed; }
-
-.sidebar-para-number {
-    font-family: var(--font-mono);
-    font-size: var(--fs-xs);
-    color: var(--text-tertiary);
-    flex-shrink: 0;
-    min-width: 30px;
-}
-.sidebar-para-link.active .sidebar-para-number { color: var(--accent-blue); }
 
 .sidebar-para-title { flex: 1; line-height: 1.35; }
 
@@ -371,24 +380,13 @@
 .para-completion-pct.pass { background: rgba(110,231,183,.12); color: #6ee7b7; }
 .para-completion-pct.warn { background: rgba(251,191,36,.1);   color: #fbbf24; }
 
-/* Подменю секций */
-.sidebar-sections {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
-.sidebar-sections.open { max-height: 600px; }
-
 .sidebar-section-item {}
 
 .sidebar-section-link {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-5) var(--space-2) calc(var(--space-5) + 14px);
+    padding: var(--space-2) var(--space-5);
     text-decoration: none;
     font-size: var(--fs-xs);
     color: var(--text-tertiary);
@@ -408,6 +406,7 @@
     border-left-color: var(--accent-cyan);
     font-weight: var(--fw-medium);
 }
+.sidebar-section-link.locked { opacity: 0.45; cursor: not-allowed; }
 
 .sidebar-section-number {
     font-family: var(--font-mono);

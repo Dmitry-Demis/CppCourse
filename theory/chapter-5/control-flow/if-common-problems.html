@@ -5,7 +5,7 @@
     <meta name="created" content="2025-03-17">
     <script src="../../../js/auth-guard.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>§5.3 Типичные ошибки с if — Курс C++</title>
+    <title>Типичные ошибки с if — Курс C++</title>
     <meta name="description" content="Dangling else, уплощение вложенных if, null statement, присваивание вместо сравнения — типичные ошибки с оператором if в C++.">
     <link rel="stylesheet" href="../../../css/variables.css">
     <link rel="stylesheet" href="../../../css/base.css">
@@ -53,7 +53,7 @@
         <main class="main-content">
             <div class="chapter-content">
 
-                <div class="section-badge">Глава V — §5.3</div>
+                <div class="section-badge">Глава V</div>
                 <h1>Типичные ошибки с if</h1>
 
                 <p>
@@ -80,7 +80,7 @@
         std::cout &lt;&lt; "отрицательное\n";  // BUG при x = 21</code></pre>
                 </div>
 
-                <div class="code-block" data-example="chapter-4/control-flow/dangling-else.cpp">
+                <div class="code-block" data-example="chapter-5/control-flow/dangling-else.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — dangling else и исправление</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -96,7 +96,7 @@
                     или объединить их логическими операторами <code>&amp;&amp;</code> и <code>||</code>.
                 </p>
 
-                <div class="code-block" data-example="chapter-4/control-flow/flatten-nested.cpp">
+                <div class="code-block" data-example="chapter-5/control-flow/flatten-nested.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — уплощение и логические операторы</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -134,7 +134,7 @@
                     компилируется без ошибок, но работает неверно.
                 </p>
 
-                <div class="code-block" data-example="chapter-4/control-flow/null-statement-bug.cpp">
+                <div class="code-block" data-example="chapter-5/control-flow/null-statement-bug.cpp">
                     <div class="code-header">
                         <span class="code-lang">C++ — null statement и = vs ==</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>

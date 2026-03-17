@@ -57,46 +57,21 @@
                     заголовочные файлы, пространства имён и препроцессор.
                 </p>
 
-                <div class="chapter-sections">
-                    <a href="multiple-files.html" class="section-card">
-                        <div class="section-card__number">§4.1</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Программы из нескольких файлов</div>
-                            <div class="section-card__desc">Компиляция и линковка, forward declarations между файлами</div>
-                        </div>
-                    </a>
-                    <a href="namespaces.html" class="section-card">
-                        <div class="section-card__number">§4.2</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Пространства имён</div>
-                            <div class="section-card__desc">namespace, using, вложенные пространства имён, анонимные namespace</div>
-                        </div>
-                    </a>
-                    <a href="preprocessor.html" class="section-card">
-                        <div class="section-card__number">§4.3</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Препроцессор</div>
-                            <div class="section-card__desc">#define, #ifdef, #if, макросы и условная компиляция</div>
-                        </div>
-                    </a>
-                    <a href="header-files.html" class="section-card">
-                        <div class="section-card__number">§4.4</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Заголовочные файлы</div>
-                            <div class="section-card__desc">Что помещать в .h файлы, разделение объявлений и определений</div>
-                        </div>
-                    </a>
-                    <a href="header-guards.html" class="section-card">
-                        <div class="section-card__number">§4.5</div>
-                        <div class="section-card__body">
-                            <div class="section-card__title">Header guards</div>
-                            <div class="section-card__desc">#pragma once и include guards — защита от двойного включения</div>
-                        </div>
-                    </a>
+                <div class="chapter-sections" id="sections-grid">
+                    <div class="chapter-sections-loading">Загрузка...</div>
                 </div>
+
+                <div class="paragraph-nav"></div>
 
             </div>
         </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">📋 Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
     </div>
 
     <footer class="site-footer">
@@ -104,7 +79,36 @@
     </footer>
 
     <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
     <script src="../../../js/gamification.js"></script>
+    <script>
+    async function buildSectionsGrid() {
+        const grid = document.getElementById('sections-grid');
+        if (!grid) return;
+        try {
+            const res = await fetch('/api/course-structure');
+            const data = await res.json();
+            const chapter = data.chapters.find(c => c.id === 'chapter-4');
+            if (!chapter) return;
+            let counter = 0;
+            const sections = chapter.paragraphs.flatMap(p => p.sections || []);
+            grid.innerHTML = sections.map(s => {
+                counter++;
+                return `<a href="/${s.file}" class="section-card">
+                    <div class="section-card__number">§4.${counter}</div>
+                    <div class="section-card__body">
+                        <div class="section-card__title">${s.title}</div>
+                        <div class="section-card__desc">${s.description || ''}</div>
+                    </div>
+                    <span class="section-card__arrow">→</span>
+                </a>`;
+            }).join('');
+        } catch (e) {
+            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции.</p>';
+        }
+    }
+    buildSectionsGrid();
+    </script>
 
 </body>
 </html>

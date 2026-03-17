@@ -5,21 +5,26 @@
   "chapters": [
     {
       "id": "chapter-1",
-      "title": "Основы C++ и типы данных",
-      "description": "Первые шаги: структура программы, переменные, ввод/вывод, операторы, а также вся система встроенных типов"
+      "title": "Основы C++",
+      "description": "Первые шаги: структура программы, переменные, ввод/вывод, операторы и комментарии"
     },
     {
       "id": "chapter-2",
+      "title": "Фундаментальные типы данных",
+      "description": "Вся система встроенных типов C++: целые, вещественные, символьные, логические, sizeof"
+    },
+    {
+      "id": "chapter-3",
       "title": "Функции",
       "description": "Функции в C++: объявление, параметры, возвращаемые значения, перегрузка и современные возможности"
     },
     {
-      "id": "chapter-3",
+      "id": "chapter-4",
       "title": "Организация кода",
       "description": "Разбивка программы на файлы, пространства имён, препроцессор и заголовочные файлы"
     },
     {
-      "id": "chapter-4",
+      "id": "chapter-5",
       "title": "Управление потоком",
       "description": "Условные операторы, ветвление, типичные ошибки с if — основа любой нетривиальной программы"
     }
@@ -49,8 +54,8 @@
     },
     {
       "id": "fundamental-types",
-      "number": 2,
-      "chapterId": "chapter-1",
+      "number": 1,
+      "chapterId": "chapter-2",
       "sections": [
         "introduction-to-fundamental-data-types",
         "integer-types",
@@ -74,7 +79,7 @@
     {
       "id": "functions",
       "number": 1,
-      "chapterId": "chapter-2",
+      "chapterId": "chapter-3",
       "sections": [
         "introduction-to-functions",
         "function-return-values",
@@ -94,7 +99,7 @@
     {
       "id": "code-organization",
       "number": 1,
-      "chapterId": "chapter-3",
+      "chapterId": "chapter-4",
       "sections": [
         "multiple-files",
         "namespaces",
@@ -112,7 +117,7 @@
     {
       "id": "control-flow",
       "number": 1,
-      "chapterId": "chapter-4",
+      "chapterId": "chapter-5",
       "sections": [
         "introduction-to-control-flow",
         "if-statements",
