@@ -21,6 +21,7 @@
     font-size: .85rem;
 }
 .gs-coins { color: var(--accent-yellow, #fde68a); font-weight: 700; white-space: nowrap; }
+.gs-timer  { color: var(--text-secondary, #b8bfe8); font-size: .82rem; white-space: nowrap; opacity: .85; }
 .gs-xp-wrap {
     display: flex;
     align-items: center;
@@ -107,7 +108,7 @@
     justify-content: space-between;
     gap: 8px;
     padding: 10px 16px;
-    background: rgba(167,139,250,.07);
+    background: var(--accent-violet-dim);
     border-bottom: 1px solid var(--border-primary, #2e2b55);
     font-size: .85rem;
     color: var(--accent-violet, #a78bfa);

@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -13,7 +14,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -23,7 +25,7 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 
     <style>
         .std-badge--14 { background: #4a3f1a; color: #f9e2af; }
@@ -78,7 +80,7 @@
                     форматы, аппаратные регистры — используйте типы из <code>&lt;cstdint&gt;</code>.
                 </p>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="cstdint">1. Заголовок &lt;cstdint&gt;</h2>
 
                 <div class="iso-quote">
@@ -104,7 +106,7 @@
                             <tr><td colspan="5" style="background:rgba(137,180,250,.08);font-style:italic;color:var(--text-muted,#6c7086)">— Точный размер (exact-width) —</td></tr>
                             <tr>
                                 <td><code>int8_t</code></td><td>8 бит</td><td>signed</td>
-                                <td>−128 … 127</td>
+                                <td>?128 … 127</td>
                                 <td>Аппаратные регистры, компактные флаги</td>
                             </tr>
                             <tr>
@@ -114,7 +116,7 @@
                             </tr>
                             <tr>
                                 <td><code>int16_t</code></td><td>16 бит</td><td>signed</td>
-                                <td>−32 768 … 32 767</td>
+                                <td>?32 768 … 32 767</td>
                                 <td>Аудио-сэмпл PCM 16-bit</td>
                             </tr>
                             <tr>
@@ -124,52 +126,52 @@
                             </tr>
                             <tr>
                                 <td><code>int32_t</code></td><td>32 бита</td><td>signed</td>
-                                <td>±2.1×10⁹</td>
+                                <td>±2.1?10?</td>
                                 <td>IPv4-адрес, цвет ARGB</td>
                             </tr>
                             <tr>
                                 <td><code>uint32_t</code></td><td>32 бита</td><td>unsigned</td>
-                                <td>0 … 4.3×10⁹</td>
+                                <td>0 … 4.3?10?</td>
                                 <td>CRC32, хеш-значения</td>
                             </tr>
                             <tr>
                                 <td><code>int64_t</code></td><td>64 бита</td><td>signed</td>
-                                <td>±9.2×10¹⁸</td>
+                                <td>±9.2?10??</td>
                                 <td>Unix timestamp, ID записей в БД</td>
                             </tr>
                             <tr>
                                 <td><code>uint64_t</code></td><td>64 бита</td><td>unsigned</td>
-                                <td>0 … 18.4×10¹⁸</td>
+                                <td>0 … 18.4?10??</td>
                                 <td>64-битная маска, SHA-256 слово</td>
                             </tr>
                             <tr><td colspan="5" style="background:rgba(137,180,250,.08);font-style:italic;color:var(--text-muted,#6c7086)">— Минимальный размер (least-width) —</td></tr>
                             <tr>
-                                <td><code>int_least8_t</code></td><td>≥8 бит</td><td>signed</td>
+                                <td><code>int_least8_t</code></td><td>?8 бит</td><td>signed</td>
                                 <td colspan="2">Гарантирует хотя бы 8 бит; может быть шире</td>
                             </tr>
                             <tr><td colspan="5" style="background:rgba(137,180,250,.08);font-style:italic;color:var(--text-muted,#6c7086)">— Быстрейший тип заданного минимума (fast) —</td></tr>
                             <tr>
-                                <td><code>int_fast8_t</code></td><td>≥8 бит</td><td>signed</td>
-                                <td colspan="2">Самый быстрый тип, вмещающий ≥8 бит (часто 32 или 64)</td>
+                                <td><code>int_fast8_t</code></td><td>?8 бит</td><td>signed</td>
+                                <td colspan="2">Самый быстрый тип, вмещающий ?8 бит (часто 32 или 64)</td>
                             </tr>
                             <tr><td colspan="5" style="background:rgba(137,180,250,.08);font-style:italic;color:var(--text-muted,#6c7086)">— Pointer-sized типы —</td></tr>
                             <tr>
-                                <td><code>intptr_t</code></td><td>≥sizeof(void*)</td><td>signed</td>
+                                <td><code>intptr_t</code></td><td>?sizeof(void*)</td><td>signed</td>
                                 <td>платформенный</td>
                                 <td>Хранение указателя как числа</td>
                             </tr>
                             <tr>
-                                <td><code>uintptr_t</code></td><td>≥sizeof(void*)</td><td>unsigned</td>
+                                <td><code>uintptr_t</code></td><td>?sizeof(void*)</td><td>unsigned</td>
                                 <td>платформенный</td>
                                 <td>Адресная арифметика</td>
                             </tr>
                             <tr>
-                                <td><code>std::size_t</code></td><td>≥sizeof(void*)</td><td>unsigned</td>
+                                <td><code>std::size_t</code></td><td>?sizeof(void*)</td><td>unsigned</td>
                                 <td>0 … platform max</td>
                                 <td>Размеры объектов, индексы контейнеров</td>
                             </tr>
                             <tr>
-                                <td><code>std::ptrdiff_t</code></td><td>≥sizeof(void*)</td><td>signed</td>
+                                <td><code>std::ptrdiff_t</code></td><td>?sizeof(void*)</td><td>signed</td>
                                 <td>платформенный</td>
                                 <td>Разность двух указателей</td>
                             </tr>
@@ -222,7 +224,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="numeric-limits">2. std::numeric_limits — интроспекция типов</h2>
 
                 <p>
@@ -298,11 +300,11 @@ int main() {
                     <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="when-to-use">3. Когда использовать fixed-width типы?</h2>
 
                 <div class="info-card">
-                    <div class="info-card__title">✅ Используйте int32_t / uint8_t когда:</div>
+                    <div class="info-card__title">? Используйте int32_t / uint8_t когда:</div>
                     <ul>
                         <li><strong>Бинарные форматы</strong> — BMP, PNG, JPEG, ZIP, ELF</li>
                         <li><strong>Сетевые протоколы</strong> — TCP/IP заголовки, HTTP/2 frames</li>
@@ -313,7 +315,7 @@ int main() {
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">💡 Используйте int / long long для общего кода</div>
+                    <div class="info-card__title">?? Используйте int / long long для общего кода</div>
                     <p>
                         В обычном бизнес-логике: счётчики, флаги, результаты вычислений — используйте
                         <code>int</code> (или <code>long long</code> для больших значений).
@@ -333,7 +335,7 @@ int main() {
 #include &lt;vector&gt;
 #include &lt;span&gt;     // C++20
 
-// ✅ Бинарный парсер: uint8_t/uint32_t — точный размер важен
+// ? Бинарный парсер: uint8_t/uint32_t — точный размер важен
 struct PngChunk {
     uint32_t length{};     // big-endian, 4 байта
     uint32_t type{};       // 4 ASCII-символа
@@ -341,23 +343,23 @@ struct PngChunk {
     uint32_t crc{};        // CRC32
 };
 
-// ✅ Бизнес-логика: int — читаемо и достаточно
+// ? Бизнес-логика: int — читаемо и достаточно
 int calculateScore(int base, int bonus, int penalty) {
     return base + bonus - penalty;  // диапазон int более чем достаточен
 }
 
-// ✅ Буфер данных: span + uint8_t
+// ? Буфер данных: span + uint8_t
 void processBuffer(std::span&lt;const uint8_t&gt; data) {  // C++20: std::span
     std::cout &lt;&lt; "Processing " &lt;&lt; data.size() &lt;&lt; " bytes\n";
 }
 
 int main() {
-    // ✅ Правильный тип для размеров
+    // ? Правильный тип для размеров
     std::vector&lt;int&gt; v(100);
     for (std::size_t i{0}; i &lt; v.size(); ++i)
         v[i] = static_cast&lt;int&gt;(i * i);
 
-    // ✅ C++20: range-based с индексом через std::views::enumerate (C++23)
+    // ? C++20: range-based с индексом через std::views::enumerate (C++23)
     for (auto&amp; val : v)
         val *= 2;
 
@@ -377,7 +379,7 @@ int main() {
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -414,5 +416,7 @@ int main() {
     });
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

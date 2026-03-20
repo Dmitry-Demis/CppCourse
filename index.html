@@ -1,5 +1,6 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,8 @@
     <meta name="description" content="Интерактивный курс по языку программирования C++. Изучайте C++ с примерами кода, компиляцией онлайн и интерактивными заданиями.">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/variables.css?v=3">
+    <link rel="stylesheet" href="css/theme-picker.css">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -212,6 +214,15 @@
         // Chapter card colors
         const CARD_COLORS = ['#58a6ff', '#f78166', '#7ee787', '#d2a8ff', '#ffa657'];
 
+        function toggleExpand(cardId) {
+            const rest = document.getElementById('rest-' + cardId);
+            const btn = document.querySelector('#' + cardId + ' .expand-btn');
+            if (!rest) return;
+            const open = rest.style.display === 'none';
+            rest.style.display = open ? 'flex' : 'none';
+            if (btn) btn.textContent = open ? '▲ Свернуть' : btn.textContent.replace('▲ Свернуть', '▼ Показать все');
+        }
+
         async function buildChaptersGrid() {
             const grid = document.getElementById('chapters-grid');
             const desc = document.getElementById('course-description');
@@ -228,47 +239,104 @@
 
             if (desc) desc.textContent = structure.course?.description || '';
 
+            if (!structure.chapters?.length) {
+                grid.innerHTML = '<p style="color:var(--text-secondary)">Нет данных о главах.</p>';
+                return;
+            }
+
             structure.chapters.forEach((chapter, ci) => {
                 const color = CARD_COLORS[ci % CARD_COLORS.length];
+                const paragraphs = chapter.paragraphs || [];
+                const firstPara = paragraphs[0];
+                const chapterIndex = firstPara
+                    ? `theory/${chapter.id}/${chapter.groupId}/${firstPara.id}.html`
+                    : '#';
 
-                // Collect all paragraphs' sections for this chapter
-                const allSections = chapter.paragraphs.flatMap(p => {
-                    // index link for the paragraph
-                    const indexFile = p.file ? p.file.replace(/[^/]+\.html$/, 'index.html') : null;
-                    return (p.sections || []).slice(0, 5).map(s => ({
-                        title: s.title,
-                        file: s.file
-                    }));
-                });
+                // Compute per-paragraph mastery from localStorage
+                function paraProgress(p) {
+                    const qids = (p.tests || []).map(t => t.quizId);
+                    if (!qids.length) return { read: false, mastery: null };
+                    const read = !!localStorage.getItem(`para_read_${p.id}`);
+                    const scores = qids.map(qid => {
+                        try { const v = localStorage.getItem(`quiz_best_${qid}`); return v !== null ? JSON.parse(v) : null; } catch { return null; }
+                    }).filter(v => v !== null);
+                    const mastery = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+                    return { read, mastery };
+                }
 
-                // Chapter index = first paragraph's index.html
-                const firstPara = chapter.paragraphs[0];
-                const chapterIndex = firstPara?.file
-                    ? firstPara.file.replace(/[^/]+\.html$/, 'index.html')
-                    : (firstPara?.file || '#');
+                // Chapter overall mastery: sum of best scores / (total tests * 100)
+                const allQids = paragraphs.flatMap(p => (p.tests || []).map(t => t.quizId));
+                const totalTests = allQids.length;
+                const scoreSum = allQids.reduce((sum, qid) => {
+                    try { const v = localStorage.getItem(`quiz_best_${qid}`); return sum + (v !== null ? JSON.parse(v) : 0); } catch { return sum; }
+                }, 0);
+                const chapterMastery = totalTests > 0 ? Math.round(scoreSum / totalTests) : 0;
+                const masteryColor = chapterMastery >= 75 ? '#fde68a' : chapterMastery >= 50 ? '#d1d5db' : chapterMastery >= 25 ? '#cd7f32' : '#6b7280';
 
-                const sectionsHtml = allSections.slice(0, 6).map(s =>
-                    `<a class="chapter-section-link" href="/${s.file || '#'}" onclick="event.stopPropagation()">
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3" fill="currentColor" opacity=".5"/></svg>
-                        ${s.title}
-                    </a>`
-                ).join('');
+                const PREVIEW = 6;
+                const hasMore = paragraphs.length > PREVIEW;
+                const cardId = `chapter-card-${ci}`;
+
+                function renderParaList(list) {
+                    return list.map(p => {
+                        const { read, mastery } = paraProgress(p);
+                        const href = `theory/${chapter.id}/${chapter.groupId}/${p.id}.html`;
+                        // Star: gold ≥75%, silver ≥50%, bronze ≥25%, grey otherwise
+                        let starHtml;
+                        if (mastery !== null && mastery >= 75) {
+                            starHtml = '<span style="color:#fde68a;filter:drop-shadow(0 0 4px rgba(253,230,138,.6))">★</span>';
+                        } else if (mastery !== null && mastery >= 50) {
+                            starHtml = '<span style="color:#d1d5db;filter:drop-shadow(0 0 3px rgba(209,213,219,.4))">★</span>';
+                        } else if (mastery !== null && mastery >= 25) {
+                            starHtml = '<span style="color:#cd7f32;filter:drop-shadow(0 0 3px rgba(205,127,50,.4))">★</span>';
+                        } else {
+                            starHtml = '<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:rgba(107,114,128,.2);border-radius:3px;font-size:.6rem;color:rgba(107,114,128,.6)">★</span>';
+                        }
+                        const masteryHtml = mastery !== null
+                            ? `<span style="font-size:.68rem;font-weight:700;color:${mastery >= 75 ? '#fde68a' : mastery >= 50 ? '#d1d5db' : mastery >= 25 ? '#cd7f32' : '#6b7280'};margin-left:auto;flex-shrink:0">${mastery}%</span>`
+                            : `<span style="font-size:.68rem;color:#6b7280;margin-left:auto;flex-shrink:0;background:rgba(107,114,128,.15);padding:1px 5px;border-radius:4px">—</span>`;
+                        return `<a class="chapter-section-link" href="${href}" onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:.85rem;line-height:1;flex-shrink:0">${starHtml}</span>
+                            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title}</span>
+                            ${masteryHtml}
+                        </a>`;
+                    }).join('');
+                }
+
+                const previewHtml = renderParaList(paragraphs.slice(0, PREVIEW));
+                const restHtml = hasMore ? renderParaList(paragraphs.slice(PREVIEW)) : '';
 
                 const card = document.createElement('div');
                 card.className = 'chapter-card';
+                card.id = cardId;
                 card.style.setProperty('--card-color', color);
                 card.style.cursor = 'pointer';
-                card.addEventListener('click', () => { location.href = '/' + chapterIndex; });
+                card.addEventListener('click', () => { location.href = chapterIndex; });
                 card.innerHTML = `
-                    <span class="card-number">Глава ${chapter.number}</span>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                        <span class="card-number">Глава ${chapter.number} <span style="font-size:.7rem;font-weight:500;opacity:.6">(${paragraphs.length} пар.)</span></span>
+                        <span class="ch-mastery-badge" style="font-size:.72rem;font-weight:800;color:${masteryColor};background:rgba(255,255,255,.06);padding:2px 8px;border-radius:99px;border:1px solid ${masteryColor}33" data-target="${chapterMastery}">0%</span>
+                    </div>
                     <h3>${chapter.title}</h3>
                     <p>${chapter.description || ''}</p>
                     <div class="chapter-topics">
-                        <div class="chapter-sections-list">${sectionsHtml}</div>
+                        <div class="chapter-sections-list" id="list-${cardId}">${previewHtml}</div>
+                        ${hasMore ? `<div class="chapter-sections-list" id="rest-${cardId}" style="display:none">${restHtml}</div>` : ''}
                     </div>
+                    ${hasMore ? `<button class="expand-btn" onclick="event.stopPropagation();toggleExpand('${cardId}')" style="background:none;border:none;color:var(--card-color,#a78bfa);font-size:.75rem;font-weight:700;cursor:pointer;padding:4px 0;margin-top:4px">▼ Показать все (${paragraphs.length})</button>` : ''}
                     <span class="card-arrow">Изучить →</span>`;
 
                 grid.appendChild(card);
+            });
+
+            // Animate mastery counters only
+            grid.querySelectorAll('.ch-mastery-badge').forEach(el => {
+                const target = parseInt(el.dataset.target);
+                if (!window.gsap) { el.textContent = target + '%'; return; }
+                gsap.to({ v: 0 }, {
+                    v: target, duration: 1.2, delay: 0.3, ease: 'power2.out',
+                    onUpdate: function() { el.textContent = Math.round(this.targets()[0].v) + '%'; }
+                });
             });
         }
 
@@ -310,18 +378,7 @@
                 ease: 'power2.out'
             });
             
-            // Animate chapter cards
-            gsap.utils.toArray('.chapter-card').forEach((card, index) => {
-                gsap.from(card, {
-                    opacity: 0,
-                    y: 50,
-                    duration: 0.8,
-                    delay: 0.8 + (index * 0.1),
-                    ease: 'power2.out'
-                });
-            });
-            
-            // Animate feature cards
+            // Feature cards
             gsap.utils.toArray('.feature-card').forEach((card, index) => {
                 gsap.from(card, {
                     opacity: 0,
@@ -343,5 +400,7 @@
         });
     </script>
 
+    <script src="js/theme.js"></script>
 </body>
 </html>
+

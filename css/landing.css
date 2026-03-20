@@ -29,10 +29,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background:
-        radial-gradient(ellipse 70% 60% at 15% 40%, rgba(91,79,207,.45) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 50% at 85% 30%, rgba(59,130,246,.3)  0%, transparent 55%),
-        radial-gradient(ellipse 40% 40% at 50% 80%, rgba(124,92,191,.2)  0%, transparent 50%);
+    background: var(--body-grad);
     pointer-events: none;
 }
 
@@ -61,8 +58,8 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
-    background: rgba(167,139,250,.12);
-    border: 1px solid rgba(167,139,250,.25);
+    background: var(--accent-violet-dim);
+    border: 1px solid var(--border-accent);
     border-radius: var(--radius-full);
     font-size: var(--fs-sm);
     color: var(--accent-violet);
@@ -161,8 +158,8 @@
 }
 
 .chapter-card {
-    background: linear-gradient(135deg, rgba(30,28,58,.95) 0%, rgba(26,24,56,.9) 100%);
-    border: 1px solid rgba(167,139,250,.12);
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+    border: 1px solid var(--border-primary);
     border-radius: var(--radius-xl);
     padding: var(--space-6);
     text-decoration: none;
@@ -184,9 +181,9 @@
     transition: opacity var(--transition-base);
 }
 .chapter-card:hover {
-    border-color: rgba(167,139,250,.3);
+    border-color: var(--border-accent);
     transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(91,79,207,.2);
+    box-shadow: var(--shadow-glow-purple);
     text-decoration: none;
 }
 .chapter-card:hover::before {
@@ -345,13 +342,13 @@
     display: flex;
     align-items: center;
     gap: var(--space-4);
-    background: linear-gradient(135deg, rgba(30,28,58,.95) 0%, rgba(26,24,56,.95) 100%);
-    border: 1px solid rgba(167,139,250,.2);
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+    border: 1px solid var(--border-secondary);
     border-radius: 20px;
     padding: var(--space-4) var(--space-6);
     max-width: 700px;
     width: 100%;
-    box-shadow: 0 4px 32px rgba(10,8,40,.4), 0 0 0 1px rgba(91,79,207,.08);
+    box-shadow: var(--shadow-lg);
     flex-wrap: wrap;
 }
 .pc-avatar {

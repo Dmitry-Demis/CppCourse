@@ -343,6 +343,8 @@ class Quiz {
             best:    Math.max(pct, prev.best || 0)
         };
         localStorage.setItem(key, JSON.stringify(entry));
+        // Also store best score under a flat key for sidebar indicator
+        localStorage.setItem(`quiz_best_${this.quizId}`, JSON.stringify(entry.best));
 
         // Флаг прохождения финального теста (для разблокировки следующего параграфа)
         if (passed && this.type === 'final') {
@@ -352,21 +354,29 @@ class Quiz {
         // Отправляем прогресс на сервер если пользователь залогинен
         const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
         if (user && user.isuNumber) {
-            fetch('/api/progress', {
+            // paragraphId = filename without extension (e.g. "comments" from /theory/chapter-1/basics/comments.html)
+            const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+            const lastPart = parts[parts.length - 1] || '';
+            const paragraphId = lastPart.replace(/\.html$/, '') || 'unknown';
+
+            const wrongIds = this.answers
+                .map((ans, idx) => (!ans?.isRight && this.questions[idx]?.id !== undefined) ? this.questions[idx].id : null)
+                .filter(id => id !== null);
+
+            fetch('/api/test/complete', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber },
                 body: JSON.stringify({
-                    isuNumber: user.isuNumber,
-                    chapterId: 'chapter-1',
-                    chapterTitle: 'Глава I: Фундаментальные типы данных',
-                    testId: this.quizId,
-                    testTitle: this.title,
-                    points: pct
+                    paragraphId,
+                    testId:          this.quizId,
+                    testTitle:       this.title,
+                    score:           pct,
+                    correctAnswers:  this.answers.filter(a => a?.isRight).length,
+                    totalQuestions:  this.questions.length,
+                    wrongQuestionIds: wrongIds,
+                    timeSpent:       0
                 })
-            })
-            .then(r => r.json())
-            .then(d => console.log('[Quiz] Progress saved:', d))
-            .catch(e => console.error('[Quiz] Failed to save progress:', e));
+            }).catch(e => console.error('[Quiz] Failed to save progress:', e));
         }
     }
 }
@@ -891,3 +901,448 @@ int main() {
         explanation: 'nullptr нельзя присвоить типу int (в отличие от NULL). bool b = nullptr тоже ошибка. void* p = nullptr и (void*)0 корректны. if(nullptr) — ложное условие, компилируется.'
     }
 ];
+
+// ============================================
+// QUIZ LOADER — загрузка тестов из JSON-файлов
+// ============================================
+
+const QuizLoader = {
+    /**
+     * Загружает JSON-тест с сервера и инициализирует Quiz.
+     * @param {string} containerId  — ID DOM-элемента
+     * @param {string} jsonPath     — путь вида '/api/tests/chapter-1/basics/program-structure.json'
+     */
+    async init(containerId, jsonPath) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = '<div class="quiz-loading">⏳ Загрузка теста...</div>';
+
+        let data;
+        try {
+            const res = await fetch(jsonPath);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            data = await res.json();
+        } catch (e) {
+            container.innerHTML = `<div class="quiz-loading" style="color:var(--accent-red)">❌ Не удалось загрузить тест</div>`;
+            console.error('[QuizLoader] Failed to load', jsonPath, e);
+            return;
+        }
+
+        const questions = QuizLoader._pickQuestions(data);
+
+        new Quiz(containerId, questions, {
+            quizId:       data.quizId,
+            title:        data.title,
+            type:         data.type || 'mini',
+            passingScore: data.passingScore ?? 70,
+        });
+    },
+
+    /**
+     * Выбирает N вопросов из банка, приоритизируя ранее неправильно отвеченные.
+     */
+    _pickQuestions(data) {
+        const all    = data.questions || [];
+        const pick   = data.pick || all.length;
+        const quizId = data.quizId;
+
+        // Загружаем ID неправильно отвеченных вопросов
+        const wrongKey  = `quiz_wrong_${quizId}`;
+        const wrongIds  = new Set(JSON.parse(localStorage.getItem(wrongKey) || '[]'));
+
+        const wrong   = all.filter(q => wrongIds.has(q.id));
+        const correct = all.filter(q => !wrongIds.has(q.id));
+
+        // Перемешиваем каждую группу
+        QuizLoader._shuffle(wrong);
+        QuizLoader._shuffle(correct);
+
+        // Берём сначала неправильные, потом остальные, до pick штук
+        const selected = [...wrong, ...correct].slice(0, pick);
+        QuizLoader._shuffle(selected);
+
+        // Оборачиваем в прокси, чтобы после завершения сохранить неправильные
+        return QuizLoader._wrapQuestions(selected, quizId);
+    },
+
+    /**
+     * Добавляет к вопросам метаданные для отслеживания ошибок.
+     */
+    _wrapQuestions(questions, quizId) {
+        // Патчим Quiz._saveResult чтобы сохранить неправильные вопросы
+        // Делаем это через кастомный атрибут на вопросах
+        return questions.map(q => ({ ...q, _quizId: quizId }));
+    },
+
+    _shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+};
+
+// Патчим Quiz._saveResult для сохранения неправильных вопросов
+const _origSaveResult = Quiz.prototype._saveResult;
+Quiz.prototype._saveResult = function(pct, passed) {
+    _origSaveResult.call(this, pct, passed);
+
+    // Собираем ID неправильно отвеченных вопросов
+    const wrongIds = [];
+    this.answers.forEach((ans, idx) => {
+        if (ans && !ans.isRight) {
+            const q = this.questions[idx];
+            if (q && q.id !== undefined) wrongIds.push(q.id);
+        }
+    });
+
+    if (wrongIds.length > 0) {
+        const quizId  = this.questions[0]?._quizId || this.quizId;
+        const wrongKey = `quiz_wrong_${quizId}`;
+        // Объединяем с предыдущими неправильными
+        const prev = new Set(JSON.parse(localStorage.getItem(wrongKey) || '[]'));
+        wrongIds.forEach(id => prev.add(id));
+        localStorage.setItem(wrongKey, JSON.stringify([...prev]));
+    } else if (passed) {
+        // Если тест пройден без ошибок — очищаем список неправильных
+        const quizId  = this.questions[0]?._quizId || this.quizId;
+        localStorage.removeItem(`quiz_wrong_${quizId}`);
+    }
+};
+
+
+// ============================================
+// MODAL QUIZ — универсальная модальная система
+// Используется на страницах с openQuizModal()
+// ============================================
+
+/**
+ * Открывает модальное окно с тестом по quizId.
+ * Требует наличия #quiz-modal-overlay и #quiz-modal-content в DOM.
+ * Если их нет — создаёт автоматически.
+ */
+window.openQuizModal = async function(quizId, title) {
+    let overlay = document.getElementById('quiz-modal-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'quiz-modal-overlay';
+        overlay.className = 'quiz-modal-overlay';
+        overlay.innerHTML = `
+            <div class="quiz-modal-box" id="quiz-modal-box">
+                <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">✕</button>
+                <div id="quiz-modal-content"></div>
+            </div>`;
+        document.body.appendChild(overlay);
+        // No backdrop-click close — only X button closes the modal
+    }
+
+    const content = document.getElementById('quiz-modal-content');
+    content.innerHTML = '<div class="quiz-modal-loading">Загрузка теста…</div>';
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
+
+    try {
+        const res = await fetch(`/api/quiz/${quizId}`);
+        if (!res.ok) throw new Error('not found');
+        const data = await res.json();
+        window._activeModalQuiz = new ModalQuiz(content, data);
+    } catch {
+        content.innerHTML = '<div class="quiz-modal-loading" style="color:var(--accent-red)">❌ Не удалось загрузить тест.</div>';
+    }
+};
+
+window.closeQuizModal = function(e) {
+    // Only close when called directly (e === null) — backdrop click is disabled
+    if (e !== null && e !== undefined) return;
+    const overlay = document.getElementById('quiz-modal-overlay');
+    if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    document.body.classList.remove('modal-open');
+    window._activeModalQuiz = null;
+};
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') window.closeQuizModal(null);
+});
+
+// ── ModalQuiz — рендерит тест внутри модалки ──────────────────────────────
+class ModalQuiz {
+    constructor(container, data) {
+        this.container    = container;
+        this.quizId       = data.quizId;
+        this.title        = data.title;
+        this.passingScore = data.passingScore ?? 70;
+        this.questions    = this._shuffle(ModalQuiz._pickQuestions(data));
+        this.current      = 0;
+        this.answers      = {};
+        this.answered     = false;
+        this._render();
+    }
+
+    static _pickQuestions(data) {
+        const all    = data.questions || [];
+        const pick   = data.pick || all.length;
+        const quizId = data.quizId;
+
+        const wrongIds = new Set(JSON.parse(localStorage.getItem(`quiz_wrong_${quizId}`) || '[]'));
+        const wrong    = all.filter(q => wrongIds.has(q.id));
+        const rest     = all.filter(q => !wrongIds.has(q.id));
+
+        const shuffle = arr => {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        };
+
+        return [...shuffle(wrong), ...shuffle(rest)].slice(0, pick);
+    }
+
+    _render() {
+        if (this.current >= this.questions.length) { this._showResults(); return; }
+        const q   = this.questions[this.current];
+        const pct = Math.round(this.current / this.questions.length * 100);
+        this.answered = false;
+
+        this.container.innerHTML = `
+            <div class="qm-header">
+                <div class="qm-title">${this.title}</div>
+                <div class="qm-counter">${this.current + 1} / ${this.questions.length}</div>
+            </div>
+            <div class="qm-progress"><div class="qm-progress-fill" style="width:${pct}%"></div></div>
+            <div class="qm-body">
+                <div class="qm-type-badge qm-type--${q.type}">${this._typeLabel(q.type)}</div>
+                <div class="qm-question">${q.question}</div>
+                ${q.code ? `<pre class="qm-code"><code class="language-cpp">${this._esc(q.code)}</code></pre>` : ''}
+                <div class="qm-answers" id="qm-answers"></div>
+                <div class="qm-feedback" id="qm-feedback" style="display:none"></div>
+            </div>
+            <div class="qm-footer">
+                <div class="qm-score">⭐ ${Object.values(this.answers).reduce((s, a) => s + a.pts, 0)} очков</div>
+                <div class="qm-actions">
+                    ${q.type === 'multiple' || q.type === 'fill'
+                        ? `<button class="btn-qm btn-qm--check" id="qm-check">Проверить</button>` : ''}
+                    <button class="btn-qm btn-qm--next" id="qm-next" style="display:none">
+                        ${this.current + 1 < this.questions.length ? 'Далее →' : 'Завершить →'}
+                    </button>
+                </div>
+            </div>`;
+
+        this._renderAnswers(q);
+        this._attachListeners(q);
+        if (window.hljs) this.container.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+    }
+
+    _renderAnswers(q) {
+        const wrap = document.getElementById('qm-answers');
+        if (q.type === 'single' || q.type === 'code') {
+            wrap.innerHTML = q.answers.map((a, i) => `
+                <button class="qm-answer" data-i="${i}">
+                    <span class="qm-letter">${String.fromCharCode(65 + i)}</span>
+                    <span>${this._esc(a)}</span>
+                </button>`).join('');
+        } else if (q.type === 'multiple') {
+            wrap.innerHTML = q.answers.map((a, i) => `
+                <label class="qm-answer qm-answer--check">
+                    <input type="checkbox" data-i="${i}">
+                    <span class="qm-letter">${String.fromCharCode(65 + i)}</span>
+                    <span>${this._esc(a)}</span>
+                </label>`).join('');
+        } else if (q.type === 'fill') {
+            wrap.innerHTML = `<input class="qm-fill" id="qm-fill-input" placeholder="Введите ответ…" autocomplete="off" spellcheck="false">`;
+        }
+    }
+
+    _attachListeners(q) {
+        const check = document.getElementById('qm-check');
+        const next  = document.getElementById('qm-next');
+
+        if (q.type === 'single' || q.type === 'code') {
+            this.container.querySelectorAll('.qm-answer').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (this.answered) return;
+                    this.answered = true;
+                    this._submitSingle(q, parseInt(btn.dataset.i));
+                });
+            });
+        }
+        if (q.type === 'multiple' && check) {
+            check.addEventListener('click', () => {
+                if (this.answered) return;
+                this.answered = true;
+                const sel = [...this.container.querySelectorAll('.qm-answer input:checked')]
+                    .map(cb => parseInt(cb.dataset.i));
+                this._submitMultiple(q, sel);
+                check.style.display = 'none';
+            });
+        }
+        if (q.type === 'fill') {
+            const input = document.getElementById('qm-fill-input');
+            const doCheck = () => {
+                if (this.answered) return;
+                this.answered = true;
+                this._submitFill(q, input?.value.trim() ?? '');
+                if (check) check.style.display = 'none';
+            };
+            if (check) check.addEventListener('click', doCheck);
+            input?.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
+        }
+        if (next) next.addEventListener('click', () => { this.current++; this._render(); });
+    }
+
+    _submitSingle(q, idx) {
+        const ok  = idx === q.correct;
+        const pts = ok ? 10 : 0;
+        this.answers[this.current] = { ok, pts, qId: q.id };
+        this.container.querySelectorAll('.qm-answer').forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === q.correct) btn.classList.add('qm-answer--correct');
+            if (i === idx && !ok) btn.classList.add('qm-answer--wrong');
+        });
+        this._feedback(ok, q.explanation, pts);
+        if (ok && window.gameSystem) window.gameSystem.earnXP(pts, 'за правильный ответ');
+    }
+
+    _submitMultiple(q, sel) {
+        const correct = q.correct;
+        const allOk   = correct.every(i => sel.includes(i)) && sel.every(i => correct.includes(i));
+        const partial = correct.some(i => sel.includes(i));
+        const pts     = allOk ? 10 : partial ? 5 : 0;
+        this.answers[this.current] = { ok: allOk, pts, qId: q.id };
+        this.container.querySelectorAll('.qm-answer').forEach((lbl, i) => {
+            lbl.querySelector('input').disabled = true;
+            if (correct.includes(i))                   lbl.classList.add('qm-answer--correct');
+            if (sel.includes(i) && !correct.includes(i)) lbl.classList.add('qm-answer--wrong');
+        });
+        this._feedback(allOk, q.explanation, pts);
+        if (pts && window.gameSystem) window.gameSystem.earnXP(pts, 'за правильный ответ');
+    }
+
+    _submitFill(q, val) {
+        const accepted = Array.isArray(q.correct) ? q.correct : [q.correct];
+        const ok  = accepted.some(v => v.toLowerCase() === val.toLowerCase());
+        const pts = ok ? 10 : 0;
+        this.answers[this.current] = { ok, pts, qId: q.id };
+        const input = document.getElementById('qm-fill-input');
+        if (input) { input.disabled = true; input.classList.add(ok ? 'qm-fill--ok' : 'qm-fill--err'); }
+        this._feedback(ok, q.explanation, pts, ok ? null : `Правильный ответ: <code>${accepted[0]}</code>`);
+        if (ok && window.gameSystem) window.gameSystem.earnXP(pts, 'за правильный ответ');
+    }
+
+    _feedback(ok, explanation, pts, extra = null) {
+        const fb = document.getElementById('qm-feedback');
+        if (!fb) return;
+        fb.style.display = 'flex';
+        fb.className = `qm-feedback qm-feedback--${ok ? 'ok' : 'err'}`;
+        fb.innerHTML = `
+            <span class="qm-fb-icon">${ok ? '✅' : '❌'}</span>
+            <div>
+                <strong>${ok ? 'Правильно!' : 'Неверно'}</strong>
+                <p>${explanation}</p>
+                ${extra ? `<p>${extra}</p>` : ''}
+                ${pts ? `<span class="qm-fb-pts">+${pts} очков</span>` : ''}
+            </div>`;
+        document.getElementById('qm-next').style.display = 'inline-flex';
+    }
+
+    _showResults() {
+        const total   = this.questions.length * 10;
+        const earned  = Object.values(this.answers).reduce((s, a) => s + a.pts, 0);
+        const pct     = Math.round(earned / total * 100);
+        const passed  = pct >= this.passingScore;
+        const correct = Object.values(this.answers).filter(a => a.ok).length;
+
+        this._saveProgress(pct, passed);
+        if (window.gameSystem) window.gameSystem.earnXP(passed ? 30 : 0, 'за тест');
+
+        this.container.innerHTML = `
+            <div class="qm-results">
+                <div class="qm-results-emoji">${pct >= 90 ? '🏆' : pct >= 70 ? '👍' : '📚'}</div>
+                <h2>${passed ? 'Тест пройден!' : 'Попробуйте ещё раз'}</h2>
+                <div class="qm-results-circle">
+                    <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-primary)" stroke-width="8"/>
+                        <circle cx="50" cy="50" r="42" fill="none"
+                            stroke="${passed ? '#a6e3a1' : '#f38ba8'}"
+                            stroke-width="8"
+                            stroke-dasharray="${pct * 2.639} 263.9"
+                            stroke-linecap="round"
+                            transform="rotate(-90 50 50)"/>
+                    </svg>
+                    <div class="qm-results-pct">${pct}%</div>
+                </div>
+                <div class="qm-results-stats">
+                    <div><div class="qm-stat-v">${earned}</div><div class="qm-stat-l">Очков</div></div>
+                    <div><div class="qm-stat-v">${correct}</div><div class="qm-stat-l">Правильных</div></div>
+                    <div><div class="qm-stat-v">${this.questions.length}</div><div class="qm-stat-l">Вопросов</div></div>
+                </div>
+                <div class="qm-results-actions">
+                    <button class="btn-qm btn-qm--check" onclick="openQuizModal('${this.quizId}','${this.title.replace(/'/g,"\\'")}')">Пройти снова</button>
+                    <button class="btn-qm btn-qm--next" onclick="closeQuizModal(null)">Закрыть</button>
+                </div>
+            </div>`;
+    }
+
+    _saveProgress(pct, passed) {
+        // Update best score in localStorage for sidebar badge
+        const lsKey = `quiz_best_${this.quizId}`;
+        const prev  = (() => { try { return JSON.parse(localStorage.getItem(lsKey) || '0'); } catch { return 0; } })();
+        if (pct > prev) localStorage.setItem(lsKey, JSON.stringify(pct));
+
+        // Track wrong question IDs for smart re-selection
+        const wrongIds = Object.values(this.answers)
+            .filter(a => !a.ok && a.qId !== undefined)
+            .map(a => a.qId);
+        if (wrongIds.length > 0) {
+            const wrongKey = `quiz_wrong_${this.quizId}`;
+            const prevWrong = new Set(JSON.parse(localStorage.getItem(wrongKey) || '[]'));
+            wrongIds.forEach(id => prevWrong.add(id));
+            localStorage.setItem(wrongKey, JSON.stringify([...prevWrong]));
+        } else if (passed) {
+            localStorage.removeItem(`quiz_wrong_${this.quizId}`);
+        }
+
+        // Send to server
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        if (!user?.isuNumber) return;
+
+        const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+        const lastPart = parts[parts.length - 1] || '';
+        const paragraphId = lastPart.replace(/\.html$/, '') || 'unknown';
+
+        fetch('/api/test/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber },
+            body: JSON.stringify({
+                paragraphId,
+                testId:          this.quizId,
+                testTitle:       this.title,
+                score:           pct,
+                correctAnswers:  Object.values(this.answers).filter(a => a.ok).length,
+                totalQuestions:  this.questions.length,
+                wrongQuestionIds: wrongIds,
+                timeSpent:       0
+            })
+        }).catch(() => {});
+    }
+
+    _typeLabel(t) {
+        return { single: 'Один ответ', multiple: 'Несколько ответов', fill: 'Введите ответ', code: 'Что выведет код?' }[t] || t;
+    }
+    _esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    _shuffle(a) {
+        const arr = [...a];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+}

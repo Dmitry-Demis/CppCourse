@@ -1,0 +1,127 @@
+/* ============================================
+   THEME PICKER — floating button + panel
+   ============================================ */
+
+#theme-picker-root {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+/* ── Toggle button ── */
+.theme-toggle-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border-secondary);
+    background: var(--bg-card);
+    color: var(--accent-violet);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg), 0 0 0 1px var(--border-primary);
+    transition: transform .2s, box-shadow .2s, background .2s;
+}
+.theme-toggle-btn:hover {
+    transform: scale(1.1) rotate(30deg);
+    box-shadow: var(--shadow-glow-purple), var(--shadow-lg);
+    background: var(--bg-card-hover);
+}
+
+/* ── Panel ── */
+.theme-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-xl);
+    padding: 14px;
+    width: 220px;
+    box-shadow: var(--shadow-xl);
+    opacity: 0;
+    transform: translateY(12px) scale(.97);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    order: -1;
+}
+.theme-panel.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.theme-panel-title {
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+    padding: 0 4px;
+}
+
+.theme-options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.theme-option {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 10px;
+    align-items: center;
+    padding: 9px 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: background .15s, border-color .15s;
+    width: 100%;
+}
+.theme-option:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-primary);
+}
+.theme-option.active {
+    background: var(--accent-indigo-dim);
+    border-color: var(--accent-indigo);
+}
+
+.theme-option-icon {
+    grid-row: 1 / 3;
+    font-size: 1.1rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+.theme-option-label {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+.theme-option-desc {
+    font-size: .68rem;
+    color: var(--text-tertiary);
+    line-height: 1.2;
+}
+
+/* Light theme adjustments for the picker itself */
+[data-theme="light"] .theme-toggle-btn {
+    box-shadow: 0 2px 12px rgba(79,70,229,.15), 0 0 0 1px var(--border-primary);
+}
+[data-theme="light"] .theme-panel {
+    box-shadow: 0 8px 32px rgba(30,27,75,.15);
+}
+
+@media (max-width: 480px) {
+    #theme-picker-root { bottom: 16px; right: 16px; }
+    .theme-panel { width: 200px; }
+}

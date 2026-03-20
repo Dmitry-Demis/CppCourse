@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -8,7 +9,8 @@
     <title>Проектирование функций — Курс C++</title>
     <meta name="description" content="Как правильно проектировать функции в C++: принцип единственной ответственности, именование, декомпозиция задач.">
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -17,7 +19,7 @@
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -71,12 +73,12 @@
                 </p>
 
                 <div class="info-card">
-                    <div class="info-card__title">📌 Признаки хорошей функции</div>
+                    <div class="info-card__title">?? Признаки хорошей функции</div>
                     <ul>
-                        <li>Умещается на экране (≈ 20–30 строк)</li>
+                        <li>Умещается на экране (? 20–30 строк)</li>
                         <li>Имя — глагол или глагол+существительное: <code>calculateArea</code>, <code>printResult</code></li>
                         <li>Делает одно дело: либо вычисляет, либо выводит — не оба сразу</li>
-                        <li>Параметров не слишком много (≤ 4–5 — сигнал задуматься)</li>
+                        <li>Параметров не слишком много (? 4–5 — сигнал задуматься)</li>
                         <li>Не зависит от глобального состояния без необходимости</li>
                     </ul>
                 </div>
@@ -109,7 +111,7 @@
                 </ul>
 
                 <div class="info-card">
-                    <div class="info-card__title">💡 Когда выносить код в функцию</div>
+                    <div class="info-card__title">?? Когда выносить код в функцию</div>
                     <ul>
                         <li>Код повторяется 2+ раза — выноси в функцию</li>
                         <li>Блок кода требует комментария «что он делает» — это кандидат на функцию</li>
@@ -124,7 +126,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -154,5 +156,7 @@
         });
     }
     </script>
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

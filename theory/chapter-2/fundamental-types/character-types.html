@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -8,7 +9,8 @@
     <title>Символьные типы — Курс C++</title>
     <meta name="description" content="Символьные типы C++: char, wchar_t, char8_t, char16_t, char32_t. ASCII, Unicode, escape-последовательности, кодировки.">
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -18,7 +20,22 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <style>
+        .int-tests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .int-test-card { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
+        .int-test-card__icon { font-size: 1.5rem; }
+        .int-test-card__title { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent-blue, #89b4fa); }
+        .int-test-card__desc { font-size: .8rem; color: var(--text-muted, #6c7086); flex: 1; }
+        .btn-quiz-open { margin-top: .4rem; padding: .5rem 1rem; background: var(--accent-blue, #89b4fa); color: #1e1e2e; border: none; border-radius: 6px; font-weight: 600; font-size: .85rem; cursor: pointer; transition: opacity .15s; }
+        .btn-quiz-open:hover { opacity: .85; }
+        .quiz-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+        .quiz-modal-overlay.active { display: flex; }
+        .quiz-modal-box { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 14px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; position: relative; padding: 2rem; }
+        .quiz-modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-muted, #6c7086); font-size: 1.2rem; cursor: pointer; line-height: 1; padding: .25rem .5rem; border-radius: 4px; }
+        .quiz-modal-close:hover { color: var(--text, #cdd6f4); background: var(--surface-2, #181825); }
+    </style>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 </head>
 <body>
 
@@ -71,7 +88,7 @@
                     Unicode-ориентированных типов, чтобы корректно работать с любым языком мира.
                 </p>
 
-                <!-- ══════════════════════════════════════════════════ -->
+                <!-- ================================================== -->
                 <h2 id="char">1. Тип char — базовый символьный тип</h2>
 
                 <div class="iso-quote">
@@ -92,7 +109,7 @@
                     </div>
                     <div class="type-spec">
                         <span class="type-spec-label">Диапазон (signed)</span>
-                        <span class="type-spec-value">−128 … 127</span>
+                        <span class="type-spec-value">?128 … 127</span>
                     </div>
                     <div class="type-spec">
                         <span class="type-spec-label">Диапазон (unsigned)</span>
@@ -101,7 +118,7 @@
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Знаковость char не определена стандартом</div>
+                    <div class="warning-block__title">? Знаковость char не определена стандартом</div>
                     <p>
                         Простой <code>char</code> может быть знаковым или беззнаковым — это решает
                         компилятор. На x86 обычно <em>signed</em>, на некоторых ARM — <em>unsigned</em>.
@@ -141,7 +158,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ── signed/unsigned char ── -->
+                <!-- -- signed/unsigned char -- -->
                 <h2 id="signed-unsigned-char">2. signed char, unsigned char и char — три разных типа</h2>
 
                 <p>
@@ -164,7 +181,7 @@ int main() {
                             <tr>
                                 <td><code>signed char</code></td>
                                 <td>1 байт (8 бит)</td>
-                                <td>−128 … 127</td>
+                                <td>?128 … 127</td>
                                 <td>Маленькое знаковое целое число</td>
                             </tr>
                             <tr>
@@ -220,7 +237,7 @@ int main() {
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Не путайте числовое и символьное значение</div>
+                    <div class="warning-block__title">? Не путайте числовое и символьное значение</div>
                     <p>
                         <code>char ch{5};</code> — хранит число 5 (управляющий символ ENQ, непечатаемый).<br>
                         <code>char ch{'5'};</code> — хранит код символа <code>'5'</code>, то есть число 53.<br>
@@ -228,7 +245,7 @@ int main() {
                     </p>
                 </div>
 
-                <!-- ── ASCII ── -->
+                <!-- -- ASCII -- -->
                 <h2 id="ascii">3. Кодировка ASCII</h2>
 
                 <p>
@@ -257,11 +274,11 @@ int main() {
                 </div>
 
                 <div class="note-card">
-                    <div class="note-card__title">📌 Полезные соотношения в ASCII</div>
+                    <div class="note-card__title">?? Полезные соотношения в ASCII</div>
                     <p>
                         • Разница между заглавной и строчной буквой одинакова: <code>'a' - 'A' == 32</code>.<br>
                         • Цифра <code>'0'</code> имеет код 48, поэтому <code>'5' - '0' == 5</code>.<br>
-                        • Для преобразования регистра: <code>ch | 32</code> → строчная, <code>ch &amp; ~32</code> → заглавная (только для ASCII-букв).
+                        • Для преобразования регистра: <code>ch | 32</code> > строчная, <code>ch &amp; ~32</code> > заглавная (только для ASCII-букв).
                     </p>
                 </div>
 
@@ -297,7 +314,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ── Ввод символов ── -->
+                <!-- -- Ввод символов -- -->
                 <h2 id="input">4. Ввод символов</h2>
 
                 <p>
@@ -331,7 +348,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ── Escape-последовательности ── -->
+                <!-- -- Escape-последовательности -- -->
                 <h2 id="escape">5. Escape-последовательности</h2>
 
                 <p>
@@ -388,7 +405,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ── Unicode-типы ── -->
+                <!-- -- Unicode-типы -- -->
                 <h2 id="unicode-types">6. Unicode-символьные типы</h2>
 
                 <p>
@@ -427,7 +444,7 @@ int main() {
                                 <td><span class="std-badge std-badge--11">C++11</span></td>
                                 <td>UTF-32</td>
                                 <td>4 байта</td>
-                                <td><code>U'🚀'</code></td>
+                                <td><code>U'??'</code></td>
                             </tr>
                             <tr>
                                 <td><code>char8_t</code></td>
@@ -452,7 +469,7 @@ int main() {
     char     c  {'A'};           // ASCII / UTF-8 байт
     wchar_t  wc {L'Я'};         // Широкий символ
     char16_t c16{u'\u20AC'};    // € (U+20AC) в UTF-16
-    char32_t c32{U'\U0001F680'}; // 🚀 в UTF-32
+    char32_t c32{U'\U0001F680'}; // ?? в UTF-32
 
     std::cout &lt;&lt; "sizeof(char)     = " &lt;&lt; sizeof(char)     &lt;&lt; '\n';
     std::cout &lt;&lt; "sizeof(wchar_t)  = " &lt;&lt; sizeof(wchar_t)  &lt;&lt; '\n';
@@ -475,7 +492,7 @@ int main() {
                 </div>
 
                 <div class="note-card">
-                    <div class="note-card__title">📌 Почему wchar_t непортабелен</div>
+                    <div class="note-card__title">?? Почему wchar_t непортабелен</div>
                     <p>
                         <code>wchar_t</code> имеет разный размер на Windows (2 байта, UTF-16) и Linux
                         (4 байта, UTF-32). Для переносимого Unicode-кода предпочитайте <code>char32_t</code>
@@ -483,7 +500,7 @@ int main() {
                     </p>
                 </div>
 
-                <!-- ── Арифметика над char ── -->
+                <!-- -- Арифметика над char -- -->
                 <h2 id="char-arithmetic">7. Арифметика над символами</h2>
 
                 <p>
@@ -525,9 +542,23 @@ int main() {
                 </div>
 
                 <!-- Мини-тест -->
-                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
-                <p>10 вопросов по символьным типам C++.</p>
-                <div id="quiz-chars"></div>
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="int-tests-grid">
+                    <div class="int-test-card">
+                        <div class="int-test-card__icon">??</div>
+                        <div class="int-test-card__title">Символьные типы</div>
+                        <div class="int-test-card__desc">10 вопросов: char, ASCII, escape-последовательности, Unicode-типы</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('chars-mini', 'Символьные типы')">Пройти тест ></button>
+                    </div>
+                </div>
+
+                <!-- Модальное окно теста -->
+                <div id="quiz-modal-overlay" class="quiz-modal-overlay" onclick="closeQuizModal(event)">
+                    <div class="quiz-modal-box" id="quiz-modal-box">
+                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">?</button>
+                        <div id="quiz-modal-content"></div>
+                    </div>
+                </div>
 
                 <!-- Навигация -->
                 <div class="paragraph-nav">
@@ -539,7 +570,7 @@ int main() {
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -573,17 +604,9 @@ int main() {
             setTimeout(() => btn.textContent = 'Копировать', 2000);
         });
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        if (typeof characterTypesQuestions !== 'undefined') {
-            new Quiz('quiz-chars', characterTypesQuestions, {
-                quizId: 'chars-mini',
-                title: 'Мини-тест: символьные типы',
-                type: 'mini'
-            });
-        }
-    });
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

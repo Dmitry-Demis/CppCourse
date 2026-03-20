@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -15,7 +16,8 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -25,10 +27,10 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 
     <style>
-        /* ── Per-type cards ── */
+        /* -- Per-type cards -- */
         .int-types-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -89,7 +91,7 @@
         .std-badge--20 { background: #2a1e4f; color: #cba6f7; }
         .std-badge--23 { background: #3d1e3d; color: #f5c2e7; }
 
-        /* ── Test cards ── */
+        /* -- Test cards -- */
         .int-tests-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -137,7 +139,7 @@
         .int-test-final__desc  { font-size: .85rem; color: var(--text-muted, #6c7086); }
         .btn-quiz-open--final  { background: #cba6f7; white-space: nowrap; }
 
-        /* ── Modal overlay ── */
+        /* -- Modal overlay -- */
         .quiz-modal-overlay {
             display: none;
             position: fixed;
@@ -175,7 +177,7 @@
         .quiz-modal-close:hover { color: var(--text, #cdd6f4); background: var(--surface-2, #181825); }
         .quiz-modal-loading { text-align: center; padding: 3rem; color: var(--text-muted, #6c7086); }
 
-        /* ── Quiz inside modal ── */
+        /* -- Quiz inside modal -- */
         .qm-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .5rem; }
         .qm-title  { font-weight: 700; font-size: 1rem; color: var(--text, #cdd6f4); }
         .qm-counter{ font-size: .85rem; color: var(--text-muted, #6c7086); }
@@ -292,7 +294,7 @@
                     (but distinct) unsigned integer type.
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="overview-table">Обзор семейства целочисленных типов</h2>
 
                 <div class="table-wrapper">
@@ -317,28 +319,28 @@
                             <tr>
                                 <td><code>short int</code></td>
                                 <td><code>short</code></td>
-                                <td>≥$16$ бит</td>
+                                <td>?$16$ бит</td>
                                 <td>$2$ байта</td>
                                 <td class="cell-range">$-32\,768$ … $32\,767$</td>
                             </tr>
                             <tr>
                                 <td><code>int</code></td>
                                 <td><code>signed</code></td>
-                                <td>≥$16$ бит</td>
+                                <td>?$16$ бит</td>
                                 <td>$4$ байта</td>
                                 <td class="cell-range">$-2\,147\,483\,648$ … $2\,147\,483\,647$</td>
                             </tr>
                             <tr>
                                 <td><code>long int</code></td>
                                 <td><code>long</code></td>
-                                <td>≥$32$ бита</td>
+                                <td>?$32$ бита</td>
                                 <td>$8$ б (Linux) / $4$ б (Windows)</td>
                                 <td class="cell-range">платформенно-зависим</td>
                             </tr>
                             <tr>
                                 <td><code>long long int</code> <span class="std-badge std-badge--11">C++11</span></td>
                                 <td><code>long long</code></td>
-                                <td>≥$64$ бита</td>
+                                <td>?$64$ бита</td>
                                 <td>$8$ байт</td>
                                 <td class="cell-range">$-9.22 \times 10^{18}$ … $9.22 \times 10^{18}$</td>
                             </tr>
@@ -352,10 +354,10 @@
                     удваивающий максимум.
                 </p>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="per-type">Описание типов</h2>
 
-                <!-- ── short ── -->
+                <!-- -- short -- -->
                 <h3 id="type-short">short</h3>
                 <p>
                     <span class="key-term">short</span> — наименьший «полноценный» целый тип (не считая
@@ -372,7 +374,7 @@
                         <div class="int-type-card__body">
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (гарантия)</span>
-                                <span class="int-type-card__row-value">≥ $16$ бит</span>
+                                <span class="int-type-card__row-value">? $16$ бит</span>
                             </div>
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (x86-64)</span>
@@ -431,10 +433,10 @@
 
                 <div class="section-quiz-prompt">
                     <span class="section-quiz-prompt__text">Проверьте знания по <code>short</code></span>
-                    <button class="btn-quiz-open" onclick="openQuizModal('integers-short','Тест: тип short')">✎ Пройти тест →</button>
+                    <button class="btn-quiz-open" onclick="openQuizModal('integers-short','Тест: тип short')">? Пройти тест ></button>
                 </div>
 
-                <!-- ── int ── -->
+                <!-- -- int -- -->
                 <h3 id="type-int">int</h3>
                 <p>
                     <span class="key-term">int</span> — «естественный» целочисленный тип платформы.
@@ -451,7 +453,7 @@
                         <div class="int-type-card__body">
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (гарантия)</span>
-                                <span class="int-type-card__row-value">≥ $16$ бит</span>
+                                <span class="int-type-card__row-value">? $16$ бит</span>
                             </div>
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (x86-64)</span>
@@ -510,10 +512,10 @@
 
                 <div class="section-quiz-prompt">
                     <span class="section-quiz-prompt__text">Проверьте знания по <code>int</code></span>
-                    <button class="btn-quiz-open" onclick="openQuizModal('integers-int','Тест: тип int')">✎ Пройти тест →</button>
+                    <button class="btn-quiz-open" onclick="openQuizModal('integers-int','Тест: тип int')">? Пройти тест ></button>
                 </div>
 
-                <!-- ── long ── -->
+                <!-- -- long -- -->
                 <h3 id="type-long">long</h3>
                 <p>
                     <span class="key-term">long</span> — источник сюрпризов: его размер
@@ -530,7 +532,7 @@
                         <div class="int-type-card__body">
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (гарантия)</span>
-                                <span class="int-type-card__row-value">≥ $32$ бита</span>
+                                <span class="int-type-card__row-value">? $32$ бита</span>
                             </div>
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Linux x86-64</span>
@@ -586,7 +588,7 @@
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Ловушка с long на разных платформах</div>
+                    <div class="warning-block__title">? Ловушка с long на разных платформах</div>
                     <p>
                         Никогда не предполагайте, что <code>long</code> — это 64 бита.
                         На Windows x64 он 32-битный. Для гарантированного 64-битного типа
@@ -606,15 +608,15 @@
 
                 <div class="section-quiz-prompt">
                     <span class="section-quiz-prompt__text">Проверьте знания по <code>long</code></span>
-                    <button class="btn-quiz-open" onclick="openQuizModal('integers-long','Тест: тип long')">✎ Пройти тест →</button>
+                    <button class="btn-quiz-open" onclick="openQuizModal('integers-long','Тест: тип long')">? Пройти тест ></button>
                 </div>
 
-                <!-- ── long long ── -->
+                <!-- -- long long -- -->
                 <h3 id="type-long-long">long long <span class="std-badge std-badge--11">C++11</span></h3>
                 <p>
                     <span class="key-term">long long</span> — единственный тип, гарантирующий не менее $64$ бит
                     на <em>любой</em> поддерживаемой платформе.
-                    Его диапазон: $-2^{63}$ до $2^{63}-1$ ≈ $\pm 9.2 \times 10^{18}$.
+                    Его диапазон: $-2^{63}$ до $2^{63}-1$ ? $\pm 9.2 \times 10^{18}$.
                 </p>
 
                 <div class="int-types-grid">
@@ -626,7 +628,7 @@
                         <div class="int-type-card__body">
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (гарантия)</span>
-                                <span class="int-type-card__row-value">≥ $64$ бита</span>
+                                <span class="int-type-card__row-value">? $64$ бита</span>
                             </div>
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (x86-64)</span>
@@ -697,11 +699,11 @@
 
                 <div class="section-quiz-prompt">
                     <span class="section-quiz-prompt__text">Проверьте знания по <code>long long</code></span>
-                    <button class="btn-quiz-open" onclick="openQuizModal('integers-longlong','Тест: тип long long')">✎ Пройти тест →</button>
+                    <button class="btn-quiz-open" onclick="openQuizModal('integers-longlong','Тест: тип long long')">? Пройти тест ></button>
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">🔗 Продолжение темы</div>
+                    <div class="info-card__title">?? Продолжение темы</div>
                     <p>
                         В следующих разделах рассматриваются связанные аспекты целочисленных типов:
                         <a href="signed-unsigned.html"><strong>§1.1.3 Знаковые и беззнаковые типы</strong></a>
@@ -719,43 +721,43 @@
 
                 <div class="int-tests-grid">
                     <div class="int-test-card">
-                        <div class="int-test-card__icon">🔢</div>
+                        <div class="int-test-card__icon">??</div>
                         <div class="int-test-card__title">short</div>
                         <div class="int-test-card__desc">10 вопросов: размер, диапазон, integer promotion, overflow</div>
-                        <button class="btn-quiz-open" onclick="openQuizModal('integers-short', 'Тест: тип short')">Пройти тест →</button>
+                        <button class="btn-quiz-open" onclick="openQuizModal('integers-short', 'Тест: тип short')">Пройти тест ></button>
                     </div>
                     <div class="int-test-card">
-                        <div class="int-test-card__icon">🔢</div>
+                        <div class="int-test-card__icon">??</div>
                         <div class="int-test-card__title">int</div>
                         <div class="int-test-card__desc">10 вопросов: диапазон, UB, unsigned, применение</div>
-                        <button class="btn-quiz-open" onclick="openQuizModal('integers-int', 'Тест: тип int')">Пройти тест →</button>
+                        <button class="btn-quiz-open" onclick="openQuizModal('integers-int', 'Тест: тип int')">Пройти тест ></button>
                     </div>
                     <div class="int-test-card">
-                        <div class="int-test-card__icon">🔢</div>
+                        <div class="int-test-card__icon">??</div>
                         <div class="int-test-card__title">long</div>
                         <div class="int-test-card__desc">10 вопросов: платформенные различия, LLP64 vs LP64</div>
-                        <button class="btn-quiz-open" onclick="openQuizModal('integers-long', 'Тест: тип long')">Пройти тест →</button>
+                        <button class="btn-quiz-open" onclick="openQuizModal('integers-long', 'Тест: тип long')">Пройти тест ></button>
                     </div>
                     <div class="int-test-card">
-                        <div class="int-test-card__icon">🔢</div>
+                        <div class="int-test-card__icon">??</div>
                         <div class="int-test-card__title">long long</div>
                         <div class="int-test-card__desc">10 вопросов: 64-битный диапазон, суффиксы, C++11</div>
-                        <button class="btn-quiz-open" onclick="openQuizModal('integers-longlong', 'Тест: тип long long')">Пройти тест →</button>
+                        <button class="btn-quiz-open" onclick="openQuizModal('integers-longlong', 'Тест: тип long long')">Пройти тест ></button>
                     </div>
                 </div>
 
                 <div class="int-test-final">
                     <div class="int-test-final__left">
-                        <div class="int-test-final__title">📋 Итоговый тест по параграфу</div>
+                        <div class="int-test-final__title">?? Итоговый тест по параграфу</div>
                         <div class="int-test-final__desc">20 вопросов по всем целочисленным типам: short, int, long, long long, signed/unsigned, overflow, fixed-width типы</div>
                     </div>
-                    <button class="btn-quiz-open btn-quiz-open--final" onclick="openQuizModal('integers-paragraph', 'Целочисленные типы — итоговый тест')">Пройти итоговый тест →</button>
+                    <button class="btn-quiz-open btn-quiz-open--final" onclick="openQuizModal('integers-paragraph', 'Целочисленные типы — итоговый тест')">Пройти итоговый тест ></button>
                 </div>
 
                 <!-- Модальное окно теста -->
                 <div id="quiz-modal-overlay" class="quiz-modal-overlay" onclick="closeQuizModal(event)">
                     <div class="quiz-modal-box" id="quiz-modal-box">
-                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">✕</button>
+                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">?</button>
                         <div id="quiz-modal-content"></div>
                     </div>
                 </div>
@@ -770,7 +772,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -782,6 +784,7 @@
 
     <script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
     <script src="../../../js/compiler.js"></script>
     <script src="../../../js/gamification.js"></script>
     <script>
@@ -792,276 +795,11 @@
             setTimeout(() => btn.textContent = 'Копировать', 2000);
         });
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-    });
-
-    // ── Quiz Modal ────────────────────────────────────────────────────────────
-
-    let _activeQuiz = null;
-
-    async function openQuizModal(quizId, title) {
-        const overlay = document.getElementById('quiz-modal-overlay');
-        const content = document.getElementById('quiz-modal-content');
-
-        content.innerHTML = '<div class="quiz-modal-loading">Загрузка теста…</div>';
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-        try {
-            const res = await fetch(`/api/quiz/${quizId}`);
-            if (!res.ok) throw new Error('not found');
-            const data = await res.json();
-            _activeQuiz = new ModalQuiz(content, data);
-        } catch {
-            content.innerHTML = '<div class="quiz-modal-loading">Не удалось загрузить тест.</div>';
-        }
-    }
-
-    function closeQuizModal(e) {
-        if (e && e.target !== document.getElementById('quiz-modal-overlay')) return;
-        document.getElementById('quiz-modal-overlay').classList.remove('active');
-        document.body.style.overflow = '';
-        _activeQuiz = null;
-    }
-
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeQuizModal(null);
-    });
-
-    // ── ModalQuiz — рендерит тест внутри модалки ──────────────────────────────
-    class ModalQuiz {
-        constructor(container, data) {
-            this.container   = container;
-            this.quizId      = data.quizId;
-            this.title       = data.title;
-            this.passingScore = data.passingScore ?? 70;
-            this.questions   = this._shuffle([...data.questions]);
-            this.current     = 0;
-            this.answers     = {};
-            this.answered    = false;
-            this._render();
-        }
-
-        _render() {
-            if (this.current >= this.questions.length) { this._showResults(); return; }
-            const q   = this.questions[this.current];
-            const pct = Math.round(this.current / this.questions.length * 100);
-            this.answered = false;
-
-            this.container.innerHTML = `
-                <div class="qm-header">
-                    <div class="qm-title">${this.title}</div>
-                    <div class="qm-counter">${this.current + 1} / ${this.questions.length}</div>
-                </div>
-                <div class="qm-progress"><div class="qm-progress-fill" style="width:${pct}%"></div></div>
-                <div class="qm-body">
-                    <div class="qm-type-badge qm-type--${q.type}">${this._typeLabel(q.type)}</div>
-                    <div class="qm-question">${q.question}</div>
-                    ${q.code ? `<pre class="qm-code"><code class="language-cpp">${this._esc(q.code)}</code></pre>` : ''}
-                    <div class="qm-answers" id="qm-answers"></div>
-                    <div class="qm-feedback" id="qm-feedback" style="display:none"></div>
-                </div>
-                <div class="qm-footer">
-                    <div class="qm-score">⭐ ${Object.values(this.answers).reduce((s,a)=>s+a.pts,0)} очков</div>
-                    <div class="qm-actions">
-                        ${q.type === 'multiple' || q.type === 'fill'
-                            ? `<button class="btn-qm btn-qm--check" id="qm-check">Проверить</button>` : ''}
-                        <button class="btn-qm btn-qm--next" id="qm-next" style="display:none">
-                            ${this.current + 1 < this.questions.length ? 'Далее →' : 'Завершить →'}
-                        </button>
-                    </div>
-                </div>`;
-
-            this._renderAnswers(q);
-            this._attachListeners(q);
-            if (window.hljs) this.container.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
-        }
-
-        _renderAnswers(q) {
-            const wrap = document.getElementById('qm-answers');
-            if (q.type === 'single' || q.type === 'code') {
-                wrap.innerHTML = q.answers.map((a, i) => `
-                    <button class="qm-answer" data-i="${i}">
-                        <span class="qm-letter">${String.fromCharCode(65+i)}</span>
-                        <span>${this._esc(a)}</span>
-                    </button>`).join('');
-            } else if (q.type === 'multiple') {
-                wrap.innerHTML = q.answers.map((a, i) => `
-                    <label class="qm-answer qm-answer--check">
-                        <input type="checkbox" data-i="${i}">
-                        <span class="qm-letter">${String.fromCharCode(65+i)}</span>
-                        <span>${this._esc(a)}</span>
-                    </label>`).join('');
-            } else if (q.type === 'fill') {
-                wrap.innerHTML = `<input class="qm-fill" id="qm-fill-input" placeholder="Введите ответ…" autocomplete="off" spellcheck="false">`;
-            }
-        }
-
-        _attachListeners(q) {
-            const check = document.getElementById('qm-check');
-            const next  = document.getElementById('qm-next');
-
-            if (q.type === 'single' || q.type === 'code') {
-                this.container.querySelectorAll('.qm-answer').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        if (this.answered) return;
-                        this.answered = true;
-                        this._submitSingle(q, parseInt(btn.dataset.i));
-                    });
-                });
-            }
-            if (q.type === 'multiple' && check) {
-                check.addEventListener('click', () => {
-                    if (this.answered) return;
-                    this.answered = true;
-                    const sel = [...this.container.querySelectorAll('.qm-answer input:checked')]
-                        .map(cb => parseInt(cb.dataset.i));
-                    this._submitMultiple(q, sel);
-                    check.style.display = 'none';
-                });
-            }
-            if (q.type === 'fill') {
-                const input = document.getElementById('qm-fill-input');
-                const doCheck = () => {
-                    if (this.answered) return;
-                    this.answered = true;
-                    this._submitFill(q, input?.value.trim() ?? '');
-                    if (check) check.style.display = 'none';
-                };
-                if (check) check.addEventListener('click', doCheck);
-                input?.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
-            }
-            if (next) next.addEventListener('click', () => { this.current++; this._render(); });
-        }
-
-        _submitSingle(q, idx) {
-            const ok  = idx === q.correct;
-            const pts = ok ? 10 : 0;
-            this.answers[this.current] = { ok, pts };
-            this.container.querySelectorAll('.qm-answer').forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === q.correct) btn.classList.add('qm-answer--correct');
-                if (i === idx && !ok) btn.classList.add('qm-answer--wrong');
-            });
-            this._feedback(ok, q.explanation, pts);
-        }
-
-        _submitMultiple(q, sel) {
-            const correct = q.correct;
-            const allOk   = correct.every(i => sel.includes(i)) && sel.every(i => correct.includes(i));
-            const partial = correct.some(i => sel.includes(i));
-            const pts     = allOk ? 10 : partial ? 5 : 0;
-            this.answers[this.current] = { ok: allOk, pts };
-            this.container.querySelectorAll('.qm-answer').forEach((lbl, i) => {
-                lbl.querySelector('input').disabled = true;
-                if (correct.includes(i))              lbl.classList.add('qm-answer--correct');
-                if (sel.includes(i) && !correct.includes(i)) lbl.classList.add('qm-answer--wrong');
-            });
-            this._feedback(allOk, q.explanation, pts);
-        }
-
-        _submitFill(q, val) {
-            const accepted = Array.isArray(q.correct) ? q.correct : [q.correct];
-            const ok  = accepted.some(v => v.toLowerCase() === val.toLowerCase());
-            const pts = ok ? 10 : 0;
-            this.answers[this.current] = { ok, pts };
-            const input = document.getElementById('qm-fill-input');
-            if (input) { input.disabled = true; input.classList.add(ok ? 'qm-fill--ok' : 'qm-fill--err'); }
-            this._feedback(ok, q.explanation, pts, ok ? null : `Правильный ответ: <code>${accepted[0]}</code>`);
-        }
-
-        _feedback(ok, explanation, pts, extra = null) {
-            const fb = document.getElementById('qm-feedback');
-            if (!fb) return;
-            fb.style.display = 'flex';
-            fb.className = `qm-feedback qm-feedback--${ok ? 'ok' : 'err'}`;
-            fb.innerHTML = `
-                <span class="qm-fb-icon">${ok ? '✅' : '❌'}</span>
-                <div>
-                    <strong>${ok ? 'Правильно!' : 'Неверно'}</strong>
-                    <p>${explanation}</p>
-                    ${extra ? `<p>${extra}</p>` : ''}
-                    ${pts ? `<span class="qm-fb-pts">+${pts} очков</span>` : ''}
-                </div>`;
-            document.getElementById('qm-next').style.display = 'inline-flex';
-        }
-
-        _showResults() {
-            const total   = this.questions.length * 10;
-            const earned  = Object.values(this.answers).reduce((s, a) => s + a.pts, 0);
-            const pct     = Math.round(earned / total * 100);
-            const passed  = pct >= this.passingScore;
-            const correct = Object.values(this.answers).filter(a => a.ok).length;
-
-            this._saveProgress(pct, passed);
-            if (window.gameSystem) gameSystem.onQuizComplete(pct);
-
-            this.container.innerHTML = `
-                <div class="qm-results">
-                    <div class="qm-results-emoji">${pct >= 90 ? '🏆' : pct >= 70 ? '👍' : '📚'}</div>
-                    <h2>${passed ? 'Тест пройден!' : 'Попробуйте ещё раз'}</h2>
-                    <div class="qm-results-circle">
-                        <svg viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-primary)" stroke-width="8"/>
-                            <circle cx="50" cy="50" r="42" fill="none"
-                                stroke="${passed ? '#a6e3a1' : '#f38ba8'}"
-                                stroke-width="8"
-                                stroke-dasharray="${pct * 2.639} 263.9"
-                                stroke-linecap="round"
-                                transform="rotate(-90 50 50)"/>
-                        </svg>
-                        <div class="qm-results-pct">${pct}%</div>
-                    </div>
-                    <div class="qm-results-stats">
-                        <div><div class="qm-stat-v">${earned}</div><div class="qm-stat-l">Очков</div></div>
-                        <div><div class="qm-stat-v">${correct}</div><div class="qm-stat-l">Правильных</div></div>
-                        <div><div class="qm-stat-v">${this.questions.length}</div><div class="qm-stat-l">Вопросов</div></div>
-                    </div>
-                    <div class="qm-results-actions">
-                        <button class="btn-qm btn-qm--check" onclick="openQuizModal('${this.quizId}','${this.title}')">Пройти снова</button>
-                        <button class="btn-qm btn-qm--next" onclick="closeQuizModal(null)">Закрыть</button>
-                    </div>
-                </div>`;
-        }
-
-        _saveProgress(pct, passed) {
-            // Save best score to localStorage for sidebar indicator
-            const lsKey = `quiz_best_${this.quizId}`;
-            const prev  = (() => { try { return JSON.parse(localStorage.getItem(lsKey) || '0'); } catch { return 0; } })();
-            if (pct > prev) localStorage.setItem(lsKey, JSON.stringify(pct));
-
-            const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
-            if (!user?.isuNumber) return;
-            fetch('/api/progress', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    isuNumber:    user.isuNumber,
-                    chapterId:    'chapter-1',
-                    chapterTitle: 'Глава I: Фундаментальные типы данных',
-                    testId:       this.quizId,
-                    testTitle:    this.title,
-                    points:       pct
-                })
-            }).catch(() => {});
-        }
-
-        _typeLabel(t) {
-            return { single:'Один ответ', multiple:'Несколько ответов', fill:'Введите ответ', code:'Что выведет код?' }[t] || t;
-        }
-        _esc(s) {
-            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        }
-        _shuffle(a) {
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [a[i], a[j]] = [a[j], a[i]];
-            }
-            return a;
-        }
-    }
+    // openQuizModal / closeQuizModal / ModalQuiz are provided by quiz.js
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+
+

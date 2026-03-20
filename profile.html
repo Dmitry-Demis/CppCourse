@@ -1,11 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль — Курс C++</title>
     <script src="js/auth-guard.js"></script>
-    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/variables.css?v=3">
+    <link rel="stylesheet" href="css/theme-picker.css">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -38,8 +40,8 @@
 
         /* ── Glass card mixin ── */
         .glass {
-            background: linear-gradient(135deg, rgba(30,28,58,.92) 0%, rgba(22,20,50,.92) 100%);
-            border: 1px solid rgba(167,139,250,.18);
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border: 1px solid var(--border-secondary);
             border-radius: 20px;
             backdrop-filter: blur(12px);
         }
@@ -53,9 +55,7 @@
         .hero-card::before {
             content: '';
             position: absolute; inset: 0; pointer-events: none;
-            background:
-                radial-gradient(ellipse 90% 70% at -5% -10%, rgba(91,79,207,.28) 0%, transparent 55%),
-                radial-gradient(ellipse 60% 50% at 105% 110%, rgba(59,130,246,.15) 0%, transparent 55%);
+            background: var(--body-grad);
         }
         .hero-top {
             position: relative;
@@ -66,7 +66,7 @@
             background: var(--grad-main);
             display: flex; align-items: center; justify-content: center;
             font-size: 2.4rem;
-            box-shadow: 0 0 0 3px rgba(167,139,250,.3), 0 8px 24px rgba(91,79,207,.3);
+            box-shadow: 0 0 0 3px var(--border-accent), var(--shadow-glow-purple);
         }
         .hero-meta { flex: 1; min-width: 180px; }
         .hero-name { font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1.15; }
@@ -108,9 +108,9 @@
             cursor: default;
         }
         .stat-card:hover {
-            border-color: rgba(167,139,250,.35);
+            border-color: var(--border-accent);
             transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(91,79,207,.15);
+            box-shadow: var(--shadow-glow-purple);
         }
         .stat-icon { font-size: 1.4rem; margin-bottom: 6px; }
         .stat-val  { font-size: 1.4rem; font-weight: 800; color: #fff; line-height: 1; }
@@ -123,12 +123,12 @@
             margin-bottom: var(--space-4);
             display: flex; align-items: center; gap: 10px;
         }
-        .sec-heading::after { content: ''; flex: 1; height: 1px; background: rgba(167,139,250,.12); }
+        .sec-heading::after { content: ''; flex: 1; height: 1px; background: var(--border-primary); }
 
         /* ── Chapter blocks ── */
         .chapters-list { display: flex; flex-direction: column; gap: var(--space-4); }
         .chapter-block { overflow: hidden; opacity: 0; transition: border-color .2s, box-shadow .2s; }
-        .chapter-block:hover { border-color: rgba(167,139,250,.3); box-shadow: 0 4px 20px rgba(91,79,207,.12); }
+        .chapter-block:hover { border-color: var(--border-accent); box-shadow: 0 4px 20px rgba(91,79,207,.12); }
 
         .chapter-header {
             display: flex; align-items: center; gap: var(--space-4);
@@ -159,7 +159,7 @@
 
         /* ── Tests section ── */
         .tests-wrap {
-            border-top: 1px solid rgba(167,139,250,.08);
+            border-top: 1px solid var(--border-primary);
             padding: var(--space-3) var(--space-5) var(--space-4);
             display: flex; flex-direction: column; gap: var(--space-1);
         }
@@ -208,6 +208,335 @@
         /* ── Empty / loading ── */
         .empty-state { text-align: center; padding: var(--space-16); color: var(--text-tertiary); }
         .empty-icon  { font-size: 3rem; margin-bottom: var(--space-3); }
+
+        /* ── Dashboard cards ── */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: var(--space-4);
+        }
+        .dash-card {
+            border-radius: 18px; overflow: hidden; opacity: 0;
+            transition: border-color .2s, box-shadow .2s, transform .2s;
+        }
+        .dash-card:hover {
+            border-color: var(--border-accent);
+            box-shadow: 0 8px 32px rgba(91,79,207,.18);
+            transform: translateY(-2px);
+        }
+        .dash-card-head {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 18px 12px;
+        }
+        .dash-card-icon {
+            width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+            background: rgba(124,92,191,.18); border: 1px solid rgba(167,139,250,.2);
+            display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+        }
+        .dash-card-title { font-weight: 700; font-size: .9rem; color: var(--text-primary); }
+        .dash-card-sub   { font-size: .72rem; color: var(--text-tertiary); margin-top: 2px; }
+        .dash-card-body  { padding: 0 18px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+        /* reading time big display */
+        .dash-read-time {
+            display: flex; align-items: baseline; gap: 6px;
+            padding: 10px 14px; border-radius: 12px;
+            background: rgba(126,184,247,.07); border: 1px solid rgba(126,184,247,.12);
+        }
+        .dash-read-val { font-size: 1.6rem; font-weight: 800; color: #7eb8f7; line-height: 1; }
+        .dash-read-unit { font-size: .75rem; color: var(--text-tertiary); }
+        .dash-read-sessions { font-size: .72rem; color: var(--text-tertiary); margin-left: auto; }
+
+        /* stat row */
+        .dash-stat-row {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: .8rem; color: var(--text-secondary);
+        }
+        .dash-stat-row span:last-child { font-weight: 700; color: var(--text-primary); }
+
+        /* test list */
+        .dash-test-list { display: flex; flex-direction: column; gap: 6px; }
+        .dash-test-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 10px; border-radius: 8px;
+            background: rgba(255,255,255,.03);
+            font-size: .78rem;
+        }
+        .dash-test-dot {
+            width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .65rem; font-weight: 700;
+        }
+        .dash-test-dot.pass { background: rgba(110,231,183,.15); color: #6ee7b7; }
+        .dash-test-dot.fail { background: rgba(248,113,113,.12); color: #f87171; }
+        .dash-test-dot.none { background: rgba(255,255,255,.05); color: var(--text-tertiary); }
+        .dash-test-name { flex: 1; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .dash-test-score {
+            font-weight: 700; font-size: .75rem; padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+        }
+        .dash-test-score.pass { background: rgba(110,231,183,.12); color: #6ee7b7; }
+        .dash-test-score.fail { background: rgba(251,191,36,.1); color: #fbbf24; }
+        .dash-test-score.none { color: var(--text-tertiary); }
+
+        /* not started overlay */
+        .dash-not-started {
+            text-align: center; padding: 14px 0;
+            font-size: .8rem; color: var(--text-tertiary);
+        }
+        .dash-not-started span { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+
+        /* chapter progress bar inside card */
+        .dash-progress-wrap { display: flex; align-items: center; gap: 8px; }
+        .dash-progress-track {
+            flex: 1; height: 5px; background: rgba(255,255,255,.07);
+            border-radius: 99px; overflow: hidden;
+        }
+        .dash-progress-fill { height: 100%; background: var(--grad-main); border-radius: 99px; transition: width .6s ease; }
+        .dash-progress-pct { font-size: .68rem; color: var(--text-tertiary); white-space: nowrap; min-width: 28px; text-align: right; }
+
+        /* ── Course tabs ── */
+        .course-tabs {
+            display: flex; gap: 4px; margin-bottom: var(--space-5);
+            background: var(--bg-tertiary); border-radius: 14px; padding: 4px;
+            border: 1px solid var(--border-primary);
+        }
+        .course-tab {
+            flex: 1; padding: 9px 16px; border-radius: 10px; border: none;
+            background: none; color: var(--text-tertiary); font-size: .85rem; font-weight: 600;
+            cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 7px;
+        }
+        .course-tab.active {
+            background: var(--accent-indigo-dim);
+            border: 1px solid var(--accent-indigo);
+            color: var(--text-primary); box-shadow: var(--shadow-glow-blue);
+        }
+        .course-tab:not(.active):hover { background: var(--bg-card-hover); color: var(--text-secondary); }
+        .course-section { display: none; margin-bottom: var(--space-8); }
+        .course-section.active { display: block; }
+
+        /* ── Chapter accordion ── */
+        .chapter-tile {
+            border-radius: 16px; overflow: hidden; margin-bottom: var(--space-3);
+            transition: border-color .25s, box-shadow .25s;
+        }
+        .chapter-tile:hover { border-color: var(--border-accent); box-shadow: 0 4px 24px rgba(91,79,207,.14); }
+        .chapter-tile-head {
+            display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+            background: var(--bg-tertiary); cursor: pointer; user-select: none;
+        }
+        .chapter-tile-icon {
+            width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0;
+            background: rgba(124,92,191,.18); border: 1px solid rgba(167,139,250,.2);
+            display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+        }
+        .chapter-tile-info { flex: 1; min-width: 0; }
+        .chapter-tile-name { font-weight: 700; font-size: .92rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chapter-tile-sub  { font-size: .68rem; color: var(--text-tertiary); margin-top: 2px; }
+        .chapter-tile-arrow { color: var(--text-tertiary); font-size: .7rem; transition: transform .25s; flex-shrink: 0; }
+        .chapter-tile-head:not(.open) .chapter-tile-arrow { transform: rotate(-90deg); }
+
+        /* Chapter summary badges */
+        .ch-badges { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+        .ch-badge { display: flex; flex-direction: column; align-items: center; padding: 4px 10px; border-radius: 10px; min-width: 52px; }
+        .ch-badge.time  { background: rgba(126,184,247,.1);  border: 1px solid rgba(126,184,247,.2); }
+        .ch-badge.tests { background: rgba(110,231,183,.1);  border: 1px solid rgba(110,231,183,.2); }
+        .ch-badge.reads { background: rgba(251,191,36,.08);  border: 1px solid rgba(251,191,36,.18); }
+        .ch-badge .cb-val { font-size: .8rem; font-weight: 800; line-height: 1.1; }
+        .ch-badge.time  .cb-val { color: #7eb8f7; }
+        .ch-badge.tests .cb-val { color: #6ee7b7; }
+        .ch-badge.reads .cb-val { color: #fbbf24; }
+        .ch-badge .cb-lbl { font-size: .58rem; color: var(--text-tertiary); margin-top: 1px; }
+
+        .chapter-body { display: none; flex-direction: column; }
+        .chapter-body.open { display: flex; }
+
+        /* ══ THEORY DASHBOARD ══ */
+        .theory-dash { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 0; }
+
+        /* Jug SVG in chapter header */
+        .ch-jug { flex-shrink: 0; }
+
+        /* Para table */
+        .para-table { width: 100%; border-collapse: collapse; }
+        .para-table-head-row {
+            display: grid;
+            grid-template-columns: 26px 1fr 52px 80px 72px 80px 96px 58px;
+            gap: 6px; padding: 7px 14px 6px;
+            font-size: .6rem; color: var(--text-tertiary);
+            text-transform: uppercase; letter-spacing: .07em;
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: 2px;
+        }
+        .para-table-head-row > div:not(:nth-child(2)) { text-align: center; }
+        @media(max-width:720px) {
+            .para-table-head-row { grid-template-columns: 26px 1fr 52px 72px 80px 80px; }
+            .para-table-head-row .pth-rating, .para-table-head-row .pth-lastread { display: none; }
+        }
+
+        /* Para row */
+        .para-row {
+            display: grid;
+            grid-template-columns: 26px 1fr 52px 80px 72px 80px 96px 58px;
+            gap: 6px; align-items: center;
+            padding: 9px 14px;
+            border-radius: 10px;
+            text-decoration: none; color: inherit;
+            transition: background .15s, transform .12s;
+            margin-bottom: 2px;
+        }
+        .para-row:hover { background: rgba(167,139,250,.07); transform: translateX(2px); text-decoration: none; }
+        .para-row.unread { opacity: .65; }
+        @media(max-width:720px) {
+            .para-row { grid-template-columns: 26px 1fr 52px 72px 80px 80px; }
+            .para-row .pr-rating, .para-row .pr-lastread { display: none; }
+        }
+
+        /* Star */
+        .pr-star { font-size: 1rem; text-align: center; line-height: 1; transition: transform .2s; }
+        .para-row:hover .pr-star { transform: scale(1.25); }
+
+        .pr-name { font-weight: 600; font-size: .85rem; color: var(--text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pr-name-sub { font-size: .65rem; color: var(--text-tertiary); margin-top: 1px; }
+
+        .pr-cell { text-align: center; font-size: .78rem; color: var(--text-secondary); }
+        .pr-cell strong { font-weight: 700; color: var(--text-primary); }
+
+        /* Review badge — pulses when due */
+        .review-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: .68rem; font-weight: 700; padding: 3px 8px; border-radius: 7px; white-space: nowrap;
+        }
+        .review-badge.overdue { background: rgba(248,113,113,.18); color: #f87171;
+            animation: pulse-red 1.4s ease-in-out infinite; }
+        .review-badge.today   { background: rgba(251,191,36,.15);  color: #fbbf24;
+            animation: pulse-yellow 1.4s ease-in-out infinite; }
+        .review-badge.soon    { background: rgba(126,184,247,.12); color: #7eb8f7; }
+        .review-badge.ok      { background: rgba(110,231,183,.1);  color: #6ee7b7; }
+        .review-badge.unread  { background: rgba(255,255,255,.05); color: var(--text-tertiary); }
+        @keyframes pulse-red    { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.4)} 50%{box-shadow:0 0 0 4px rgba(248,113,113,0)} }
+        @keyframes pulse-yellow { 0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.4)}  50%{box-shadow:0 0 0 4px rgba(251,191,36,0)} }
+
+        /* Mastery bar */
+        .mastery-wrap { display: flex; align-items: center; gap: 5px; justify-content: center; }
+        .mastery-track { width: 34px; height: 4px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
+        .mastery-fill  { height: 100%; border-radius: 99px; transition: width .8s ease; min-width: 2px; }
+        .mastery-fill.high { background: linear-gradient(90deg,#6ee7b7,#3b82f6); }
+        .mastery-fill.mid  { background: linear-gradient(90deg,#fbbf24,#f97316); }
+        .mastery-fill.low  { background: linear-gradient(90deg,#f87171,#ec4899); }
+        .mastery-val { font-size: .7rem; font-weight: 700; white-space: nowrap; }
+        .mastery-val.high { color: #6ee7b7; }
+        .mastery-val.mid  { color: #fbbf24; }
+        .mastery-val.low  { color: #f87171; }
+        .mastery-val.none { color: var(--text-tertiary); }
+
+        /* Rating badge */
+        .ph-rating-val {
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: .78rem; font-weight: 800; padding: 2px 8px; border-radius: 8px; min-width: 40px;
+        }
+        .ph-rating-val.high { background: rgba(110,231,183,.12); color: #6ee7b7; }
+        .ph-rating-val.mid  { background: rgba(251,191,36,.1);   color: #fbbf24; }
+        .ph-rating-val.low  { background: rgba(248,113,113,.1);  color: #f87171; }
+        .ph-rating-val.none { background: rgba(255,255,255,.05); color: var(--text-tertiary); }
+
+        /* ══ PRACTICE DASHBOARD ══ */
+        .practice-dash { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 16px; }
+
+        /* Summary chips */
+        .p-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+        .p-chip {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 10px 8px; border-radius: 12px; text-align: center; gap: 3px;
+        }
+        .p-chip.passed { background: rgba(110,231,183,.07); border: 1px solid rgba(110,231,183,.15); }
+        .p-chip.failed { background: rgba(248,113,113,.06); border: 1px solid rgba(248,113,113,.12); }
+        .p-chip.total  { background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.15); }
+        .p-chip .pc-val { font-size: 1.1rem; font-weight: 800; line-height: 1; }
+        .p-chip.passed .pc-val { color: #6ee7b7; }
+        .p-chip.failed .pc-val { color: #f87171; }
+        .p-chip.total  .pc-val { color: #a78bfa; }
+        .p-chip .pc-lbl { font-size: .62rem; color: var(--text-tertiary); }
+
+        /* Score bar chart */
+        .score-chart-wrap { display: flex; flex-direction: column; gap: 7px; }
+        .score-chart-title { font-size: .63rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px; }
+        .score-bar-row { display: grid; grid-template-columns: 140px 1fr 50px; gap: 8px; align-items: center; }
+        @media(max-width:640px){ .score-bar-row { grid-template-columns: 80px 1fr 42px; } }
+        .score-bar-label { font-size: .72rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
+        .score-bar-track { height: 8px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; position: relative; }
+        .score-bar-fill  { height: 100%; border-radius: 99px; width: 0; transition: width 1s cubic-bezier(.4,0,.2,1); }
+        .score-bar-fill.pass { background: linear-gradient(90deg,#6ee7b7,#3b82f6); }
+        .score-bar-fill.fail { background: linear-gradient(90deg,#fbbf24,#f87171); }
+        .score-bar-fill.none { background: rgba(255,255,255,.08); }
+        .score-bar-val { font-size: .72rem; font-weight: 700; white-space: nowrap; }
+        .score-bar-val.pass { color: #6ee7b7; }
+        .score-bar-val.fail { color: #fbbf24; }
+        .score-bar-val.none { color: var(--text-tertiary); }
+
+        /* Attempt heatmap */
+        .attempts-label { font-size: .63rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+        .attempts-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+        .attempt-dot {
+            width: 11px; height: 11px; border-radius: 3px;
+            transition: transform .15s, box-shadow .15s; cursor: default;
+        }
+        .attempt-dot:hover { transform: scale(1.5); }
+        .attempt-dot.pass { background: #6ee7b7; box-shadow: 0 0 5px rgba(110,231,183,.5); }
+        .attempt-dot.fail { background: #f87171; box-shadow: 0 0 5px rgba(248,113,113,.4); }
+        .attempt-dot.empty { background: rgba(255,255,255,.07); }
+
+        /* ══ PRACTICE TABLE ══ */
+        .pt-wrap { padding: 0 14px 14px; }
+        .pt-head-row {
+            display: grid;
+            grid-template-columns: 1fr 52px 90px 60px 60px 96px;
+            gap: 6px; padding: 7px 10px 6px;
+            font-size: .6rem; color: var(--text-tertiary);
+            text-transform: uppercase; letter-spacing: .07em;
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: 2px;
+        }
+        .pt-head-row > div:not(:first-child) { text-align: center; }
+        .pt-para-label {
+            font-size: .68rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .08em; color: var(--text-tertiary);
+            padding: 10px 10px 4px;
+        }
+        .pt-test-row {
+            display: grid;
+            grid-template-columns: 1fr 52px 90px 60px 60px 96px;
+            gap: 6px; align-items: center;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            background: rgba(255,255,255,.02);
+            transition: background .15s;
+        }
+        .pt-test-row:hover { background: rgba(167,139,250,.07); }
+        .pt-test-row.pt-not-started { opacity: .5; }
+        .pt-test-name { font-size: .82rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pt-cell { text-align: center; font-size: .75rem; color: var(--text-secondary); }
+        .pt-score {
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: .72rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; min-width: 36px;
+        }
+        .pt-score.pass { background: rgba(110,231,183,.12); color: #6ee7b7; }
+        .pt-score.fail { background: rgba(251,191,36,.1);   color: #fbbf24; }
+        .pt-score.none { color: var(--text-tertiary); }
+        @media(max-width:720px) {
+            .pt-head-row, .pt-test-row { grid-template-columns: 1fr 52px 60px 60px 96px; }
+            .pt-head-row > div:nth-child(3), .pt-test-row > div:nth-child(3) { display: none; }
+        }
+
+        /* Dash divider */
+        .dash-divider { height: 1px; background: var(--border-primary); }
+
+        /* ── Empty / loading ── */
+        .empty-state { text-align: center; padding: var(--space-16); color: var(--text-tertiary); }
+        .empty-icon  { font-size: 3rem; margin-bottom: var(--space-3); }
+
+        /* ── Course tabs ── */
     </style>
 </head>
 <body>
@@ -235,179 +564,464 @@ const LEVEL_DATA = [
     { level:5, min:1000, title:'Эксперт',     icon:'🔬' },
     { level:6, min:2000, title:'Мастер C++',  icon:'👑' },
 ];
-const CHAPTER_ICONS = ['🔢','📦','➕','🔀','⚙️','🧩','🔗','📐'];
-
 function getLevel(pts) { return [...LEVEL_DATA].reverse().find(l => pts >= l.min) || LEVEL_DATA[0]; }
 function logout() { localStorage.removeItem('cpp_user'); window.location.href = 'login.html'; }
+
+function _fmtReadLabel(totalReadSecs) {
+    const h = Math.floor(totalReadSecs / 3600);
+    const m = Math.floor((totalReadSecs % 3600) / 60);
+    const s = totalReadSecs % 60;
+    return h > 0 ? `${h}ч ${m}м` : m > 0 ? `${m}м ${s}с` : totalReadSecs > 0 ? `${s}с` : '0м';
+}
+
+function updateStatsFromProgress(progressMap) {
+    let totalReadSecs = 0, totalSessions = 0, totalCodeRuns = 0, totalTestsDone = 0;
+    Object.values(progressMap).forEach(p => {
+        totalReadSecs  += p.totalReadingSeconds  || 0;
+        totalSessions  += p.readingSessionsCount || 0;
+        totalCodeRuns  += p.codeRunsCount        || 0;
+        Object.values(p.tests || {}).forEach(t => {
+            if ((t.attemptsCount || 0) > 0) totalTestsDone++;
+        });
+    });
+    const el = id => document.getElementById(id);
+    if (el('stat-read-time'))   el('stat-read-time').textContent   = _fmtReadLabel(totalReadSecs);
+    if (el('stat-sessions'))    el('stat-sessions').textContent    = totalSessions;
+    if (el('stat-code-runs'))   el('stat-code-runs').textContent   = totalCodeRuns;
+    if (el('stat-tests-done'))  el('stat-tests-done').textContent  = totalTestsDone;
+}
 
 async function loadProfile() {
     const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
     if (!user) { window.location.href = 'login.html'; return; }
+
+    // Helper: fetch with timeout
+    async function fetchWithTimeout(url, opts = {}, ms = 8000) {
+        const ctrl = new AbortController();
+        const tid  = setTimeout(() => ctrl.abort(), ms);
+        try {
+            const r = await fetch(url, { ...opts, signal: ctrl.signal });
+            clearTimeout(tid);
+            return r;
+        } catch(e) {
+            clearTimeout(tid);
+            throw e;
+        }
+    }
+
     try {
+        // Load profile + course structure first (required)
         const [profileRes, courseRes] = await Promise.all([
-            fetch(`/api/profile/${user.isuNumber}`),
-            fetch('/api/course-structure')
+            fetchWithTimeout(`/api/profile/${user.isuNumber}`),
+            fetchWithTimeout('/api/course-structure')
         ]);
+
         if (!profileRes.ok) { window.location.href = 'login.html'; return; }
-        const [profile, course] = await Promise.all([profileRes.json(), courseRes.json()]);
-        renderProfile(profile, course.chapters || []);
+
+        const profile = await profileRes.json();
+        const course  = courseRes.ok ? await courseRes.json() : { chapters: [] };
+        const chapters = course.chapters || [];
+
+        // Render hero + stats immediately with empty progress
+        renderProfile(profile, chapters, {});
+
+        // Then load progress separately and update
+        try {
+            const progressRes = await fetchWithTimeout(`/api/progress/${user.isuNumber}/all`, {}, 10000);
+            const progressMap = progressRes.ok ? await progressRes.json() : {};
+            // Update stats cards with real data
+            updateStatsFromProgress(progressMap);
+            // Re-render chapters progress section
+            loadChaptersProgress(user.isuNumber, chapters, progressMap);
+        } catch(e) {
+            console.warn('Progress load failed:', e);
+            loadChaptersProgress(user.isuNumber, chapters, {});
+        }
+
     } catch(e) {
-        console.error(e);
+        console.error('Profile load error:', e);
         document.getElementById('profileContent').innerHTML =
-            '<div class="empty-state"><div class="empty-icon">❌</div><p>Ошибка загрузки</p></div>';
+            '<div class="empty-state"><div class="empty-icon">❌</div><p>Ошибка загрузки профиля</p></div>';
     }
 }
 
-function renderProfile(data, chapters) {
-    const gsLevel  = GS.get('gs_level', 1);
-    const gsXp     = GS.get('gs_xp', 0);
-    const coins    = GS.get('gs_coins', 0);
-    const keys     = GS.get('gs_keys', 0);
-    const readMins = GS.get('gs_read_mins', 0);
-    const codeRuns = GS.get('gs_code_runs', 0);
-    const quizDone = GS.get('gs_quizzes_done', 0);
-    const achCount = GS.get('gs_achievements', []).length;
-    const needed   = gsLevel * 120;
-    const xpPct    = Math.min(gsXp / needed * 100, 100);
-    const readHrs  = Math.floor(readMins / 60);
-    const readMin  = readMins % 60;
-    const lvl      = getLevel(data.totalPoints);
+function renderProfile(data, chapters, progressMap) {
+    const coins = GS.get('gs_coins', 0);
+    const readLabel = '...';
 
-    const chapterMap = {};
-    (data.chapters || []).forEach(c => {
-        chapterMap[c.chapterId] = {
-            points: c.points, testsPassed: c.testsPassed,
-            tests: Object.fromEntries((c.tests || []).map(t => [t.testId, t]))
-        };
-    });
-
-    const sectionFileMap = {};
-    chapters.forEach(ch => (ch.paragraphs || []).forEach(para =>
-        (para.sections || []).forEach(sec => { if (sec.quizId && sec.file) sectionFileMap[sec.quizId] = sec.file; })
-    ));
-
-    const chaptersHtml = chapters.map((ch, idx) => {
-        const chProg = chapterMap[ch.id];
-        const chPts  = chProg ? chProg.points : 0;
-        const icon   = CHAPTER_ICONS[idx] || '📖';
-
-        const sectionQuizIds = new Set();
-        (ch.paragraphs || []).forEach(p => (p.sections || []).forEach(s => { if (s.quizId) sectionQuizIds.add(s.quizId); }));
-
-        // Считаем суммарный % освоенности главы
-        const allTestSections = [];
-        (ch.paragraphs || []).forEach(p => (p.sections || []).forEach(s => { if (s.hasTest && s.quizId) allTestSections.push(s.quizId); }));
-        let chapterPct = 0;
-        if (allTestSections.length > 0) {
-            const scores = allTestSections.map(qid => {
-                try { const v = localStorage.getItem(`quiz_best_${qid}`); return v !== null ? JSON.parse(v) : 0; } catch { return 0; }
-            });
-            chapterPct = Math.round(scores.reduce((a, b) => a + b, 0) / allTestSections.length);
-        }
-
-        const paraRows = (ch.paragraphs || []).map(para => {
-            const rows = (para.sections || [])
-                .filter(s => s.hasTest && s.quizId)
-                .map(s => buildTestRow(s.title, s.quizId, chProg, sectionFileMap[s.quizId]))
-                .join('');
-            if (!rows) return '';
-            return `<div class="para-label">${para.title}</div>${rows}`;
-        }).join('');
-
-        const extraRows = chProg
-            ? Object.keys(chProg.tests).filter(id => !sectionQuizIds.has(id))
-                .map(id => buildTestRow(chProg.tests[id].testTitle, id, chProg, null)).join('')
-            : '';
-        const extraBlock = extraRows ? `<div class="para-label">Дополнительные тесты</div>${extraRows}` : '';
-
-        const progressBar = allTestSections.length > 0 ? `
-            <div class="chapter-progress-wrap">
-                <div class="chapter-progress-track">
-                    <div class="chapter-progress-fill" style="width:${chapterPct}%"></div>
-                </div>
-                <span class="chapter-progress-pct">${chapterPct}%</span>
-            </div>` : '';
-
-        return `<div class="chapter-block glass">
-            <div class="chapter-header">
-                <div class="chapter-icon">${icon}</div>
-                <div class="chapter-info">
-                    <div class="chapter-name">${ch.title}</div>
-                    <div class="chapter-meta">${chProg ? `Тестов пройдено: ${chProg.testsPassed}` : 'Ещё не начато'}</div>
-                    ${progressBar}
-                </div>
-                <div class="chapter-pts ${chPts ? '' : 'zero'}">${chPts ? chPts + ' ⭐' : '—'}</div>
-            </div>
-            ${(paraRows || extraBlock) ? `<div class="tests-wrap">${paraRows}${extraBlock}</div>` : ''}
-        </div>`;
-    }).join('');
+    // Guard against missing server data
+    const xp      = data.xp    || 0;
+    const level   = data.level || 1;
+    const lvl     = getLevel(xp);
+    const xpInLevel   = xp % 500;
+    const xpForNext   = 500;
+    const xpFillPct   = Math.min(xpInLevel / xpForNext * 100, 100);
+    const xpToNext    = xpForNext - xpInLevel;
 
     document.getElementById('profileContent').innerHTML = `
         <div class="hero-card glass" id="hero-card">
             <div class="hero-top">
                 <div class="hero-avatar" id="hero-avatar">${lvl.icon}</div>
                 <div class="hero-meta">
-                    <div class="hero-name">${data.firstName} ${data.lastName}</div>
+                    <div class="hero-name">${data.firstName || ''} ${data.lastName || ''}</div>
                     <div class="hero-sub">ИСУ: ${data.isuNumber} · С нами с ${new Date(data.registeredAt).toLocaleDateString('ru')}</div>
                     <div class="hero-badges">
-                        <span class="badge badge-level">${lvl.icon} Ур.${lvl.level} · ${lvl.title}</span>
-                        <span class="badge badge-streak">🔥 ${data.currentStreak} дн.</span>
-                        <span class="badge badge-record">🏆 Рекорд ${data.maxStreak} дн.</span>
+                        <span class="badge badge-level">${lvl.icon} Ур.${level} · ${lvl.title}</span>
+                        <span class="badge badge-streak">🔥 ${data.currentStreak || 0} дн.</span>
+                        <span class="badge badge-record">🏆 Рекорд ${data.maxStreak || 0} дн.</span>
                     </div>
                 </div>
                 <div class="hero-pts-block">
-                    <div class="hero-pts-val" id="pts-counter">0</div>
-                    <div class="hero-pts-lbl">очков за тесты</div>
+                    <div class="hero-pts-val" id="pts-counter">${xp}</div>
+                    <div class="hero-pts-lbl">XP</div>
                 </div>
             </div>
             <div class="hero-xp-wrap">
                 <div class="hero-xp-labels">
-                    <span>Ур.${gsLevel} · ${gsXp} XP</span>
-                    <span>до Ур.${gsLevel+1}: ${needed - gsXp} XP</span>
+                    <span>Ур.${level} · ${xp} XP</span>
+                    <span>до Ур.${level + 1}: ${xpToNext} XP</span>
                 </div>
-                <div class="hero-xp-track"><div class="hero-xp-fill" id="hero-xp-fill"></div></div>
+                <div class="hero-xp-track"><div class="hero-xp-fill" id="hero-xp-fill" style="width:${xpFillPct}%"></div></div>
             </div>
         </div>
 
         <div class="stats-grid" id="stats-grid">
-            <div class="stat-card glass"><div class="stat-icon">🪙</div><div class="stat-val" id="sc-coins">0</div><div class="stat-lbl">Монеты</div></div>
-            <div class="stat-card glass"><div class="stat-icon">🗝️</div><div class="stat-val" id="sc-keys">0</div><div class="stat-lbl">Ключи</div></div>
-            <div class="stat-card glass"><div class="stat-icon">📖</div><div class="stat-val">${readHrs > 0 ? readHrs+'ч ' : ''}${readMin}м</div><div class="stat-lbl">Чтение</div></div>
-            <div class="stat-card glass"><div class="stat-icon">💻</div><div class="stat-val" id="sc-code">0</div><div class="stat-lbl">Запусков</div></div>
-            <div class="stat-card glass"><div class="stat-icon">✎</div><div class="stat-val" id="sc-quiz">0</div><div class="stat-lbl">Тестов</div></div>
-            <div class="stat-card glass"><div class="stat-icon">🏅</div><div class="stat-val" id="sc-ach">0</div><div class="stat-lbl">Достижений</div></div>
+            <div class="stat-card glass"><div class="stat-icon">🪙</div><div class="stat-val">${coins}</div><div class="stat-lbl">Монеты</div></div>
+            <div class="stat-card glass"><div class="stat-icon">📖</div><div class="stat-val" id="stat-read-time">${readLabel}</div><div class="stat-lbl">Время чтения</div></div>
+            <div class="stat-card glass"><div class="stat-icon">🔁</div><div class="stat-val" id="stat-sessions">...</div><div class="stat-lbl">Прочтений</div></div>
+            <div class="stat-card glass"><div class="stat-icon">💻</div><div class="stat-val" id="stat-code-runs">...</div><div class="stat-lbl">Запусков кода</div></div>
+            <div class="stat-card glass"><div class="stat-icon">✎</div><div class="stat-val" id="stat-tests-done">...</div><div class="stat-lbl">Тестов сдано</div></div>
+            <div class="stat-card glass"><div class="stat-icon">🔥</div><div class="stat-val">${data.currentStreak || 0}</div><div class="stat-lbl">Дней подряд</div></div>
         </div>
 
         <div class="sec-heading">Прогресс по курсу</div>
-        <div class="chapters-list" id="chapters-list">${chaptersHtml}</div>`;
+        <div id="course-progress-wrap">
+            <div class="empty-state" style="padding:var(--space-8)"><div class="empty-icon">⏳</div><p>Загрузка прогресса...</p></div>
+        </div>`;
 
-    // Animations
     if (window.gsap) {
         gsap.from('#hero-card',   { opacity:0, y:24, duration:.6, ease:'power2.out' });
         gsap.from('#hero-avatar', { scale:0, duration:.45, delay:.15, ease:'back.out(1.7)' });
-        gsap.to('#hero-xp-fill',  { width: xpPct+'%', duration:1, delay:.35, ease:'power2.out' });
-        gsap.to({ v:0 }, { v: data.totalPoints, duration:1.1, delay:.25, ease:'power2.out',
-            onUpdate: function() { const el=document.getElementById('pts-counter'); if(el) el.textContent=Math.round(this.targets()[0].v); }
+        gsap.to('#hero-xp-fill',  { width: xpFillPct+'%', duration:1, delay:.35, ease:'power2.out' });
+        gsap.from('#stats-grid .stat-card', { opacity:0, y:16, stagger:.06, duration:.45, delay:.4, ease:'power2.out' });
+    } else {
+        document.querySelectorAll('.stat-card').forEach(el => el.style.opacity='1');
+    }
+}
+
+async function loadChaptersProgress(isuNumber, chapters, progressMap) {
+    const wrap = document.getElementById('course-progress-wrap');
+    if (!wrap) return;
+
+    function fmtTime(secs) {
+        if (!secs) return '—';
+        const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), s = secs % 60;
+        if (h > 0) return `${h}ч ${m}м`;
+        if (m > 0) return `${m}м ${s}с`;
+        return `${s}с`;
+    }
+
+    const CHAPTER_ICONS = ['🔢','📦','➕','🔀','⚙️','🧩','🔗','📐'];
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+    // SVG jug that fills up based on completion %
+    function buildJugSvg(pct) {
+        const W = 36, H = 44;
+        const fillH = Math.round((H - 14) * Math.min(pct, 1));
+        const fillY = H - 6 - fillH;
+        const color = pct >= 0.8 ? '#6ee7b7' : pct >= 0.4 ? '#7eb8f7' : '#a78bfa';
+        const glow  = pct >= 0.8 ? 'rgba(110,231,183,.35)' : pct >= 0.4 ? 'rgba(126,184,247,.3)' : 'rgba(167,139,250,.25)';
+        const uid = 'j' + Math.random().toString(36).slice(2, 7);
+        const jugPath = `M10,4 Q10,2 13,2 L23,2 Q26,2 26,4 L28,10 Q32,12 32,16 L32,38 Q32,42 28,42 L8,42 Q4,42 4,38 L4,16 Q4,12 8,10 Z`;
+        const liquidRect = fillH > 0
+            ? `<rect x="5" y="${fillY}" width="26" height="${fillH + 6}" rx="2" fill="${color}" opacity="0.85"/>`
+            : '';
+        const shine  = `<path d="M13,6 Q12,14 13,22" stroke="rgba(255,255,255,.25)" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+        const spout  = `<path d="M26,8 Q34,6 35,10 Q34,14 28,12" fill="rgba(167,139,250,.3)" stroke="rgba(167,139,250,.4)" stroke-width="0.8"/>`;
+        const handle = `<path d="M4,18 Q0,22 0,28 Q0,34 4,36" fill="none" stroke="rgba(167,139,250,.4)" stroke-width="1.5" stroke-linecap="round"/>`;
+        return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" class="ch-jug" style="filter:drop-shadow(0 0 6px ${glow})">
+            <defs><clipPath id="${uid}"><path d="${jugPath}"/></clipPath></defs>
+            <path d="${jugPath}" fill="rgba(255,255,255,.04)" stroke="rgba(167,139,250,.35)" stroke-width="1.2"/>
+            ${spout}${handle}
+            <g clip-path="url(#${uid})">${liquidRect}</g>
+            ${shine}
+            <text x="18" y="${H - 14}" text-anchor="middle" font-size="7" font-weight="700" fill="${color}">${Math.round(pct*100)}%</text>
+        </svg>`;
+    }
+
+    function buildChapterHead(ch, idx, jugSvg, badges) {
+        const icon = CHAPTER_ICONS[idx] || '📖';
+        return `<div class="chapter-tile-head open" onclick="toggleChapter(this)">
+            <div class="chapter-tile-icon">${icon}</div>
+            <div class="chapter-tile-info">
+                <div class="chapter-tile-name">Глава ${ch.number}. ${ch.title}</div>
+            </div>
+            ${jugSvg}
+            <div class="ch-badges">${badges}</div>
+            <div class="chapter-tile-arrow">▼</div>
+        </div>`;
+    }
+
+    // ── ТЕОРИЯ ───────────────────────────────────────────────────────────────
+    const allParaIds = chapters.flatMap(ch => (ch.paragraphs || []).map(p => p.id));
+    let globalAvgMap = {};
+    try {
+        const r = await fetch('/api/stats/avg-reading/bulk', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(allParaIds)
         });
-        gsap.from('#stats-grid .stat-card', { opacity:0, y:16, stagger:.06, duration:.45, delay:.4, ease:'power2.out',
-            onComplete: () => {
-                counter('sc-coins', coins); counter('sc-keys', keys);
-                counter('sc-code', codeRuns); counter('sc-quiz', quizDone); counter('sc-ach', achCount);
+        if (r.ok) globalAvgMap = await r.json();
+    } catch {}
+
+    const avgValues = Object.values(globalAvgMap).filter(v => v > 0);
+    const maxAvg = avgValues.length ? Math.max(...avgValues) : 1;
+    function calcRating(paragraphId) {
+        const avg = globalAvgMap[paragraphId] || 0;
+        if (!avg) return null;
+        return Math.round(avg / maxAvg * 100) / 10;
+    }
+
+    function fmtDate(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        return d.toLocaleDateString('ru', { day: 'numeric', month: 'short' });
+    }
+
+    function reviewBadge(srNextDue, wasRead) {
+        if (!wasRead) return `<span class="review-badge unread">не изучен</span>`;
+        if (!srNextDue) return `<span class="review-badge ok">—</span>`;
+        const now = new Date();
+        const due = new Date(srNextDue);
+        const diffDays = Math.round((due - now) / 86400000);
+        if (diffDays < 0)   return `<span class="review-badge overdue">⚠ просрочено</span>`;
+        if (diffDays === 0) return `<span class="review-badge today">📌 сегодня</span>`;
+        if (diffDays === 1) return `<span class="review-badge today">📌 завтра</span>`;
+        if (diffDays <= 3)  return `<span class="review-badge soon">через ${diffDays} дн.</span>`;
+        return `<span class="review-badge ok">через ${diffDays} дн.</span>`;
+    }
+
+    let theoryHtml = '';
+    chapters.forEach((ch, idx) => {
+        const paragraphs = ch.paragraphs || [];
+
+        // Chapter header stats
+        let chTotalSecs = 0, chPassedTests = 0, chTotalTests = 0, chCounted = 0;
+        paragraphs.forEach(p => {
+            if (typeof p === 'string') p = { id: p, title: p, tests: [] };
+            const prog = progressMap[p.id] || {};
+            const tests = prog.tests || {};
+            chTotalSecs += prog.totalReadingSeconds || 0;
+            const qids = (p.tests || []).map(t => t.quizId).filter(Boolean);
+            chTotalTests  += qids.length;
+            chPassedTests += qids.filter(qid => (tests[qid]?.bestScore || 0) >= 70).length;
+            // "counted" = was read (≥1 session) OR has test attempts
+            if ((prog.readingSessionsCount || 0) > 0 || qids.some(qid => (tests[qid]?.attemptsCount || 0) > 0)) chCounted++;
+        });
+
+        const jugPct = paragraphs.length ? chCounted / paragraphs.length : 0;
+        const jugSvg = buildJugSvg(jugPct);
+        const badges = [
+            chTotalSecs > 0 ? `<div class="ch-badge time"><span class="cb-val">${fmtTime(chTotalSecs)}</span><span class="cb-lbl">время</span></div>` : '',
+            chTotalTests > 0 ? `<div class="ch-badge tests"><span class="cb-val">${chPassedTests}/${chTotalTests}</span><span class="cb-lbl">тестов</span></div>` : '',
+            chCounted > 0 ? `<div class="ch-badge reads"><span class="cb-val">${chCounted}/${paragraphs.length}</span><span class="cb-lbl">изучено</span></div>` : '',
+        ].join('');
+
+        const tableHead = `<div class="para-table-head-row">
+            <div></div>
+            <div style="text-align:left">Параграф</div>
+            <div>Читал</div>
+            <div>Время</div>
+            <div class="pth-lastread">Последнее</div>
+            <div>Усвоение</div>
+            <div>Повторить</div>
+            <div class="pth-rating">Рейтинг</div>
+        </div>`;
+
+        const rowsHtml = paragraphs.map(p => {
+            // Support both object {id,title,tests} and plain string (old API)
+            if (typeof p === 'string') p = { id: p, title: p, tests: [] };
+            const prog       = progressMap[p.id] || {};
+            const tests      = prog.tests || {};
+            const totalSecs  = prog.totalReadingSeconds || 0;
+            const sessions   = prog.readingSessionsCount || 0;
+            const lastReadAt = prog.lastReadAt || null;
+            const srNextDue  = prog.srNextDue  || null;
+
+            // Tests: from p.tests[] (loaded dynamically from server)
+            const qids = (p.tests || []).map(t => t.quizId).filter(Boolean);
+
+            // "wasRead" = paragraph was opened for ≥15s (has reading sessions)
+            const wasRead = sessions > 0;
+
+            // "testDone" = at least one test attempted
+            const testDone = qids.some(qid => (tests[qid]?.attemptsCount || 0) > 0);
+
+            // Mastery = avg bestScore across ALL tests (attempted or not — show 0 for unattempted)
+            // If no tests defined for paragraph — mastery based on reading only
+            const doneQids = qids.filter(qid => (tests[qid]?.attemptsCount || 0) > 0);
+            let mastery = null;
+            if (qids.length === 0) {
+                // No tests — mastery = 100% if read, null if not
+                mastery = wasRead ? 100 : null;
+            } else if (doneQids.length > 0) {
+                // Has tests and at least one attempted
+                mastery = Math.min(100, Math.round(
+                    doneQids.reduce((s, qid) => s + (tests[qid]?.bestScore || 0), 0) / doneQids.length
+                ));
+            } else if (wasRead) {
+                // Read but no tests done yet — show 0%
+                mastery = 0;
+            }
+            const mCls = mastery === null ? 'none' : mastery >= 70 ? 'high' : mastery >= 40 ? 'mid' : 'low';
+
+            const rating = calcRating(p.id);
+            const rCls   = rating === null ? 'none' : rating >= 7 ? 'high' : rating >= 4 ? 'mid' : 'low';
+
+            // Star: gold if test passed ≥70%, silver if read+tested, bronze if just read, grey if untouched
+            const star = testDone && mastery >= 70
+                ? '⭐'
+                : testDone
+                    ? '<span style="color:#94a3b8;font-size:.9rem" title="Тест не сдан">★</span>'
+                    : wasRead
+                        ? '<span style="color:rgba(255,255,255,.4);font-size:.9rem" title="Читал, тест не проходил">★</span>'
+                        : '<span style="color:rgba(255,255,255,.15);font-size:.9rem">★</span>';
+
+            return `<a class="para-row${wasRead ? '' : ' unread'}" href="theory/${ch.id}/${ch.groupId}/${p.id}.html">
+                <div class="pr-star">${star}</div>
+                <div><div class="pr-name">${p.title || p.id}</div></div>
+                <div class="pr-cell" title="${sessions > 0 ? `${sessions} сессий · ${fmtTime(totalSecs)} суммарно` : 'Не читал'}"><strong>${sessions > 0 ? sessions : '—'}</strong></div>
+                <div class="pr-cell" title="${totalSecs > 0 ? `${totalSecs} сек. суммарно` : ''}"><strong>${totalSecs > 0 ? fmtTime(totalSecs) : '—'}</strong></div>
+                <div class="pr-cell pr-lastread">${sessions > 0 ? fmtDate(lastReadAt) : '—'}</div>
+                <div class="pr-cell">
+                    ${mastery !== null
+                        ? `<div class="mastery-wrap">
+                            <div class="mastery-track"><div class="mastery-fill ${mCls}" style="width:${mastery}%"></div></div>
+                            <span class="mastery-val ${mCls}">${mastery}%</span>
+                           </div>`
+                        : '<span style="color:var(--text-tertiary);font-size:.7rem">—</span>'}
+                </div>
+                <div class="pr-cell">${reviewBadge(srNextDue, wasRead)}</div>
+                <div class="pr-cell pr-rating"><span class="ph-rating-val ${rCls}">${rating !== null ? rating.toFixed(1) : '—'}</span></div>
+            </a>`;
+        }).join('');
+
+        theoryHtml += `<div class="chapter-tile glass">
+            ${buildChapterHead(ch, idx, jugSvg, badges)}
+            <div class="chapter-body open">
+                <div class="theory-dash">
+                    ${tableHead}
+                    ${rowsHtml || '<div style="padding:8px 14px;font-size:.8rem;color:var(--text-tertiary)">Нет параграфов</div>'}
+                </div>
+            </div>
+        </div>`;
+    });
+
+    // ── ПРАКТИКА ─────────────────────────────────────────────────────────────
+    let practiceHtml = '';
+    chapters.forEach((ch, idx) => {
+        const paragraphs = ch.paragraphs || [];
+
+        // Collect tests grouped by paragraph
+        const paraTestGroups = [];
+        paragraphs.forEach(p => {
+            if (typeof p === 'string') p = { id: p, title: p, tests: [] };
+            const prog = progressMap[p.id] || {};
+            const tests = prog.tests || {};
+            const pTests = (p.tests || []).filter(t => t?.quizId);
+            if (pTests.length > 0) {
+                paraTestGroups.push({ para: p, tests, pTests, prog });
             }
         });
-        gsap.from('#chapters-list .chapter-block', { opacity:0, x:-16, stagger:.08, duration:.45, delay:.7, ease:'power2.out' });
-    } else {
-        document.getElementById('hero-xp-fill').style.width = xpPct+'%';
-        document.getElementById('pts-counter').textContent = data.totalPoints;
-        ['sc-coins','sc-keys','sc-code','sc-quiz','sc-ach'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = {
-                'sc-coins': coins, 'sc-keys': keys, 'sc-code': codeRuns,
-                'sc-quiz': quizDone, 'sc-ach': achCount
-            }[id];
+
+        if (paraTestGroups.length === 0) return;
+
+        const allChTests = paraTestGroups.flatMap(g => g.pTests.map(t => ({ quizId: t.quizId, tests: g.tests })));
+        const chPassed   = allChTests.filter(t => (t.tests[t.quizId]?.bestScore || 0) >= 70).length;
+        const chAttempts = allChTests.reduce((s, t) => s + (t.tests[t.quizId]?.attemptsCount || 0), 0);
+
+        const badges = [
+            `<div class="ch-badge tests"><span class="cb-val">${chPassed}/${allChTests.length}</span><span class="cb-lbl">сдано</span></div>`,
+            chAttempts > 0 ? `<div class="ch-badge reads"><span class="cb-val">${chAttempts}</span><span class="cb-lbl">попыток</span></div>` : '',
+        ].join('');
+
+        // Build detailed table per paragraph
+        const tableHead = `<div class="pt-head-row">
+            <div style="text-align:left">Тест</div>
+            <div>Попыток</div>
+            <div>Последняя дата</div>
+            <div>Лучший</div>
+            <div>Средний</div>
+            <div>Повторить</div>
+        </div>`;
+
+        let tableRows = '';
+        paraTestGroups.forEach(({ para, tests, pTests, prog }) => {
+            tableRows += `<div class="pt-para-label">${para.title}</div>`;
+            pTests.forEach(t => {
+                const td = tests[t.quizId];
+                const done = td && td.attemptsCount > 0;
+                const pass = done && td.bestScore >= 70;
+                const bestCls = !done ? 'none' : pass ? 'pass' : 'fail';
+                const avgCls  = !done ? 'none' : td.averageScore >= 70 ? 'pass' : 'fail';
+                const lastDate = done && td?.lastAttemptAt ? fmtDate(td.lastAttemptAt) : '—';
+                const srNextDue = prog.srNextDue || null;
+                tableRows += `<div class="pt-test-row${done ? '' : ' pt-not-started'}">
+                    <div class="pt-test-name">${t.title || td?.testTitle || t.quizId}</div>
+                    <div class="pt-cell">${done ? td.attemptsCount : '—'}</div>
+                    <div class="pt-cell">${lastDate}</div>
+                    <div class="pt-cell"><span class="pt-score ${bestCls}">${done ? td.bestScore + '%' : '—'}</span></div>
+                    <div class="pt-cell"><span class="pt-score ${avgCls}">${done ? td.averageScore + '%' : '—'}</span></div>
+                    <div class="pt-cell">${reviewBadge(srNextDue, done)}</div>
+                </div>`;
+            });
         });
-        document.querySelectorAll('.stat-card,.chapter-block').forEach(el => el.style.opacity='1');
-    }
+
+        practiceHtml += `<div class="chapter-tile glass">
+            ${buildChapterHead(ch, idx, '', badges)}
+            <div class="chapter-body open">
+                <div class="pt-wrap">
+                    ${tableHead}
+                    ${tableRows}
+                </div>
+            </div>
+        </div>`;
+    });
+
+    wrap.innerHTML = `
+        <div class="course-tabs">
+            <button class="course-tab active" onclick="switchTab(this,'theory-section')">📖 Теория</button>
+            <button class="course-tab" onclick="switchTab(this,'practice-section')">🧪 Практика</button>
+        </div>
+        <div class="course-section active" id="theory-section">${theoryHtml || '<div class="empty-state" style="padding:var(--space-6)"><p>Нет данных</p></div>'}</div>
+        <div class="course-section" id="practice-section">${practiceHtml || '<div class="empty-state" style="padding:var(--space-6)"><p>Нет тестов</p></div>'}</div>`;
+
+    // Animate bars after DOM is ready
+    requestAnimationFrame(() => {
+        wrap.querySelectorAll('.bar-fill, .score-bar-fill, .sec-mini-fill').forEach(el => {
+            const w = el.style.width;
+            el.style.width = '0';
+            requestAnimationFrame(() => { el.style.width = w; });
+        });
+        if (window.gsap) {
+            gsap.from(wrap.querySelectorAll('.chapter-tile'), { y: 20, opacity: 0, stagger: .07, duration: .45, ease: 'power2.out' });
+        }
+    });
+}
+
+function toggleChapter(head) {
+    const body = head.nextElementSibling;
+    const arrow = head.querySelector('.chapter-tile-arrow');
+    const isOpen = head.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    head.classList.toggle('open', !isOpen);
+    if (arrow) arrow.textContent = isOpen ? '▶' : '▼';
+}
+
+function switchTab(btn, sectionId) {
+    document.querySelectorAll('.course-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.course-section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(sectionId)?.classList.add('active');
 }
 
 function counter(id, target) {
@@ -418,31 +1032,9 @@ function counter(id, target) {
     });
 }
 
-function buildTestRow(title, quizId, chProg, sectionFile) {
-    const t   = chProg?.tests?.[quizId];
-    const tag  = sectionFile ? 'a' : 'div';
-    const href = sectionFile ? ` href="${sectionFile}"` : '';
-    if (t) {
-        const pass = t.bestScore >= 70;
-        return `<${tag} class="test-row"${href}>
-            <div class="test-dot ${pass?'pass':'fail'}">${pass?'✓':'✗'}</div>
-            <div class="test-info">
-                <div class="test-title">${t.testTitle || title}</div>
-                <div class="test-id">${quizId}</div>
-            </div>
-            <div class="test-meta">${t.attempts} попыт. · ${new Date(t.lastAttempt).toLocaleDateString('ru')}</div>
-            <div class="test-score ${pass?'pass':'fail'}">${t.bestScore}%</div>
-        </${tag}>`;
-    }
-    return `<div class="test-row not-started">
-        <div class="test-dot none">○</div>
-        <div class="test-info"><div class="test-title">${title}</div><div class="test-id">${quizId}</div></div>
-        <div class="test-meta">не пройден</div>
-        <div class="test-score" style="color:var(--text-tertiary)">—</div>
-    </div>`;
-}
-
 loadProfile();
 </script>
+    <script src="js/theme.js"></script>
 </body>
 </html>
+

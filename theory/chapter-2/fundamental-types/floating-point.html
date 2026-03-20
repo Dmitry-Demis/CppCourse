@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -13,7 +14,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -23,7 +25,21 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
+    <style>
+        .test-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .test-card { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
+        .test-card__icon { font-size: 1.5rem; }
+        .test-card__title { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent-blue, #89b4fa); }
+        .test-card__desc { font-size: .8rem; color: var(--text-muted, #6c7086); flex: 1; }
+        .btn-quiz-open { margin-top: .4rem; padding: .5rem 1rem; background: var(--accent-blue, #89b4fa); color: #1e1e2e; border: none; border-radius: 6px; font-weight: 600; font-size: .85rem; cursor: pointer; transition: opacity .15s; }
+        .btn-quiz-open:hover { opacity: .85; }
+        .quiz-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+        .quiz-modal-overlay.active { display: flex; }
+        .quiz-modal-box { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 14px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; position: relative; padding: 2rem; }
+        .quiz-modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-muted, #6c7086); font-size: 1.2rem; cursor: pointer; line-height: 1; padding: .25rem .5rem; border-radius: 4px; }
+        .quiz-modal-close:hover { color: var(--text, #cdd6f4); background: var(--surface-2, #181825); }
+    </style>
 </head>
 <body>
 
@@ -77,7 +93,7 @@
                     для корректного кода.
                 </p>
 
-                <!-- ══════════════════════════════════════════════════ -->
+                <!-- ================================================== -->
                 <h2 id="ieee754">1. Стандарт IEEE 754</h2>
 
                 <p>
@@ -139,7 +155,7 @@
                 </div>
 
                 <div class="note-card">
-                    <div class="note-card__title">📌 double — тип по умолчанию</div>
+                    <div class="note-card__title">?? double — тип по умолчанию</div>
                     <p>
                         Литерал <code>3.14</code> без суффикса имеет тип <code>double</code>.
                         Суффикс <code>f</code> делает его <code>float</code>, суффикс <code>L</code> — <code>long double</code>.
@@ -147,7 +163,7 @@
                     </p>
                 </div>
 
-                <!-- ── Точность ── -->
+                <!-- -- Точность -- -->
                 <h2 id="precision">2. Точность и ошибки округления</h2>
 
                 <p>
@@ -183,7 +199,7 @@ int main() {
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Никогда не используйте == для сравнения вещественных чисел</div>
+                    <div class="warning-block__title">? Никогда не используйте == для сравнения вещественных чисел</div>
                     <p>
                         Из-за ошибок округления <code>a == b</code> может вернуть <code>false</code>
                         даже для математически равных значений. Используйте сравнение через эпсилон:
@@ -212,16 +228,16 @@ int main() {
     double a{0.1 + 0.2};
     double b{0.3};
 
-    // ❌ Не делайте так:
+    // ? Не делайте так:
     // if (a == b) ...
 
-    // ✅ Правильно:
+    // ? Правильно:
     if (nearlyEqual(a, b)) { /* равны с точностью до 1e-9 */ }
 }</code></pre>
                     </div>
                 </div>
 
-                <!-- ── Машинный эпсилон ── -->
+                <!-- -- Машинный эпсилон -- -->
                 <h2 id="epsilon">3. Машинный эпсилон и numeric_limits</h2>
 
                 <p>
@@ -232,11 +248,11 @@ int main() {
                 <div class="type-specs">
                     <div class="type-spec">
                         <span class="type-spec-label">float epsilon</span>
-                        <span class="type-spec-value">~1.19 × 10⁻⁷</span>
+                        <span class="type-spec-value">~1.19 ? 10??</span>
                     </div>
                     <div class="type-spec">
                         <span class="type-spec-label">double epsilon</span>
-                        <span class="type-spec-value">~2.22 × 10⁻¹⁶</span>
+                        <span class="type-spec-value">~2.22 ? 10???</span>
                     </div>
                     <div class="type-spec">
                         <span class="type-spec-label">float digits10</span>
@@ -276,7 +292,7 @@ int main() {
                     <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
                 </div>
 
-                <!-- ── Специальные значения ── -->
+                <!-- -- Специальные значения -- -->
                 <h2 id="special-values">4. Специальные значения IEEE 754</h2>
 
                 <div class="table-wrapper">
@@ -287,7 +303,7 @@ int main() {
                         <tbody>
                             <tr><td><code>+Infinity</code></td><td><code>1.0 / 0.0</code></td><td><code>std::isinf(x) &amp;&amp; x&gt;0</code></td></tr>
                             <tr><td><code>-Infinity</code></td><td><code>-1.0 / 0.0</code></td><td><code>std::isinf(x) &amp;&amp; x&lt;0</code></td></tr>
-                            <tr><td><code>NaN</code></td><td><code>0.0/0.0</code>, <code>sqrt(-1)</code></td><td><code>std::isnan(x)</code> — NaN≠NaN!</td></tr>
+                            <tr><td><code>NaN</code></td><td><code>0.0/0.0</code>, <code>sqrt(-1)</code></td><td><code>std::isnan(x)</code> — NaN?NaN!</td></tr>
                             <tr><td><code>-0.0</code></td><td>underflow с отриц. знаком</td><td><code>std::signbit(x)</code></td></tr>
                         </tbody>
                     </table>
@@ -322,7 +338,7 @@ int main() {
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">💡 Когда использовать какой тип</div>
+                    <div class="info-card__title">?? Когда использовать какой тип</div>
                     <p>
                         • <strong>double</strong> — основной выбор; достаточная точность для большинства задач.<br>
                         • <strong>float</strong> — когда важны память или скорость (GPU, большие массивы).<br>
@@ -331,9 +347,22 @@ int main() {
                 </div>
 
                 <!-- Мини-тест -->
-                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
-                <p>10 вопросов по типам с плавающей точкой.</p>
-                <div id="quiz-float"></div>
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="test-cards-grid">
+                    <div class="test-card">
+                        <div class="test-card__icon">??</div>
+                        <div class="test-card__title">float / double</div>
+                        <div class="test-card__desc">10 вопросов: IEEE 754, точность, NaN, Infinity, epsilon, сравнение</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('float-mini', 'Типы с плавающей точкой')">Пройти тест ></button>
+                    </div>
+                </div>
+
+                <div id="quiz-modal-overlay" class="quiz-modal-overlay" onclick="closeQuizModal(event)">
+                    <div class="quiz-modal-box" id="quiz-modal-box">
+                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">?</button>
+                        <div id="quiz-modal-content"></div>
+                    </div>
+                </div>
 
                 <!-- Навигация -->
                 <div class="paragraph-nav">
@@ -345,7 +374,7 @@ int main() {
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -381,15 +410,11 @@ int main() {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof floatingPointQuestions !== 'undefined') {
-            new Quiz('quiz-float', floatingPointQuestions, {
-                quizId: 'float-mini',
-                title: 'Мини-тест: типы с плавающей точкой',
-                type: 'mini'
-            });
-        }
     });
+    // openQuizModal / closeQuizModal provided by quiz.js
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

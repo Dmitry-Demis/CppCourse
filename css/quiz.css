@@ -364,6 +364,15 @@
 }
 .quiz-modal-overlay.active { display: flex; }
 
+/* Blur page content when modal is open */
+body.modal-open .page-wrapper,
+body.modal-open .site-header,
+body.modal-open .site-footer {
+    filter: blur(3px);
+    pointer-events: none;
+    transition: filter .2s;
+}
+
 .quiz-modal-box {
     position: relative;
     background: var(--bg-card, #1e1c3a);

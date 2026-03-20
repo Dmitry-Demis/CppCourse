@@ -1,40 +1,13 @@
 {
-  "course": {
-    "description": "Изучайте C++ от основ до продвинутых концепций с интерактивными примерами и тестами"
-  },
   "chapters": [
     {
       "id": "chapter-1",
-      "title": "Основы C++",
-      "description": "Первые шаги: структура программы, переменные, ввод/вывод, операторы и комментарии"
-    },
-    {
-      "id": "chapter-2",
-      "title": "Фундаментальные типы данных",
-      "description": "Вся система встроенных типов C++: целые, вещественные, символьные, логические, sizeof"
-    },
-    {
-      "id": "chapter-3",
-      "title": "Функции",
-      "description": "Функции в C++: объявление, параметры, возвращаемые значения, перегрузка и современные возможности"
-    },
-    {
-      "id": "chapter-4",
-      "title": "Организация кода",
-      "description": "Разбивка программы на файлы, пространства имён, препроцессор и заголовочные файлы"
-    },
-    {
-      "id": "chapter-5",
-      "title": "Управление потоком",
-      "description": "Условные операторы, ветвление, типичные ошибки с if — основа любой нетривиальной программы"
-    }
-  ],
-  "paragraphs": [
-    {
-      "id": "cpp-basics",
       "number": 1,
-      "chapterId": "chapter-1",
-      "sections": [
+      "groupId": "basics",
+      "title": "Основы C++",
+      "description": "Первые шаги: структура программы, переменные, ввод/вывод, операторы и комментарии",
+      "paragraphs": [
+        "first-program",
         "program-structure",
         "comments",
         "variables-and-types",
@@ -42,93 +15,70 @@
         "iostream",
         "uninitialized-variables",
         "keywords-and-naming",
-        "literals-operators-expressions",
-        "first-program"
-      ],
-      "finalTest": {
-        "quizId": "cpp-basics-final",
-        "questions": 20,
-        "passingScore": 70,
-        "achievement": "Первые шаги в C++"
-      }
+        "literals-operators-expressions"
+      ]
     },
     {
-      "id": "fundamental-types",
-      "number": 1,
-      "chapterId": "chapter-2",
-      "sections": [
+      "id": "chapter-2",
+      "number": 2,
+      "groupId": "fundamental-types",
+      "title": "Фундаментальные типы данных",
+      "description": "Вся система встроенных типов C++: целые, вещественные, символьные, логические, sizeof",
+      "paragraphs": [
         "introduction-to-fundamental-data-types",
         "integer-types",
-        "integer-overflow",
         "signed-unsigned",
+        "integer-overflow",
         "fixed-width-types",
-        "boolean",
         "floating-point",
+        "boolean",
         "character-types",
-        "void",
+        "type-conversion",
         "sizeof-operator",
-        "type-conversion"
-      ],
-      "finalTest": {
-        "quizId": "fundamental-types-final",
-        "questions": 30,
-        "passingScore": 70,
-        "achievement": "Знаток системы типов C++"
-      }
+        "void"
+      ]
     },
     {
-      "id": "functions",
-      "number": 1,
-      "chapterId": "chapter-3",
-      "sections": [
+      "id": "chapter-3",
+      "number": 3,
+      "groupId": "functions",
+      "title": "Функции",
+      "description": "Функции в C++: объявление, параметры, возвращаемые значения, перегрузка",
+      "paragraphs": [
         "introduction-to-functions",
         "function-return-values",
-        "void-functions",
         "function-parameters",
-        "local-scope",
         "forward-declarations",
+        "local-scope",
+        "void-functions",
         "function-design"
-      ],
-      "finalTest": {
-        "quizId": "functions-final",
-        "questions": 20,
-        "passingScore": 70,
-        "achievement": "Мастер функций C++"
-      }
+      ]
     },
     {
-      "id": "code-organization",
-      "number": 1,
-      "chapterId": "chapter-4",
-      "sections": [
+      "id": "chapter-4",
+      "number": 4,
+      "groupId": "code-organization",
+      "title": "Организация кода",
+      "description": "Разбивка программы на файлы, пространства имён, препроцессор и заголовочные файлы",
+      "paragraphs": [
         "multiple-files",
         "namespaces",
         "preprocessor",
         "header-files",
         "header-guards"
-      ],
-      "finalTest": {
-        "quizId": "code-organization-final",
-        "questions": 20,
-        "passingScore": 70,
-        "achievement": "Архитектор C++ проектов"
-      }
+      ]
     },
     {
-      "id": "control-flow",
-      "number": 1,
-      "chapterId": "chapter-5",
-      "sections": [
+      "id": "chapter-5",
+      "number": 5,
+      "groupId": "control-flow",
+      "title": "Управление потоком",
+      "description": "Условные операторы, ветвление, типичные ошибки с if",
+      "paragraphs": [
         "introduction-to-control-flow",
         "if-statements",
         "if-common-problems"
-      ],
-      "finalTest": {
-        "quizId": "control-flow-final",
-        "questions": 15,
-        "passingScore": 70,
-        "achievement": "Мастер ветвления"
-      }
+      ]
     }
   ]
 }

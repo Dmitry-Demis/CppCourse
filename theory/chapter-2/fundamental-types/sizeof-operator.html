@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -19,7 +20,8 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -27,7 +29,7 @@
     <link rel="stylesheet" href="../../../css/quiz.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 </head>
 <body>
 
@@ -82,7 +84,7 @@
                     определения размера типов и объектов <em>на этапе компиляции</em>.
                 </p>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="chto-takoe-sizeof">1. Что такое sizeof</h2>
 
                 <div class="definition" data-label="Определение">
@@ -103,7 +105,7 @@
                     <li><strong>Выражениям</strong>: <code>sizeof(x + y)</code> (выражение не вычисляется!)</li>
                 </ul>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="sintaksis">2. Синтаксис</h2>
 
                 <div class="code-block">
@@ -177,7 +179,7 @@ sizeof(double):     8 байт
 sizeof(long double):16 байт</code></pre>
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="klyuchevye-osobennosti">3. Ключевые особенности</h2>
 
                 <h3>3.1. Размер зависит от платформы</h3>
@@ -194,7 +196,7 @@ sizeof(long double):16 байт</code></pre>
                 </ul>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Портируемость кода</div>
+                    <div class="warning-block__title">? Портируемость кода</div>
                     <p>
                         Никогда не полагайтесь на конкретные размеры типов в переносимом коде!
                         Используйте <code>sizeof</code> для динамического определения размеров или
@@ -300,7 +302,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="prakticheskoe-primenenie">4. Практическое применение</h2>
 
                 <h3>4.1. Определение количества элементов в массиве</h3>
@@ -334,7 +336,7 @@ int main() {
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Массивы и указатели</div>
+                    <div class="warning-block__title">? Массивы и указатели</div>
                     <p>
                         Этот приём работает <strong>только для массивов</strong>, объявленных локально.
                         Если массив передан в функцию как параметр, он «распадается» в указатель, и
@@ -405,7 +407,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="vazhnye-zamechaniya">5. Важные замечания</h2>
 
                 <div class="info-card">
@@ -428,7 +430,7 @@ int main() {
                     unevaluated operand, or a parenthesized type-id.»
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="razmery-tipov">6. Размеры всех фундаментальных типов</h2>
 
                 <p>
@@ -451,13 +453,13 @@ int main() {
                         </thead>
                         <tbody>
                             <tr><td><code>char</code></td><td>1 байт</td><td class="cell-highlight">1 байт</td><td class="cell-range">-127…127</td><td class="cell-range">0…255</td></tr>
-                            <tr><td><code>short</code></td><td>≥ 2 байта</td><td class="cell-highlight">2 байта</td><td class="cell-range">-32 767…32 767</td><td class="cell-range">0…65 535</td></tr>
-                            <tr><td><code>int</code></td><td>≥ 2 байта</td><td class="cell-highlight">4 байта</td><td class="cell-range">-2 147 483 648…2 147 483 647</td><td class="cell-range">0…4 294 967 295</td></tr>
-                            <tr><td><code>long</code></td><td>≥ 4 байта</td><td class="cell-highlight">8 б (Linux) / 4 б (Win)</td><td class="cell-range">платформ.-зависим</td><td class="cell-range">платформ.-зависим</td></tr>
-                            <tr><td><code>long long</code></td><td>≥ 8 байт</td><td class="cell-highlight">8 байт</td><td class="cell-range">-9 223 372 036 854 775 808…max</td><td class="cell-range">0…18 446 744 073 709 551 615</td></tr>
-                            <tr><td><code>float</code></td><td>≥ 4 байта</td><td class="cell-highlight">4 байта</td><td class="cell-range" colspan="2">±3.4×10³⁸ (7 значащих цифр)</td></tr>
-                            <tr><td><code>double</code></td><td>≥ 8 байт</td><td class="cell-highlight">8 байт</td><td class="cell-range" colspan="2">±1.7×10³⁰⁸ (15–16 значащих цифр)</td></tr>
-                            <tr><td><code>long double</code></td><td>≥ sizeof(double)</td><td class="cell-highlight">16 б (Linux) / 8 б (MSVC)</td><td class="cell-range" colspan="2">80-бит расшир. точность (Linux)</td></tr>
+                            <tr><td><code>short</code></td><td>? 2 байта</td><td class="cell-highlight">2 байта</td><td class="cell-range">-32 767…32 767</td><td class="cell-range">0…65 535</td></tr>
+                            <tr><td><code>int</code></td><td>? 2 байта</td><td class="cell-highlight">4 байта</td><td class="cell-range">-2 147 483 648…2 147 483 647</td><td class="cell-range">0…4 294 967 295</td></tr>
+                            <tr><td><code>long</code></td><td>? 4 байта</td><td class="cell-highlight">8 б (Linux) / 4 б (Win)</td><td class="cell-range">платформ.-зависим</td><td class="cell-range">платформ.-зависим</td></tr>
+                            <tr><td><code>long long</code></td><td>? 8 байт</td><td class="cell-highlight">8 байт</td><td class="cell-range">-9 223 372 036 854 775 808…max</td><td class="cell-range">0…18 446 744 073 709 551 615</td></tr>
+                            <tr><td><code>float</code></td><td>? 4 байта</td><td class="cell-highlight">4 байта</td><td class="cell-range" colspan="2">±3.4?10?? (7 значащих цифр)</td></tr>
+                            <tr><td><code>double</code></td><td>? 8 байт</td><td class="cell-highlight">8 байт</td><td class="cell-range" colspan="2">±1.7?10??? (15–16 значащих цифр)</td></tr>
+                            <tr><td><code>long double</code></td><td>? sizeof(double)</td><td class="cell-highlight">16 б (Linux) / 8 б (MSVC)</td><td class="cell-range" colspan="2">80-бит расшир. точность (Linux)</td></tr>
                             <tr><td><code>bool</code></td><td>не менее 1 байта</td><td class="cell-highlight">1 байт</td><td class="cell-range" colspan="2">false (0) / true (1)</td></tr>
                         </tbody>
                     </table>
@@ -500,7 +502,7 @@ int main() {
                     <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="zaklyuchenie">Заключение</h2>
 
                 <p>
@@ -538,5 +540,7 @@ int main() {
         });
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

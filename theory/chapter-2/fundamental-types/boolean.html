@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -8,7 +9,8 @@
     <title>Логический тип bool — Курс C++</title>
     <meta name="description" content="Тип bool в C++: true/false, преобразования, логические операторы, boolalpha, применение в условиях и флагах.">
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -18,7 +20,21 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
+    <style>
+        .test-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .test-card { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
+        .test-card__icon { font-size: 1.5rem; }
+        .test-card__title { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent-blue, #89b4fa); }
+        .test-card__desc { font-size: .8rem; color: var(--text-muted, #6c7086); flex: 1; }
+        .btn-quiz-open { margin-top: .4rem; padding: .5rem 1rem; background: var(--accent-blue, #89b4fa); color: #1e1e2e; border: none; border-radius: 6px; font-weight: 600; font-size: .85rem; cursor: pointer; transition: opacity .15s; }
+        .btn-quiz-open:hover { opacity: .85; }
+        .quiz-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+        .quiz-modal-overlay.active { display: flex; }
+        .quiz-modal-box { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 14px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; position: relative; padding: 2rem; }
+        .quiz-modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-muted, #6c7086); font-size: 1.2rem; cursor: pointer; line-height: 1; padding: .25rem .5rem; border-radius: 4px; }
+        .quiz-modal-close:hover { color: var(--text, #cdd6f4); background: var(--surface-2, #181825); }
+    </style>
 </head>
 <body>
 
@@ -72,7 +88,7 @@
                     предотвращает целый класс трудноуловимых ошибок.
                 </p>
 
-                <!-- ══════════════════════════════════════════════════ -->
+                <!-- ================================================== -->
                 <h2 id="bool-basics">1. Основы типа bool</h2>
 
                 <div class="iso-quote">
@@ -92,11 +108,11 @@
                         <span class="type-spec-value">обычно 1 байт (стандарт не фиксирует)</span>
                     </div>
                     <div class="type-spec">
-                        <span class="type-spec-label">true → int</span>
+                        <span class="type-spec-label">true > int</span>
                         <span class="type-spec-value">1 (гарантировано)</span>
                     </div>
                     <div class="type-spec">
-                        <span class="type-spec-label">false → int</span>
+                        <span class="type-spec-label">false > int</span>
                         <span class="type-spec-value">0 (гарантировано)</span>
                     </div>
                 </div>
@@ -132,26 +148,26 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ── Преобразования ── -->
+                <!-- -- Преобразования -- -->
                 <h2 id="conversions">2. Преобразования в bool и из bool</h2>
 
                 <p>
                     Любой тип неявно преобразуется в <code>bool</code> по правилу:
-                    <strong>нулевое/пустое/нулевой указатель → false, всё остальное → true</strong>.
+                    <strong>нулевое/пустое/нулевой указатель > false, всё остальное > true</strong>.
                 </p>
 
                 <div class="table-wrapper">
                     <table>
                         <thead>
-                            <tr><th>Значение</th><th>→ bool</th><th>Пример</th></tr>
+                            <tr><th>Значение</th><th>> bool</th><th>Пример</th></tr>
                         </thead>
                         <tbody>
                             <tr><td><code>0</code> (int)</td><td><code>false</code></td><td><code>bool b = 0;</code></td></tr>
-                            <tr><td>Любое ненулевое число</td><td><code>true</code></td><td><code>bool b = 42;</code> → <code>true</code></td></tr>
+                            <tr><td>Любое ненулевое число</td><td><code>true</code></td><td><code>bool b = 42;</code> > <code>true</code></td></tr>
                             <tr><td><code>0.0</code> (double)</td><td><code>false</code></td><td><code>bool b = 0.0;</code></td></tr>
                             <tr><td><code>nullptr</code></td><td><code>false</code></td><td><code>bool b = nullptr;</code></td></tr>
                             <tr><td>Ненулевой указатель</td><td><code>true</code></td><td><code>bool b = &x;</code></td></tr>
-                            <tr><td><code>""</code> (пустая строка)</td><td><code>true</code> (!)</td><td>Строковый литерал — это указатель, ≠ nullptr</td></tr>
+                            <tr><td><code>""</code> (пустая строка)</td><td><code>true</code> (!)</td><td>Строковый литерал — это указатель, ? nullptr</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -167,7 +183,7 @@ int main() {
 int main() {
     std::cout &lt;&lt; std::boolalpha;
 
-    // int → bool
+    // int > bool
     bool b1{0};    // false
     bool b2{1};    // true
     bool b3{-42};  // true  (ненулевое!)
@@ -176,11 +192,11 @@ int main() {
     std::cout &lt;&lt; b1 &lt;&lt; ' ' &lt;&lt; b2 &lt;&lt; ' ' &lt;&lt; b3 &lt;&lt; ' ' &lt;&lt; b4 &lt;&lt; '\n';
     // false true true true
 
-    // double → bool
+    // double > bool
     bool b5{0.0};   // false
     bool b6{0.001}; // true
 
-    // Указатель → bool
+    // Указатель > bool
     int x{5};
     bool b7{nullptr}; // false
     bool b8{&x};      // true
@@ -193,7 +209,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ── Логические операторы ── -->
+                <!-- -- Логические операторы -- -->
                 <h2 id="logical-ops">3. Логические операторы</h2>
 
                 <p>
@@ -258,7 +274,7 @@ int main() {
                 </div>
 
                 <div class="note-card">
-                    <div class="note-card__title">📌 Ленивые вычисления (short-circuit evaluation)</div>
+                    <div class="note-card__title">?? Ленивые вычисления (short-circuit evaluation)</div>
                     <p>
                         Оператор <code>&&</code>: если левая часть <code>false</code> — правая <em>не вычисляется</em>.<br>
                         Оператор <code>||</code>: если левая часть <code>true</code> — правая <em>не вычисляется</em>.<br>
@@ -266,7 +282,7 @@ int main() {
                     </p>
                 </div>
 
-                <!-- ── Типичные паттерны ── -->
+                <!-- -- Типичные паттерны -- -->
                 <h2 id="patterns">4. Типичные паттерны использования</h2>
 
                 <div class="code-block">
@@ -312,10 +328,10 @@ int main() {
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">✅ Ключевые выводы</div>
+                    <div class="info-card__title">? Ключевые выводы</div>
                     <p>
                         • <code>bool</code> принимает только <code>true</code> (1) и <code>false</code> (0).<br>
-                        • Любое ненулевое значение → <code>true</code>; ноль и <code>nullptr</code> → <code>false</code>.<br>
+                        • Любое ненулевое значение > <code>true</code>; ноль и <code>nullptr</code> > <code>false</code>.<br>
                         • <code>std::boolalpha</code> переключает вывод на "true"/"false".<br>
                         • Логические операторы <code>&&</code> и <code>||</code> — ленивые: правая часть может не вычисляться.<br>
                         • Результат сравнений (<code>==</code>, <code>&lt;</code> и др.) всегда <code>bool</code>.
@@ -323,9 +339,22 @@ int main() {
                 </div>
 
                 <!-- Мини-тест -->
-                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
-                <p>10 вопросов по типам bool и void.</p>
-                <div id="quiz-bool"></div>
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="test-cards-grid">
+                    <div class="test-card">
+                        <div class="test-card__icon">??</div>
+                        <div class="test-card__title">bool</div>
+                        <div class="test-card__desc">10 вопросов: true/false, преобразования, логические операторы, boolalpha, nullptr</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('bool-mini', 'Тип bool')">Пройти тест ></button>
+                    </div>
+                </div>
+
+                <div id="quiz-modal-overlay" class="quiz-modal-overlay" onclick="closeQuizModal(event)">
+                    <div class="quiz-modal-box" id="quiz-modal-box">
+                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">?</button>
+                        <div id="quiz-modal-content"></div>
+                    </div>
+                </div>
 
                 <!-- Навигация -->
                 <div class="paragraph-nav">
@@ -337,7 +366,7 @@ int main() {
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -373,15 +402,11 @@ int main() {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof boolVoidQuestions !== 'undefined') {
-            new Quiz('quiz-bool', boolVoidQuestions, {
-                quizId: 'bool-mini',
-                title: 'Мини-тест: bool и void',
-                type: 'mini'
-            });
-        }
     });
+    // openQuizModal / closeQuizModal provided by quiz.js
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

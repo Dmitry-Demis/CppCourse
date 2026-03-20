@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -13,7 +14,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -23,7 +25,7 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 
     <style>
         .std-badge--14 { background: #4a3f1a; color: #f9e2af; }
@@ -95,11 +97,11 @@
                     Поведение зависит от того, знаковый тип или беззнаковый — и разница принципиальная.
                 </p>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="signed-overflow">1. Знаковое переполнение — UB</h2>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">🔴 Переполнение signed — неопределённое поведение (Undefined Behaviour)</div>
+                    <div class="warning-block__title">?? Переполнение signed — неопределённое поведение (Undefined Behaviour)</div>
                     <p>
                         Стандарт C++ явно указывает: переполнение <em>знакового</em> целого — это
                         <strong>UB</strong>. Компилятор не обязан ничего делать — он вправе
@@ -115,10 +117,10 @@
 
                 <div class="overflow-visual">
                     <span class="val val--ok">INT_MAX = 2 147 483 647</span>
-                    <span class="arrow">+1 →</span>
+                    <span class="arrow">+1 ></span>
                     <span class="val val--bad">?? (UB)</span>
-                    <span class="arrow">≠</span>
-                    <span class="val val--bad">−2 147 483 648</span>
+                    <span class="arrow">?</span>
+                    <span class="val val--bad">?2 147 483 648</span>
                 </div>
 
                 <div class="code-block">
@@ -133,14 +135,14 @@
 int main() {
     int max{std::numeric_limits&lt;int&gt;::max()};
 
-    // ❌ UB: компилятор может делать что угодно
+    // ? UB: компилятор может делать что угодно
     // int overflow = max + 1;
 
     // Реальный пример: компилятор может УБРАТЬ эту проверку!
     // if (max + 1 > max) — оптимизатор знает, что overflow UB,
-    // значит max + 1 > max всегда "истина" → убирает else ветку
+    // значит max + 1 > max всегда "истина" > убирает else ветку
 
-    // ✅ Безопасно: проверяем ДО операции
+    // ? Безопасно: проверяем ДО операции
     if (max &lt; std::numeric_limits&lt;int&gt;::max()) {
         int result{max + 1};  // теперь безопасно, мы проверили
         std::cout &lt;&lt; result &lt;&lt; '\n';
@@ -153,7 +155,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="unsigned-overflow">2. Беззнаковое переполнение — wrap-around</h2>
 
                 <p>
@@ -164,13 +166,13 @@ int main() {
 
                 <div class="overflow-visual">
                     <span class="val val--ok">UINT_MAX = 4 294 967 295</span>
-                    <span class="arrow">+1 →</span>
+                    <span class="arrow">+1 ></span>
                     <span class="val val--ok">0 (определено!)</span>
                 </div>
 
                 <div class="overflow-visual">
                     <span class="val val--ok">0u</span>
-                    <span class="arrow">−1 →</span>
+                    <span class="arrow">?1 ></span>
                     <span class="val val--ok">4 294 967 295 (определено!)</span>
                 </div>
 
@@ -204,7 +206,7 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="safe-patterns">3. Безопасные паттерны проверки переполнения</h2>
 
                 <h3 id="pre-check">3.1 Проверка перед операцией</h3>
@@ -317,11 +319,11 @@ int main() {
                     <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="compiler-flags">4. Флаги компилятора для обнаружения</h2>
 
                 <div class="info-card">
-                    <div class="info-card__title">🛠 Флаги для поиска переполнений</div>
+                    <div class="info-card__title">?? Флаги для поиска переполнений</div>
                     <ul>
                         <li><code>-fsanitize=signed-integer-overflow</code> — runtime-детектор для signed UB</li>
                         <li><code>-fsanitize=unsigned-integer-overflow</code> — для unsigned wrap-around</li>
@@ -341,7 +343,7 @@ int main() {
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -378,5 +380,7 @@ int main() {
     });
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

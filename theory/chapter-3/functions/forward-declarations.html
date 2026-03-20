@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -8,7 +9,8 @@
     <title>Forward declarations и ODR — Курс C++</title>
     <meta name="description" content="Forward declarations в C++: объявление vs определение, One Definition Rule (ODR), порядок компиляции.">
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -17,7 +19,7 @@
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -95,7 +97,7 @@
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">📌 Объявление vs Определение</div>
+                    <div class="info-card__title">?? Объявление vs Определение</div>
                     <ul>
                         <li><strong>Объявление</strong> — сообщает компилятору об имени и типе. Не генерирует код. Можно повторять.</li>
                         <li><strong>Определение</strong> — содержит тело функции или инициализатор переменной. Генерирует код. Только одно на программу.</li>
@@ -117,7 +119,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -147,5 +149,7 @@
         });
     }
     </script>
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

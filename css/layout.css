@@ -9,10 +9,10 @@
     left: 0;
     right: 0;
     height: var(--header-height);
-    background: rgba(12, 11, 30, 0.75);
+    background: var(--header-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(167,139,250,.15);
+    border-bottom: 1px solid var(--header-border);
     z-index: var(--z-sticky);
     display: flex;
     align-items: center;
@@ -91,9 +91,9 @@
     left: 0;
     bottom: 0;
     width: var(--sidebar-width);
-    background: rgba(17, 15, 42, 0.92);
+    background: var(--sidebar-bg);
     backdrop-filter: blur(8px);
-    border-right: 1px solid rgba(167,139,250,.1);
+    border-right: 1px solid var(--sidebar-border);
     overflow-y: auto;
     padding: var(--space-6) 0;
     z-index: var(--z-base);
@@ -171,7 +171,7 @@
     text-transform: uppercase;
     letter-spacing: 0.12em;
     padding: 0 var(--space-5) var(--space-4);
-    border-bottom: 1px solid rgba(167,139,250,.1);
+    border-bottom: 1px solid var(--sidebar-border);
     margin-bottom: var(--space-2);
 }
 
@@ -287,7 +287,7 @@
 /* Блок главы — визуальный контейнер */
 .sidebar-chapter {
     margin-bottom: var(--space-2);
-    border-bottom: 1px solid rgba(167,139,250,.08);
+    border-bottom: 1px solid var(--sidebar-border);
     padding-bottom: var(--space-3);
 }
 .sidebar-chapter:last-child {
@@ -353,7 +353,7 @@
 }
 .sidebar-para-link.active {
     color: var(--accent-purple);
-    background: rgba(167,139,250,.08);
+    background: var(--accent-purple-dim);
     border-left-color: var(--accent-purple);
 }
 .sidebar-para-link.done { color: var(--accent-green); }
@@ -396,7 +396,7 @@
 }
 .sidebar-section-link:hover {
     color: var(--text-secondary);
-    background: rgba(255,255,255,0.03);
+    background: var(--bg-tertiary);
     border-left-color: var(--border-primary);
     text-decoration: none;
 }

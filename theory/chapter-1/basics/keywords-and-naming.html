@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -7,7 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ключевые слова и именование — Курс C++</title>
     <meta name="description" content="Ключевые слова C++, правила именования идентификаторов, соглашения об именовании, форматирование кода.">
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -16,7 +18,21 @@
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
+    <style>
+        .test-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .test-card { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
+        .test-card__icon { font-size: 1.5rem; }
+        .test-card__title { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent-blue, #89b4fa); }
+        .test-card__desc { font-size: .8rem; color: var(--text-muted, #6c7086); flex: 1; }
+        .btn-quiz-open { margin-top: .4rem; padding: .5rem 1rem; background: var(--accent-blue, #89b4fa); color: #1e1e2e; border: none; border-radius: 6px; font-weight: 600; font-size: .85rem; cursor: pointer; transition: opacity .15s; }
+        .btn-quiz-open:hover { opacity: .85; }
+        .quiz-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+        .quiz-modal-overlay.active { display: flex; }
+        .quiz-modal-box { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 14px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; position: relative; padding: 2rem; }
+        .quiz-modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-muted, #6c7086); font-size: 1.2rem; cursor: pointer; line-height: 1; padding: .25rem .5rem; border-radius: 4px; }
+        .quiz-modal-close:hover { color: var(--text, #cdd6f4); background: var(--surface-2, #181825); }
+    </style>
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -70,7 +86,7 @@
                 </p>
 
                 <div class="info-card">
-                    <div class="info-card__title">📌 Часто встречающиеся ключевые слова</div>
+                    <div class="info-card__title">?? Часто встречающиеся ключевые слова</div>
                     <p style="font-family: monospace; line-height: 2;">
                         <code>int</code> &nbsp; <code>double</code> &nbsp; <code>char</code> &nbsp; <code>bool</code> &nbsp;
                         <code>void</code> &nbsp; <code>return</code> &nbsp; <code>if</code> &nbsp; <code>else</code> &nbsp;
@@ -93,11 +109,11 @@
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">📌 Правила (обязательные)</div>
+                    <div class="info-card__title">?? Правила (обязательные)</div>
                     <ul>
                         <li>Только буквы, цифры и подчёркивание <code>_</code></li>
                         <li>Не может начинаться с цифры</li>
-                        <li>Чувствительно к регистру: <code>value</code> ≠ <code>Value</code></li>
+                        <li>Чувствительно к регистру: <code>value</code> ? <code>Value</code></li>
                         <li>Нельзя использовать ключевые слова</li>
                         <li>Нельзя начинать с <code>_</code> (зарезервировано для компилятора)</li>
                     </ul>
@@ -106,7 +122,7 @@
                 <h2 id="conventions">3. Соглашения об именовании</h2>
 
                 <div class="info-card">
-                    <div class="info-card__title">✅ Рекомендации</div>
+                    <div class="info-card__title">? Рекомендации</div>
                     <ul>
                         <li>Переменные и функции: <code>camelCase</code> или <code>snake_case</code></li>
                         <li>Константы: <code>UPPER_CASE</code> или <code>kConstantName</code></li>
@@ -116,13 +132,30 @@
                     </ul>
                 </div>
 
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="test-cards-grid">
+                    <div class="test-card">
+                        <div class="test-card__icon">??</div>
+                        <div class="test-card__title">keywords-and-naming</div>
+                        <div class="test-card__desc">Тест по теме: ключевые слова C++, правила именования переменных</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('keywords-and-naming', 'Ключевые слова и именование')">Пройти тест ></button>
+                    </div>
+                </div>
+
+                <div id="quiz-modal-overlay" class="quiz-modal-overlay" onclick="closeQuizModal(event)">
+                    <div class="quiz-modal-box" id="quiz-modal-box">
+                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">?</button>
+                        <div id="quiz-modal-content"></div>
+                    </div>
+                </div>
+
                 <div class="paragraph-nav"></div>
             </div>
         </main>
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -153,6 +186,9 @@
             setTimeout(() => btn.textContent = 'Копировать', 2000);
         });
     }
+    // openQuizModal / closeQuizModal provided by quiz.js
     </script>
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

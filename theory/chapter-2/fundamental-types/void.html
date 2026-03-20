@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -9,7 +10,8 @@
     <meta name="description" content="Тип void в C++: пустой тип, void-функции, указатели void*. nullptr и std::nullptr_t — безопасный нулевой указатель C++11.">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -19,7 +21,22 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <style>
+        .int-tests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .int-test-card { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
+        .int-test-card__icon { font-size: 1.5rem; }
+        .int-test-card__title { font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent-blue, #89b4fa); }
+        .int-test-card__desc { font-size: .8rem; color: var(--text-muted, #6c7086); flex: 1; }
+        .btn-quiz-open { margin-top: .4rem; padding: .5rem 1rem; background: var(--accent-blue, #89b4fa); color: #1e1e2e; border: none; border-radius: 6px; font-weight: 600; font-size: .85rem; cursor: pointer; transition: opacity .15s; }
+        .btn-quiz-open:hover { opacity: .85; }
+        .quiz-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+        .quiz-modal-overlay.active { display: flex; }
+        .quiz-modal-box { background: var(--surface, #1e1e2e); border: 1px solid var(--border, #313244); border-radius: 14px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; position: relative; padding: 2rem; }
+        .quiz-modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-muted, #6c7086); font-size: 1.2rem; cursor: pointer; line-height: 1; padding: .25rem .5rem; border-radius: 4px; }
+        .quiz-modal-close:hover { color: var(--text, #cdd6f4); background: var(--surface-2, #181825); }
+    </style>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 </head>
 <body>
 
@@ -75,7 +92,7 @@
                     Несмотря на кажущуюся простоту, они играют ключевую роль в системе типов языка.
                 </p>
 
-                <!-- ══════════════════════════════════════════════════ -->
+                <!-- ================================================== -->
                 <h2 id="void-type">1. Тип void — пустой тип</h2>
 
                 <div class="iso-quote">
@@ -106,14 +123,14 @@
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Что запрещено с void</div>
+                    <div class="warning-block__title">? Что запрещено с void</div>
                     <p>
                         <code>void x;</code> — ошибка компиляции. <code>void arr[10];</code> — ошибка.
                         <code>void&amp; ref = …;</code> — ошибка. Объект типа void не может существовать.
                     </p>
                 </div>
 
-                <!-- ── void функции ── -->
+                <!-- -- void функции -- -->
                 <h2 id="void-functions">2. Функции, возвращающие void</h2>
 
                 <p>
@@ -139,10 +156,10 @@ void greet(const std::string&amp; name) {
 
 // Нельзя использовать результат void-функции
 int main() {
-    greet("Алексей");          // ✅ OK
+    greet("Алексей");          // ? OK
 
-    // int x = greet("Иван"); // ❌ void нельзя присвоить
-    // std::cout &lt;&lt; greet("Иван"); // ❌ тоже нельзя
+    // int x = greet("Иван"); // ? void нельзя присвоить
+    // std::cout &lt;&lt; greet("Иван"); // ? тоже нельзя
 
     return 0;
 }</code></pre>
@@ -150,7 +167,7 @@ int main() {
                 </div>
 
                 <div class="note-card">
-                    <div class="note-card__title">📌 void в шаблонном программировании</div>
+                    <div class="note-card__title">?? void в шаблонном программировании</div>
                     <p>
                         Хотя <code>void</code>-объекты невозможны, тип <code>void</code> активно используется
                         в шаблонном программировании: <code>std::is_void&lt;T&gt;</code>, специализации шаблонов,
@@ -158,7 +175,7 @@ int main() {
                     </p>
                 </div>
 
-                <!-- ── Указатели void* ── -->
+                <!-- -- Указатели void* -- -->
                 <h2 id="void-pointers">3. Указатели на void — универсальный указатель</h2>
 
                 <p>
@@ -168,7 +185,7 @@ int main() {
                 </p>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ void* нельзя разыменовать без явного приведения типа</div>
+                    <div class="warning-block__title">? void* нельзя разыменовать без явного приведения типа</div>
                     <p>
                         Для разыменования указателя нужно знать тип данных. Поскольку <code>void*</code>
                         этой информации не несёт, его нужно привести (<code>static_cast</code> или C-стиль)
@@ -184,7 +201,7 @@ int main() {
                     <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
                 </div>
 
-                <!-- ── nullptr ── -->
+                <!-- -- nullptr -- -->
                 <h2 id="nullptr">4. nullptr и std::nullptr_t</h2>
 
                 <p>
@@ -213,9 +230,9 @@ void func(int x)   { std::cout &lt;&lt; "func(int):  " &lt;&lt; x   &lt;&lt; '\n
 void func(int* p)  { std::cout &lt;&lt; "func(int*): " &lt;&lt; p   &lt;&lt; '\n'; }
 
 int main() {
-    func(0);       // ➡ func(int)  — 0 трактуется как int
-    func(NULL);    // ➡ func(int)  — NULL == 0 на большинстве платформ
-    func(nullptr); // ➡ func(int*) — nullptr — это указатель, не int
+    func(0);       // ? func(int)  — 0 трактуется как int
+    func(NULL);    // ? func(int)  — NULL == 0 на большинстве платформ
+    func(nullptr); // ? func(int*) — nullptr — это указатель, не int
 
     return 0;
 }</code></pre>
@@ -234,12 +251,12 @@ int main() {
                         <span class="type-spec-value">== sizeof(void*)</span>
                     </div>
                     <div class="type-spec">
-                        <span class="type-spec-label">→ bool</span>
+                        <span class="type-spec-label">> bool</span>
                         <span class="type-spec-value">false</span>
                     </div>
                     <div class="type-spec">
-                        <span class="type-spec-label">→ int</span>
-                        <span class="type-spec-value">❌ ошибка</span>
+                        <span class="type-spec-label">> int</span>
+                        <span class="type-spec-value">? ошибка</span>
                     </div>
                 </div>
 
@@ -255,12 +272,12 @@ int main() {
 int main() {
     std::nullptr_t nptr{nullptr};
 
-    // nullptr → любой тип указателя
+    // nullptr > любой тип указателя
     int*    iptr{nullptr};
     double* dptr{nullptr};
     void*   vptr{nullptr};
 
-    // nullptr → bool (false)
+    // nullptr > bool (false)
     if (!nullptr) std::cout &lt;&lt; "nullptr == false\n";
 
     // nullptr сравнивается с указателями
@@ -270,18 +287,18 @@ int main() {
     std::cout &lt;&lt; "sizeof(nullptr_t) = " &lt;&lt; sizeof(std::nullptr_t) &lt;&lt; '\n';
     std::cout &lt;&lt; "sizeof(void*)     = " &lt;&lt; sizeof(void*)           &lt;&lt; '\n';
 
-    // int x = nullptr; // ❌ ошибка компиляции
+    // int x = nullptr; // ? ошибка компиляции
 
     return 0;
 }</code></pre>
                     </div>
                 </div>
 
-                <!-- ── Резюме ── -->
+                <!-- -- Резюме -- -->
                 <h2 id="summary">5. Резюме</h2>
 
                 <div class="info-card">
-                    <div class="info-card__title">✅ Ключевые выводы</div>
+                    <div class="info-card__title">? Ключевые выводы</div>
                     <p>
                         • <strong>void</strong> — неполный тип без значений; объекты <code>void</code> невозможны, но <code>void*</code> и <code>void f()</code> — ключевые конструкции C++.<br>
                         • <strong>void*</strong> — обобщённый указатель; разыменование требует явного приведения типа.<br>
@@ -291,9 +308,23 @@ int main() {
                 </div>
 
                 <!-- Мини-тест -->
-                <div class="quiz-section-title">✎ Мини-тест — проверьте знания</div>
-                <p>10 вопросов по теме «void и nullptr».</p>
-                <div id="quiz-void"></div>
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="int-tests-grid">
+                    <div class="int-test-card">
+                        <div class="int-test-card__icon">??</div>
+                        <div class="int-test-card__title">void и nullptr</div>
+                        <div class="int-test-card__desc">10 вопросов по теме «void и nullptr»</div>
+                        <button class="btn-quiz-open" onclick="openQuizModal('void-mini', 'Тип void и nullptr')">Пройти тест ></button>
+                    </div>
+                </div>
+
+                <!-- Модальное окно теста -->
+                <div id="quiz-modal-overlay" class="quiz-modal-overlay" onclick="closeQuizModal(event)">
+                    <div class="quiz-modal-box" id="quiz-modal-box">
+                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">?</button>
+                        <div id="quiz-modal-content"></div>
+                    </div>
+                </div>
 
                 <!-- Навигация -->
                 <div class="paragraph-nav">
@@ -306,7 +337,7 @@ int main() {
         <!-- Right Sidebar: TOC -->
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav">
                     <!-- toc.js заполнит автоматически -->
                 </nav>
@@ -346,16 +377,11 @@ int main() {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Мини-тест
-        if (typeof boolVoidQuestions !== 'undefined') {
-            new Quiz('quiz-void', boolVoidQuestions, {
-                quizId: 'void-mini',
-                title: 'Мини-тест: void и nullptr',
-                type: 'mini'
-            });
-        }
+        // openQuizModal / closeQuizModal provided by quiz.js
     });
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

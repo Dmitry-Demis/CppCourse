@@ -423,8 +423,19 @@ class ReadingTracker {
     }
 
     _tick() {
+        this._sessionSecs = 0;
+        this._codeWasRun  = false;
+        this._paused      = false;
+
+        // Track code runs during this session
+        const origOnCodeRun = this.gs.onCodeRun.bind(this.gs);
+        this.gs.onCodeRun = () => { this._codeWasRun = true; origOnCodeRun(); };
+
         setInterval(() => {
-            if (!this.active || document.hidden) return;
+            if (!this.active || this._paused || document.hidden || window._quizActive) return;
+            // Session timer
+            this._sessionSecs++;
+
             // Track per-page time
             const pageMins = GS.get(this.pageKey, 0) + (1/60);
             GS.set(this.pageKey, pageMins);
@@ -433,6 +444,53 @@ class ReadingTracker {
             GS.set('gs_read_secs', totalSecs);
             if (totalSecs % 60 === 0) this.gs.onReadMinute();
         }, 1000);
+
+        // Пауза при потере фокуса мыши (курсор ушёл с вкладки)
+        document.addEventListener('mouseleave', () => { this._paused = true; });
+        document.addEventListener('mouseenter', () => { this._paused = false; });
+
+        // Завершить сессию при скрытии вкладки (переключение / закрытие)
+        const sendSession = () => {
+            if (this._sessionSecs < 15) return; // ignore < 15 sec visits
+            const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+            if (!user?.isuNumber) return;
+
+            // paragraphId = filename without extension
+            // e.g. /theory/chapter-1/basics/program-structure.html → "program-structure"
+            const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+            const lastPart = parts[parts.length - 1] || '';
+            const paragraphId = lastPart.replace(/\.html$/, '') || 'unknown';
+
+            const payload = JSON.stringify({
+                paragraphId,
+                timeSpent: this._sessionSecs,
+                codeWasRun: this._codeWasRun
+            });
+
+            this._sessionSecs = 0; // сбрасываем чтобы не отправить дважды
+
+            const url = '/api/reading/complete';
+            const headers = { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber };
+            fetch(url, {
+                method: 'POST',
+                headers,
+                body: payload,
+                keepalive: true
+            }).catch(() => {});
+        };
+
+        // Переключение вкладки — сразу завершаем сессию
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                sendSession();
+                this._paused = true;
+            } else {
+                this._paused = false;
+            }
+        });
+
+        window.addEventListener('pagehide',      sendSession);
+        window.addEventListener('beforeunload',  sendSession);
     }
 }
 

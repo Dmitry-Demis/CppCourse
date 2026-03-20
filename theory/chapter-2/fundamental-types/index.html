@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -7,13 +8,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Глава II — Фундаментальные типы данных — Курс C++</title>
     <meta name="description" content="Введение в фундаментальные типы данных C++. Обзор всех встроенных типов языка.">
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
+    <style>
+        .section-card { position: relative; }
+        .section-card__quiz-btn {
+            position: absolute; top: 50%; right: 2.5rem; transform: translateY(-50%);
+            background: rgba(167,139,250,.15); border: 1px solid rgba(167,139,250,.3);
+            color: #a78bfa; font-size: .72rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 99px; cursor: pointer;
+            white-space: nowrap; transition: background .15s; z-index: 2;
+        }
+        .section-card__quiz-btn:hover { background: rgba(167,139,250,.3); }
+    </style>
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -49,36 +63,32 @@
 
         <main class="main-content">
             <div class="chapter-content">
-
                 <div class="section-badge">Глава II</div>
                 <h1>Фундаментальные типы данных</h1>
-
-                <p>
-                    В программировании <span class="key-term">тип данных</span> определяет, какие значения может хранить переменная
-                    и какие операции можно с ней выполнять. C++ — строго типизированный язык: каждая переменная имеет тип,
-                    известный на этапе компиляции.
-                </p>
-
+                <p>В программировании <span class="key-term">тип данных</span> определяет, какие значения может хранить переменная и какие операции можно с ней выполнять. C++ — строго типизированный язык: каждая переменная имеет тип, известный на этапе компиляции.</p>
+                <div id="avg-reading-time" style="display:none;margin-bottom:1rem;font-size:.85rem;color:var(--text-tertiary)"></div>
                 <div class="chapter-sections" id="sections-grid">
                     <div class="chapter-sections-loading">Загрузка...</div>
                 </div>
-
                 <div class="paragraph-nav"></div>
             </div>
         </main>
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
     </div>
 
-    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
 
     <script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
     <script src="../../../js/gamification.js"></script>
     <script>
     (function () {
@@ -97,25 +107,76 @@
             const res = await fetch('/api/course-structure');
             const data = await res.json();
             const chapter = data.chapters.find(c => c.id === 'chapter-2');
-            if (!chapter) return;
-            let counter = 0;
-            const sections = chapter.paragraphs.flatMap(p => p.sections || []);
-            grid.innerHTML = sections.map(s => {
-                counter++;
-                return `<a href="/${s.file}" class="section-card">
-                    <div class="section-card__number">§2.${counter}</div>
-                    <div class="section-card__body">
-                        <div class="section-card__title">${s.title}</div>
-                        <div class="section-card__desc">${s.description || ''}</div>
+            if (!chapter) {
+                grid.innerHTML = '<p style="color:var(--text-secondary)">Глава не найдена.</p>';
+                return;
+            }
+            const paragraphs = chapter.paragraphs || [];
+            if (!paragraphs.length) {
+                grid.innerHTML = '<p style="color:var(--text-secondary)">Параграфы не найдены.</p>';
+                return;
+            }
+
+            grid.innerHTML = paragraphs.map((p, i) => {
+                const href = `${p.id}.html`;
+                const testCount = (p.tests || []).length;
+                // Star based on mastery
+                const qids = (p.tests || []).map(t => t.quizId).filter(Boolean);
+                const scores = qids.map(qid => {
+                    try { const v = localStorage.getItem(`quiz_best_${qid}`); return v !== null ? JSON.parse(v) : null; } catch { return null; }
+                }).filter(v => v !== null);
+                const mastery = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+
+                let starHtml;
+                if (mastery !== null && mastery >= 75) {
+                    starHtml = '<span style="color:#fde68a;filter:drop-shadow(0 0 4px rgba(253,230,138,.6))">?</span>';
+                } else if (mastery !== null && mastery >= 50) {
+                    starHtml = '<span style="color:#d1d5db">?</span>';
+                } else if (mastery !== null && mastery >= 25) {
+                    starHtml = '<span style="color:#cd7f32">?</span>';
+                } else {
+                    starHtml = '<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:rgba(107,114,128,.2);border-radius:3px;font-size:.6rem;color:rgba(107,114,128,.5)">?</span>';
+                }
+
+                const testBadge = testCount > 0
+                    ? `<span style="position:absolute;top:50%;right:2.5rem;transform:translateY(-50%);background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px;">Итоговый тест по параграфу</span>`
+                    : '';
+                return `<a href="${href}" class="section-card">
+                    <div class="section-card__number" style="display:flex;align-items:center;gap:6px;">
+                        <span style="font-size:.9rem">${starHtml}</span>
+                        §2.${i + 1}
                     </div>
-                    <span class="section-card__arrow">→</span>
+                    <div class="section-card__body">
+                        <div class="section-card__title">${p.title}</div>
+                        ${mastery !== null ? `<div style="font-size:.7rem;color:${mastery >= 75 ? '#fde68a' : mastery >= 50 ? '#d1d5db' : mastery >= 25 ? '#cd7f32' : '#6b7280'};margin-top:2px">${mastery}% освоено</div>` : ''}
+                    </div>
+                    ${testBadge}
+                    <span class="section-card__arrow">></span>
                 </a>`;
             }).join('');
         } catch (e) {
-            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции.</p>';
+            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции: ' + e.message + '</p>';
         }
     }
     buildSectionsGrid();
+
+    // Avg reading time
+    (async function loadAvgReading() {
+        try {
+            const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+            const paragraphId = parts[parts.length - 2] || parts[parts.length - 1];
+            const res = await fetch(`/api/stats/avg-reading/${paragraphId}`);
+            if (!res.ok) return;
+            const { avgSeconds } = await res.json();
+            if (!avgSeconds) return;
+            const mins = Math.floor(avgSeconds / 60);
+            const secs = avgSeconds % 60;
+            const label = mins > 0 ? `${mins} мин${secs > 0 ? ' ' + secs + ' сек' : ''}` : `${secs} сек`;
+            const el = document.getElementById('avg-reading-time');
+            if (el) { el.textContent = `? Среднее время чтения параграфа: ${label}`; el.style.display = 'block'; }
+        } catch {}
+    })();
     </script>
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>

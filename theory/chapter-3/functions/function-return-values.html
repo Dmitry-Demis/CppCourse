@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -8,7 +9,8 @@
     <title>Возвращаемые значения — Курс C++</title>
     <meta name="description" content="Возвращаемые значения функций в C++: return, типы возврата, [[nodiscard]], trailing return type (C++11).">
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -18,7 +20,7 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 
     <style>
         .std-badge {
@@ -75,7 +77,7 @@
                     и возвращать его вызывающему коду. Это делает функции по-настоящему мощным инструментом.
                 </p>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="return-statement">1. Оператор return</h2>
 
                 <p>
@@ -93,7 +95,7 @@
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="return-stops">2. return завершает функцию</h2>
 
                 <p>
@@ -111,7 +113,7 @@
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="return-types">3. Типы возвращаемых значений</h2>
 
                 <p>Функция может возвращать любой тип C++: числа, строки, булевы значения и т.д.</p>
@@ -126,7 +128,7 @@
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="trailing-return">
                     4. Trailing return type
                     <span class="std-badge std-badge--11">C++11</span>
@@ -147,7 +149,7 @@
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="nodiscard">
                     5. [[nodiscard]]
                     <span class="std-badge std-badge--17">C++17</span>
@@ -169,11 +171,11 @@
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="missing-return">6. Забытый return — UB</h2>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">🔴 Отсутствие return в не-void функции — UB</div>
+                    <div class="warning-block__title">?? Отсутствие return в не-void функции — UB</div>
                     <p>
                         Если функция должна вернуть значение, но <code>return</code> не достигается —
                         это <strong>неопределённое поведение</strong>. Включайте <code>-Wall -Wextra</code>
@@ -188,7 +190,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -222,5 +224,7 @@
     }
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

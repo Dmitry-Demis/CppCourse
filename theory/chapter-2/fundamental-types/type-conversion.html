@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -24,7 +25,8 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -32,7 +34,7 @@
     <link rel="stylesheet" href="../../../css/quiz.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 </head>
 <body>
 
@@ -91,7 +93,7 @@
                     и когда использовать <code>static_cast</code>.
                 </p>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="implicit-conversion">1. Неявное преобразование типов</h2>
 
                 <div class="definition" data-label="Определение">
@@ -122,19 +124,19 @@
 
 int main() {
     int i = 42;
-    double d = i;  // int → double (расширяющее преобразование)
+    double d = i;  // int > double (расширяющее преобразование)
     
     std::cout &lt;&lt; "i = " &lt;&lt; i &lt;&lt; '\n';  // 42
     std::cout &lt;&lt; "d = " &lt;&lt; d &lt;&lt; '\n';  // 42.0
     
     // Безопасные расширяющие преобразования:
     short s = 100;
-    int i2 = s;        // short → int ✅
-    long l = i2;       // int → long ✅
-    long long ll = l;  // long → long long ✅
+    int i2 = s;        // short > int ?
+    long l = i2;       // int > long ?
+    long long ll = l;  // long > long long ?
     
     float f = 3.14f;
-    double d2 = f;     // float → double ✅
+    double d2 = f;     // float > double ?
     
     return 0;
 }</code></pre>
@@ -168,14 +170,14 @@ int main() {
 
 int main() {
     double d = 3.14159;
-    int i = d;  // double → int (сужающее преобразование)
+    int i = d;  // double > int (сужающее преобразование)
     
     std::cout &lt;&lt; "d = " &lt;&lt; d &lt;&lt; '\n';  // 3.14159
     std::cout &lt;&lt; "i = " &lt;&lt; i &lt;&lt; '\n';  // 3 (дробная часть отброшена!)
     
     // Опасные сужающие преобразования:
     int big = 100000;
-    short s = big;  // int → short (переполнение!)
+    short s = big;  // int > short (переполнение!)
     
     std::cout &lt;&lt; "big = " &lt;&lt; big &lt;&lt; '\n';  // 100000
     std::cout &lt;&lt; "s = "   &lt;&lt; s   &lt;&lt; '\n';  // -31072 (неопределённое поведение!)
@@ -186,7 +188,7 @@ int main() {
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Опасность сужающих преобразований</div>
+                    <div class="warning-block__title">? Опасность сужающих преобразований</div>
                     <p>
                         Сужающие преобразования могут привести к:
                     </p>
@@ -197,7 +199,7 @@ int main() {
                     </ul>
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="explicit-conversion">2. Явное преобразование типов</h2>
 
                 <p>
@@ -221,7 +223,7 @@ int i = (int)d;  // C-style cast (не рекомендуется в C++)</code>
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠ Не используйте C-style cast в C++</div>
+                    <div class="warning-block__title">? Не используйте C-style cast в C++</div>
                     <p>
                         C-style cast <code>(int)value</code> слишком мощный и может выполнять опасные преобразования
                         (например, <code>reinterpret_cast</code>). В C++ используйте <code>static_cast</code>.
@@ -265,12 +267,12 @@ int i = (int)d;  // C-style cast (не рекомендуется в C++)</code>
                         <pre><code class="language-cpp">#include &lt;iostream&gt;
 
 int main() {
-    // 1. Явное преобразование double → int
+    // 1. Явное преобразование double > int
     double d = 3.14159;
     int i = static_cast&lt;int&gt;(d);
     std::cout &lt;&lt; "d = " &lt;&lt; d &lt;&lt; ", i = " &lt;&lt; i &lt;&lt; '\n';  // d = 3.14159, i = 3
     
-    // 2. Явное преобразование int → double для точного деления
+    // 2. Явное преобразование int > double для точного деления
     int a = 7;
     int b = 2;
     
@@ -280,7 +282,7 @@ int main() {
     std::cout &lt;&lt; "7 / 2 = " &lt;&lt; result1 &lt;&lt; '\n';  // 3
     std::cout &lt;&lt; "7.0 / 2 = " &lt;&lt; result2 &lt;&lt; '\n';  // 3.5
     
-    // 3. Явное преобразование char → int
+    // 3. Явное преобразование char > int
     char ch = 'A';
     int ascii = static_cast&lt;int&gt;(ch);
     std::cout &lt;&lt; "Символ '" &lt;&lt; ch &lt;&lt; "' имеет код " &lt;&lt; ascii &lt;&lt; '\n';  // 65
@@ -292,7 +294,7 @@ int main() {
 
                 <div id="compiler-static-cast"></div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="numeric-promotion">3. Числовые повышения (Numeric promotions)</h2>
 
                 <p>
@@ -315,13 +317,13 @@ int main() {
     short s1 = 10;
     short s2 = 20;
     
-    // short + short → int + int → int
+    // short + short > int + int > int
     auto result = s1 + s2;
     
     std::cout &lt;&lt; "Тип result: " &lt;&lt; typeid(result).name() &lt;&lt; '\n';  // int
     std::cout &lt;&lt; "result = " &lt;&lt; result &lt;&lt; '\n';  // 30
     
-    // Смешанные типы: int + double → double + double → double
+    // Смешанные типы: int + double > double + double > double
     int i = 5;
     double d = 2.5;
     auto result2 = i + d;
@@ -347,7 +349,7 @@ int main() {
                     </p>
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="brace-init">4. Brace-initialization и защита от сужения</h2>
 
                 <p>
@@ -367,18 +369,18 @@ int main() {
 
 int main() {
     // Старый стиль — разрешает сужающие преобразования
-    int i1 = 3.14;  // ✅ компилируется, но теряется точность
+    int i1 = 3.14;  // ? компилируется, но теряется точность
     std::cout &lt;&lt; "i1 = " &lt;&lt; i1 &lt;&lt; '\n';  // 3
     
     // Brace-init — запрещает сужающие преобразования
-    // int i2{3.14};  // ❌ ошибка компиляции: narrowing conversion
+    // int i2{3.14};  // ? ошибка компиляции: narrowing conversion
     
     // Явное преобразование с brace-init
-    int i3{static_cast&lt;int&gt;(3.14)};  // ✅ OK, явно указано
+    int i3{static_cast&lt;int&gt;(3.14)};  // ? OK, явно указано
     std::cout &lt;&lt; "i3 = " &lt;&lt; i3 &lt;&lt; '\n';  // 3
     
     // Переполнение тоже запрещено
-    // short s{100000};  // ❌ ошибка: 100000 не помещается в short
+    // short s{100000};  // ? ошибка: 100000 не помещается в short
     
     return 0;
 }</code></pre>
@@ -393,7 +395,7 @@ int main() {
                     </p>
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="common-pitfalls">5. Частые ошибки</h2>
 
                 <h3>5.1. Целочисленное деление</h3>
@@ -412,11 +414,11 @@ int main() {
     int a = 7;
     int b = 2;
     
-    // ❌ НЕПРАВИЛЬНО: int / int = int
+    // ? НЕПРАВИЛЬНО: int / int = int
     double result1 = a / b;
     std::cout &lt;&lt; "7 / 2 = " &lt;&lt; result1 &lt;&lt; '\n';  // 3.0 (не 3.5!)
     
-    // ✅ ПРАВИЛЬНО: преобразуем хотя бы один операнд в double
+    // ? ПРАВИЛЬНО: преобразуем хотя бы один операнд в double
     double result2 = static_cast&lt;double&gt;(a) / b;
     std::cout &lt;&lt; "7.0 / 2 = " &lt;&lt; result2 &lt;&lt; '\n';  // 3.5
     
@@ -445,12 +447,12 @@ int main() {
 int main() {
     int big = 100000;
     
-    // ❌ Переполнение: 100000 не помещается в short (макс. 32767)
+    // ? Переполнение: 100000 не помещается в short (макс. 32767)
     short s = static_cast&lt;short&gt;(big);
     std::cout &lt;&lt; "big = " &lt;&lt; big &lt;&lt; '\n';  // 100000
     std::cout &lt;&lt; "s = " &lt;&lt; s &lt;&lt; '\n';      // -31072 (неопределённое поведение!)
     
-    // ✅ Проверка перед преобразованием
+    // ? Проверка перед преобразованием
     if (big &lt;= std::numeric_limits&lt;short&gt;::max() &amp;&amp; 
         big &gt;= std::numeric_limits&lt;short&gt;::min()) {
         short safe = static_cast&lt;short&gt;(big);
@@ -464,14 +466,14 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ════════════════════════════════════════════ -->
+                <!-- ============================================ -->
                 <h2 id="summary">Заключение</h2>
 
                 <div class="info-card">
                     <div class="info-card__title">Ключевые моменты</div>
                     <ul style="margin:0;padding-left:var(--space-4);">
                         <li><strong>Неявные преобразования</strong> выполняются автоматически, но могут быть опасны</li>
-                        <li><strong>Расширяющие преобразования</strong> безопасны (short → int → long)</li>
+                        <li><strong>Расширяющие преобразования</strong> безопасны (short > int > long)</li>
                         <li><strong>Сужающие преобразования</strong> могут привести к потере данных</li>
                         <li>Используйте <code>static_cast&lt;T&gt;()</code> для явных преобразований</li>
                         <li>Избегайте C-style cast <code>(int)value</code> в C++</li>
@@ -492,11 +494,11 @@ int main() {
             <!-- Navigation -->
             <nav class="lesson-nav">
                 <a href="sizeof-operator.html" class="lesson-nav__prev">
-                    <span class="lesson-nav__label">← Предыдущий урок</span>
+                    <span class="lesson-nav__label">< Предыдущий урок</span>
                     <span class="lesson-nav__title">Оператор sizeof</span>
                 </a>
                 <a href="../../../index.html" class="lesson-nav__next">
-                    <span class="lesson-nav__label">Следующий урок →</span>
+                    <span class="lesson-nav__label">Следующий урок ></span>
                     <span class="lesson-nav__title">Вернуться к главам</span>
                 </a>
             </nav>
@@ -515,3 +517,4 @@ int main() {
 
 </body>
 </html>
+

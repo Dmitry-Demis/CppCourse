@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -8,7 +9,8 @@
     <title>Локальная область видимости — Курс C++</title>
     <meta name="description" content="Локальные переменные в C++: область видимости, время жизни, shadowing. Почему локальные переменные лучше глобальных.">
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -17,7 +19,7 @@
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -110,7 +112,7 @@
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠️ Глобальные переменные — с осторожностью</div>
+                    <div class="warning-block__title">?? Глобальные переменные — с осторожностью</div>
                     <p>
                         Глобальные переменные доступны из любой функции, что делает программу трудно
                         предсказуемой. Предпочитай передавать данные через параметры и возвращать через
@@ -124,7 +126,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -154,5 +156,7 @@
         });
     }
     </script>
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

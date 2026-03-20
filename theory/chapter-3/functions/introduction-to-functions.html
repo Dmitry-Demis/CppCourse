@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -8,7 +9,8 @@
     <title>Введение в функции — Курс C++</title>
     <meta name="description" content="Что такое функции в C++, зачем они нужны, синтаксис объявления и определения, вызов функций.">
 
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
@@ -18,7 +20,7 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 </head>
 <body>
 
@@ -66,7 +68,7 @@
                     Функции позволяют разбить код на именованные блоки, которые можно вызывать многократно.
                 </p>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="what-is-function">1. Что такое функция</h2>
 
                 <p>
@@ -76,7 +78,7 @@
                 </p>
 
                 <div class="info-card">
-                    <div class="info-card__title">💡 Зачем нужны функции</div>
+                    <div class="info-card__title">?? Зачем нужны функции</div>
                     <ul>
                         <li><strong>Повторное использование</strong> — написал один раз, вызываешь сколько угодно</li>
                         <li><strong>Читаемость</strong> — код разбит на логические блоки с понятными именами</li>
@@ -85,7 +87,7 @@
                     </ul>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="syntax">2. Синтаксис функции</h2>
 
                 <p>Функция состоит из <em>заголовка</em> и <em>тела</em>. Базовый вызов и повторное использование:</p>
@@ -100,7 +102,7 @@
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="nested-calls">3. Вложенные вызовы</h2>
 
                 <p>
@@ -118,7 +120,7 @@
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="definition-vs-declaration">4. Определение и объявление</h2>
 
                 <p>
@@ -148,7 +150,7 @@
                 </div>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">⚠️ Порядок имеет значение</div>
+                    <div class="warning-block__title">?? Порядок имеет значение</div>
                     <p>
                         Компилятор читает файл сверху вниз. Если вызвать функцию до её определения
                         <em>и</em> без объявления — ошибка компиляции. Решения:
@@ -159,11 +161,11 @@
                     </ul>
                 </div>
 
-                <!-- ══════════════════════════════════════════════ -->
+                <!-- ============================================== -->
                 <h2 id="main-is-function">5. main() — тоже функция</h2>
 
                 <div class="info-card">
-                    <div class="info-card__title">📌 Правила для main()</div>
+                    <div class="info-card__title">?? Правила для main()</div>
                     <ul>
                         <li>Должна быть ровно одна функция <code>main()</code> в программе</li>
                         <li>Возвращает <code>int</code> — код завершения для ОС</li>
@@ -179,7 +181,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -213,5 +215,7 @@
     }
     </script>
 
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

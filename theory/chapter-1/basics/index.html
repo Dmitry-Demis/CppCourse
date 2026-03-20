@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
@@ -7,13 +8,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Глава I — Основы C++ — Курс C++</title>
     <meta name="description" content="Первые шаги в C++: структура программы, переменные, ввод/вывод, операторы и выражения.">
-    <link rel="stylesheet" href="../../../css/variables.css">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
+    <style>
+        .section-card { position: relative; }
+        .section-card__quiz-btn {
+            position: absolute; top: 50%; right: 2.5rem; transform: translateY(-50%);
+            background: rgba(167,139,250,.15); border: 1px solid rgba(167,139,250,.3);
+            color: #a78bfa; font-size: .72rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 99px; cursor: pointer;
+            white-space: nowrap; transition: background .15s;
+            z-index: 2;
+        }
+        .section-card__quiz-btn:hover { background: rgba(167,139,250,.3); }
+    </style>
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -52,6 +67,7 @@
                 <div class="section-badge">Глава I</div>
                 <h1>Основы C++</h1>
                 <p>Первые шаги в C++: структура программы, переменные, ввод/вывод, операторы и выражения. Всё, что нужно для написания первых программ.</p>
+                <div id="avg-reading-time" style="display:none;margin-bottom:1rem;font-size:.85rem;color:var(--text-tertiary)"></div>
                 <div class="chapter-sections" id="sections-grid">
                     <div class="chapter-sections-loading">Загрузка...</div>
                 </div>
@@ -61,7 +77,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">📋 Содержание</div>
+                <div class="toc-title">?? Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -71,6 +87,7 @@
 
     <script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
     <script src="../../../js/gamification.js"></script>
     <script>
     (function () {
@@ -89,26 +106,55 @@
             const res = await fetch('/api/course-structure');
             const data = await res.json();
             const chapter = data.chapters.find(c => c.id === 'chapter-1');
-            if (!chapter) return;
+            if (!chapter) {
+                grid.innerHTML = '<p style="color:var(--text-secondary)">Глава не найдена.</p>';
+                return;
+            }
+            const paragraphs = chapter.paragraphs || [];
+            if (!paragraphs.length) {
+                grid.innerHTML = '<p style="color:var(--text-secondary)">Параграфы не найдены (сервер вернул пустой список).</p>';
+                return;
+            }
 
-            let counter = 0;
-            const sections = chapter.paragraphs.flatMap(p => p.sections || []);
-            grid.innerHTML = sections.map(s => {
-                counter++;
-                return `<a href="/${s.file}" class="section-card">
-                    <div class="section-card__number">§1.${counter}</div>
+            grid.innerHTML = paragraphs.map((p, i) => {
+                const href = `${p.id}.html`;
+                const testCount = (p.tests || []).length;
+                const testBadge = testCount > 0
+                    ? `<span style="position:absolute;top:50%;right:2.5rem;transform:translateY(-50%);background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px;">? ${testCount} тест${testCount > 1 ? 'а' : ''}</span>`
+                    : '';
+                return `<a href="${href}" class="section-card">
+                    <div class="section-card__number">§1.${i + 1}</div>
                     <div class="section-card__body">
-                        <div class="section-card__title">${s.title}</div>
-                        <div class="section-card__desc">${s.description || ''}</div>
+                        <div class="section-card__title">${p.title}</div>
                     </div>
-                    <span class="section-card__arrow">→</span>
+                    ${testBadge}
+                    <span class="section-card__arrow">></span>
                 </a>`;
             }).join('');
         } catch (e) {
-            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции.</p>';
+            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции: ' + e.message + '</p>';
         }
     }
     buildSectionsGrid();
+
+    // Avg reading time — derive paragraphId from URL dynamically
+    (async function loadAvgReading() {
+        try {
+            const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+            const paragraphId = parts[parts.length - 2] || parts[parts.length - 1];
+            const res = await fetch(`/api/stats/avg-reading/${paragraphId}`);
+            if (!res.ok) return;
+            const { avgSeconds } = await res.json();
+            if (!avgSeconds) return;
+            const mins = Math.floor(avgSeconds / 60);
+            const secs = avgSeconds % 60;
+            const label = mins > 0 ? `${mins} мин${secs > 0 ? ' ' + secs + ' сек' : ''}` : `${secs} сек`;
+            const el = document.getElementById('avg-reading-time');
+            if (el) { el.textContent = `? Среднее время чтения параграфа: ${label}`; el.style.display = 'block'; }
+        } catch {}
+    })();
     </script>
+    <script src="../../../js/theme.js"></script>
 </body>
 </html>
+

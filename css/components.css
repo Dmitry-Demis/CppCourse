@@ -420,6 +420,7 @@
     border-radius: var(--radius-md);
     text-decoration: none;
     transition: all var(--transition-fast);
+    position: relative;
 }
 
 .section-card:hover {
