@@ -105,55 +105,25 @@
         try {
             const data = await loadCourseStructure('../../../');
             const chapter = data.chapters.find(c => c.id === 'chapter-2');
-            if (!chapter) {
-                grid.innerHTML = '<p style="color:var(--text-secondary)">Глава не найдена.</p>';
-                return;
-            }
+            if (!chapter) { grid.innerHTML = '<p style="color:var(--text-secondary)">Глава не найдена.</p>'; return; }
             const paragraphs = chapter.paragraphs || [];
-            if (!paragraphs.length) {
-                grid.innerHTML = '<p style="color:var(--text-secondary)">Параграфы не найдены.</p>';
-                return;
-            }
+            if (!paragraphs.length) { grid.innerHTML = '<p style="color:var(--text-secondary)">Параграфы не найдены.</p>'; return; }
 
             grid.innerHTML = paragraphs.map((p, i) => {
                 const href = `${p.id}.html`;
                 const testCount = (p.tests || []).length;
-                // Star based on mastery
-                const qids = (p.tests || []).map(t => t.quizId).filter(Boolean);
-                const scores = qids.map(qid => {
-                    try { const v = localStorage.getItem(`quiz_best_${qid}`); return v !== null ? JSON.parse(v) : null; } catch { return null; }
-                }).filter(v => v !== null);
-                const mastery = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
-
-                let starHtml;
-                if (mastery !== null && mastery >= 75) {
-                    starHtml = '<span style="color:#fde68a;filter:drop-shadow(0 0 4px rgba(253,230,138,.6))">?</span>';
-                } else if (mastery !== null && mastery >= 50) {
-                    starHtml = '<span style="color:#d1d5db">?</span>';
-                } else if (mastery !== null && mastery >= 25) {
-                    starHtml = '<span style="color:#cd7f32">?</span>';
-                } else {
-                    starHtml = '<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:rgba(107,114,128,.2);border-radius:3px;font-size:.6rem;color:rgba(107,114,128,.5)">?</span>';
-                }
-
                 const testBadge = testCount > 0
-                    ? `<span style="position:absolute;top:50%;right:2.5rem;transform:translateY(-50%);background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px;">Итоговый тест по параграфу</span>`
+                    ? `<span style="position:absolute;top:50%;right:2.5rem;transform:translateY(-50%);background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px;">${testCount > 1 ? testCount + ' теста' : 'Тест'}</span>`
                     : '';
                 return `<a href="${href}" class="section-card">
-                    <div class="section-card__number" style="display:flex;align-items:center;gap:6px;">
-                        <span style="font-size:.9rem">${starHtml}</span>
-                        §2.${i + 1}
-                    </div>
-                    <div class="section-card__body">
-                        <div class="section-card__title">${p.title}</div>
-                        ${mastery !== null ? `<div style="font-size:.7rem;color:${mastery >= 75 ? '#fde68a' : mastery >= 50 ? '#d1d5db' : mastery >= 25 ? '#cd7f32' : '#6b7280'};margin-top:2px">${mastery}% освоено</div>` : ''}
-                    </div>
+                    <div class="section-card__number">§2.${i + 1}</div>
+                    <div class="section-card__body"><div class="section-card__title">${p.title}</div></div>
                     ${testBadge}
-                    <span class="section-card__arrow">></span>
+                    <span class="section-card__arrow">&rsaquo;</span>
                 </a>`;
             }).join('');
         } catch (e) {
-            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции: ' + e.message + '</p>';
+            grid.innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции: ' + e.message + '</p>';
         }
     }
     buildSectionsGrid();
@@ -161,6 +131,7 @@
     <script src="../../../js/theme.js"></script>
 </body>
 </html>
+
 
 
 
