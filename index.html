@@ -230,7 +230,7 @@
 
             let structure;
             try {
-                const res = await fetch('/api/course-structure');
+                const res = await fetch('course-meta.json');
                 structure = await res.json();
             } catch (e) {
                 grid.innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить структуру курса.</p>';
@@ -246,7 +246,11 @@
 
             structure.chapters.forEach((chapter, ci) => {
                 const color = CARD_COLORS[ci % CARD_COLORS.length];
-                const paragraphs = chapter.paragraphs || [];
+                const rawParagraphs = chapter.paragraphs || [];
+                // Normalize: support both string ids and {id, title, tests} objects
+                const paragraphs = rawParagraphs.map(p =>
+                    typeof p === 'string' ? { id: p, title: p.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), tests: [] } : p
+                );
                 const firstPara = paragraphs[0];
                 const chapterIndex = firstPara
                     ? `theory/${chapter.id}/${chapter.groupId}/${firstPara.id}.html`

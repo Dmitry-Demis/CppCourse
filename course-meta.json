@@ -7,15 +7,15 @@
       "title": "Основы C++",
       "description": "Первые шаги: структура программы, переменные, ввод/вывод, операторы и комментарии",
       "paragraphs": [
-        "first-program",
-        "program-structure",
-        "comments",
-        "variables-and-types",
-        "initialization-and-assignment",
-        "iostream",
-        "uninitialized-variables",
-        "keywords-and-naming",
-        "literals-operators-expressions"
+        { "id": "first-program",                  "title": "Первая программа" },
+        { "id": "program-structure",               "title": "Структура программы" },
+        { "id": "comments",                        "title": "Комментарии" },
+        { "id": "variables-and-types",             "title": "Переменные и типы данных" },
+        { "id": "initialization-and-assignment",   "title": "Инициализация и присваивание" },
+        { "id": "iostream",                        "title": "Ввод и вывод: iostream" },
+        { "id": "uninitialized-variables",         "title": "Неинициализированные переменные и UB" },
+        { "id": "keywords-and-naming",             "title": "Ключевые слова и именование" },
+        { "id": "literals-operators-expressions",  "title": "Литералы, операторы и выражения" }
       ]
     },
     {
@@ -25,17 +25,17 @@
       "title": "Фундаментальные типы данных",
       "description": "Вся система встроенных типов C++: целые, вещественные, символьные, логические, sizeof",
       "paragraphs": [
-        "introduction-to-fundamental-data-types",
-        "integer-types",
-        "signed-unsigned",
-        "integer-overflow",
-        "fixed-width-types",
-        "floating-point",
-        "boolean",
-        "character-types",
-        "type-conversion",
-        "sizeof-operator",
-        "void"
+        { "id": "introduction-to-fundamental-data-types", "title": "Введение в фундаментальные типы данных" },
+        { "id": "integer-types",      "title": "Целочисленные типы" },
+        { "id": "signed-unsigned",    "title": "Знаковые и беззнаковые типы" },
+        { "id": "integer-overflow",   "title": "Переполнение целых чисел" },
+        { "id": "fixed-width-types",  "title": "Типы с фиксированным размером" },
+        { "id": "floating-point",     "title": "Типы с плавающей точкой" },
+        { "id": "boolean",            "title": "Логический тип bool" },
+        { "id": "character-types",    "title": "Символьные типы" },
+        { "id": "type-conversion",    "title": "Преобразование типов и static_cast" },
+        { "id": "sizeof-operator",    "title": "Оператор sizeof" },
+        { "id": "void",               "title": "Тип void и nullptr" }
       ]
     },
     {
@@ -45,13 +45,13 @@
       "title": "Функции",
       "description": "Функции в C++: объявление, параметры, возвращаемые значения, перегрузка",
       "paragraphs": [
-        "introduction-to-functions",
-        "function-return-values",
-        "function-parameters",
-        "forward-declarations",
-        "local-scope",
-        "void-functions",
-        "function-design"
+        { "id": "introduction-to-functions",  "title": "Введение в функции" },
+        { "id": "function-return-values",     "title": "Возвращаемые значения функций" },
+        { "id": "function-parameters",        "title": "Параметры и аргументы функций" },
+        { "id": "forward-declarations",       "title": "Forward declarations и ODR" },
+        { "id": "local-scope",                "title": "Локальная область видимости" },
+        { "id": "void-functions",             "title": "Void-функции" },
+        { "id": "function-design",            "title": "Проектирование функций" }
       ]
     },
     {
@@ -61,11 +61,11 @@
       "title": "Организация кода",
       "description": "Разбивка программы на файлы, пространства имён, препроцессор и заголовочные файлы",
       "paragraphs": [
-        "multiple-files",
-        "namespaces",
-        "preprocessor",
-        "header-files",
-        "header-guards"
+        { "id": "multiple-files",  "title": "Программы из нескольких файлов" },
+        { "id": "namespaces",      "title": "Пространства имён" },
+        { "id": "preprocessor",    "title": "Препроцессор" },
+        { "id": "header-files",    "title": "Заголовочные файлы" },
+        { "id": "header-guards",   "title": "Header guards" }
       ]
     },
     {
@@ -75,9 +75,9 @@
       "title": "Управление потоком",
       "description": "Условные операторы, ветвление, типичные ошибки с if",
       "paragraphs": [
-        "introduction-to-control-flow",
-        "if-statements",
-        "if-common-problems"
+        { "id": "introduction-to-control-flow", "title": "Введение в управление потоком" },
+        { "id": "if-statements",                "title": "Оператор if и блоки" },
+        { "id": "if-common-problems",           "title": "Типичные ошибки с if" }
       ]
     }
   ]
