@@ -97,7 +97,7 @@
                 </p>
 
                 <!-- ============================================== -->
-                <h2 id="signed-overflow">1. Знаковое переполнение — UB</h2>
+                <h2 id="signed-overflow">Знаковое переполнение — UB</h2>
 
                 <div class="warning-block">
                     <div class="warning-block__title">?? Переполнение signed — неопределённое поведение (Undefined Behaviour)</div>
@@ -155,7 +155,7 @@ int main() {
                 </div>
 
                 <!-- ============================================== -->
-                <h2 id="unsigned-overflow">2. Беззнаковое переполнение — wrap-around</h2>
+                <h2 id="unsigned-overflow">Беззнаковое переполнение — wrap-around</h2>
 
                 <p>
                     Для беззнаковых типов переполнение строго <em>определено</em> стандартом:
@@ -206,9 +206,9 @@ int main() {
                 </div>
 
                 <!-- ============================================== -->
-                <h2 id="safe-patterns">3. Безопасные паттерны проверки переполнения</h2>
+                <h2 id="safe-patterns">Безопасные паттерны проверки переполнения</h2>
 
-                <h3 id="pre-check">3.1 Проверка перед операцией</h3>
+                <h3 id="pre-check">Проверка перед операцией</h3>
 
                 <div class="code-block">
                     <div class="code-header">
@@ -242,7 +242,7 @@ int main() {
                     </div>
                 </div>
 
-                <h3 id="builtin-overflow">3.2 Intrinsic-функции GCC/Clang</h3>
+                <h3 id="builtin-overflow">Intrinsic-функции GCC/Clang</h3>
 
                 <p>
                     GCC и Clang предоставляют встроенные функции для атомарной проверки переполнения.
@@ -282,7 +282,7 @@ int main() {
                     </div>
                 </div>
 
-                <h3 id="wide-type">3.3 Расширение через более широкий тип</h3>
+                <h3 id="wide-type">Расширение через более широкий тип</h3>
 
                 <div class="code-block">
                     <div class="code-header">
@@ -319,7 +319,7 @@ int main() {
                 </div>
 
                 <!-- ============================================== -->
-                <h2 id="compiler-flags">4. Флаги компилятора для обнаружения</h2>
+                <h2 id="compiler-flags">Флаги компилятора для обнаружения</h2>
 
                 <div class="info-card">
                     <div class="info-card__title">?? Флаги для поиска переполнений</div>
@@ -352,7 +352,7 @@ int main() {
         <p>Интерактивный курс по языку программирования C++</p>
     </footer>
 
-    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/course.js"></script><script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
     <script src="../../../js/quiz.js"></script>
     <script src="../../../js/compiler.js"></script>
@@ -382,5 +382,8 @@ int main() {
     <script src="../../../js/theme.js"></script>
 </body>
 </html>
+
+
+
 
 

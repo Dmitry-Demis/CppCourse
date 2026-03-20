@@ -172,6 +172,7 @@
 
     <!-- JS -->
     <script src="js/navigation.js"></script>
+    <script src="js/course.js"></script>
     <script src="js/gamification.js"></script>
     <script src="js/code-highlighter.js"></script>
     <script src="js/effects.js"></script>
@@ -230,8 +231,7 @@
 
             let structure;
             try {
-                const res = await fetch('course-meta.json');
-                structure = await res.json();
+                structure = await loadCourseStructure('');
             } catch (e) {
                 grid.innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить структуру курса.</p>';
                 return;
@@ -246,15 +246,8 @@
 
             structure.chapters.forEach((chapter, ci) => {
                 const color = CARD_COLORS[ci % CARD_COLORS.length];
-                const rawParagraphs = chapter.paragraphs || [];
-                // Normalize: support both string ids and {id, title, tests} objects
-                const paragraphs = rawParagraphs.map(p =>
-                    typeof p === 'string' ? { id: p, title: p.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), tests: [] } : p
-                );
-                const firstPara = paragraphs[0];
-                const chapterIndex = firstPara
-                    ? `theory/${chapter.id}/${chapter.groupId}/${firstPara.id}.html`
-                    : '#';
+                const paragraphs = chapter.paragraphs || [];
+                const chapterIndex = `theory/${chapter.id}/${chapter.groupId}/index.html`;
 
                 // Compute per-paragraph mastery from localStorage
                 function paraProgress(p) {

@@ -92,7 +92,7 @@
         <p>Интерактивный курс по языку программирования C++</p>
     </footer>
 
-    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/course.js"></script><script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
     <script src="../../../js/quiz.js"></script>
     <script src="../../../js/gamification.js"></script>
@@ -101,8 +101,7 @@
         const grid = document.getElementById('sections-grid');
         if (!grid) return;
         try {
-            const res = await fetch('/api/course-structure');
-            const data = await res.json();
+            const data = await loadCourseStructure('../../../');
             const chapter = data.chapters.find(c => c.id === 'chapter-3');
             if (!chapter) { grid.innerHTML = '<p style="color:var(--text-secondary)">Глава не найдена.</p>'; return; }
             const paragraphs = chapter.paragraphs || [];
@@ -137,27 +136,14 @@
         }
     }
     buildSectionsGrid();
-
-    // Avg reading time — derive paragraphId from URL dynamically
-    (async function loadAvgReading() {
-        try {
-            const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
-            const paragraphId = parts[parts.length - 2] || parts[parts.length - 1];
-            const res = await fetch(`/api/stats/avg-reading/${paragraphId}`);
-            if (!res.ok) return;
-            const { avgSeconds } = await res.json();
-            if (!avgSeconds) return;
-            const mins = Math.floor(avgSeconds / 60);
-            const secs = avgSeconds % 60;
-            const label = mins > 0 ? `${mins} мин${secs > 0 ? ' ' + secs + ' сек' : ''}` : `${secs} сек`;
-            const el = document.getElementById('avg-reading-time');
-            if (el) { el.textContent = `? Среднее время чтения параграфа: ${label}`; el.style.display = 'block'; }
-        } catch {}
-    })();
     </script>
 
     <script src="../../../js/theme.js"></script>
 </body>
 </html>
+
+
+
+
 
 

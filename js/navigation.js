@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Загружаем structure один раз — используем везде
-    const structure = await loadCourseStructure();
+    const structure = await _loadStructure();
     if (!structure) return;
 
     buildCourseNav(structure);
@@ -54,21 +54,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ------------------------------------------
-// ЗАГРУЗКА course-structure.json (кэш)
+// ЗАГРУЗКА course-structure (кэш)
+// course.js подключён раньше и содержит loadCourseStructure(base)
 // ------------------------------------------
 let _structureCache = null;
 
-async function loadCourseStructure() {
+async function _loadStructure() {
     if (_structureCache) return _structureCache;
-
-    try {
-        const res = await fetch('/api/course-structure');
-        _structureCache = await res.json();
-        return _structureCache;
-    } catch (err) {
-        console.error('Navigation: failed to load course-structure', err);
-        return null;
-    }
+    _structureCache = await loadCourseStructure(_siteRoot);
+    return _structureCache;
 }
 
 // ------------------------------------------
