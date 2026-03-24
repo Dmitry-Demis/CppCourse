@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест — Курс C++</title>
+    <link rel="stylesheet" href="css/variables.css?v=3">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/quiz.css">
+    <link rel="stylesheet" href="css/gamification.css">
+    <link rel="stylesheet" href="css/code-highlight.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    <style>
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        .standalone-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: var(--space-8) var(--space-4);
+            max-width: 760px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .standalone-back {
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--text-secondary);
+            font-size: var(--fs-sm);
+            text-decoration: none;
+            margin-bottom: var(--space-5);
+            transition: color .15s;
+        }
+        .standalone-back:hover { color: var(--text-primary); }
+        #quiz-root { width: 100%; }
+        .quiz-error {
+            text-align: center;
+            padding: var(--space-10);
+            color: var(--text-secondary);
+        }
+        .quiz-error h2 { color: var(--accent-red); margin-bottom: var(--space-3); }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+        </div>
+    </header>
+
+    <div class="standalone-wrap">
+        <a class="standalone-back" id="back-link" href="javascript:history.back()">← Назад</a>
+        <div id="quiz-root"></div>
+    </div>
+
+    <script src="js/quiz.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+    (async function () {
+        const params  = new URLSearchParams(location.search);
+        const quizId  = params.get('id');
+        const backUrl = params.get('back');
+
+        if (backUrl) {
+            const link = document.getElementById('back-link');
+            link.href = decodeURIComponent(backUrl);
+        }
+
+        if (!quizId) {
+            document.getElementById('quiz-root').innerHTML = `
+                <div class="quiz-error">
+                    <h2>Тест не указан</h2>
+                    <p>Добавьте параметр <code>?id=quiz-id</code> в URL.</p>
+                </div>`;
+            return;
+        }
+
+        await QuizLoader.init('quiz-root', `/api/quiz/${quizId}`);
+
+        // Update page title once quiz loads
+        const titleEl = document.querySelector('.quiz-title');
+        if (titleEl) document.title = titleEl.textContent + ' — Курс C++';
+    })();
+    </script>
+</body>
+</html>

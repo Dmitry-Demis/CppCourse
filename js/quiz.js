@@ -4,6 +4,11 @@
 // Интеграция с GameSystem (gamification.js)
 // ============================================
 
+// Утилита: `код` → <code>код</code>
+function quizMd(text) {
+    return String(text).replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
 class Quiz {
     /**
      * @param {string}  containerId  — ID DOM-элемента для рендера
@@ -53,7 +58,7 @@ class Quiz {
 
                 <div class="quiz-body">
                     <div class="quiz-type-badge quiz-type--${q.type}">${this._typeLabel(q.type)}</div>
-                    <div class="quiz-question">${q.question}</div>
+                    <div class="quiz-question">${quizMd(q.question)}</div>
                     ${q.code ? `<pre class="quiz-code"><code class="language-cpp">${this._escape(q.code)}</code></pre>` : ''}
                     <div class="quiz-answers" id="quiz-answers-${this.quizId}">
                         ${this._renderAnswers(q)}
@@ -176,7 +181,7 @@ class Quiz {
         const isRight  = selectedIdx === correct;
         const earned   = isRight ? 10 : 0;
         this.score    += earned;
-        this.answers[this.current] = { selected: selectedIdx, correct, isRight };
+        this.answers[this.current] = { selected: selectedIdx, correct, isRight, qId: q.id };
 
         this.container.querySelectorAll('.quiz-answer').forEach((btn, i) => {
             btn.disabled = true;
@@ -195,7 +200,7 @@ class Quiz {
         const partialOk  = correct.some(i => selectedIndices.includes(i));
         const earned     = allRight ? 10 : partialOk ? 5 : 0;
         this.score      += earned;
-        this.answers[this.current] = { selected: selectedIndices, correct, isRight: allRight };
+        this.answers[this.current] = { selected: selectedIndices, correct, isRight: allRight, qId: q.id };
 
         this.container.querySelectorAll('.quiz-answer').forEach((label, i) => {
             const cb = label.querySelector('.quiz-checkbox');
@@ -213,7 +218,7 @@ class Quiz {
         const isRight  = accepted.some(v => v.toLowerCase() === value.toLowerCase());
         const earned   = isRight ? 10 : 0;
         this.score    += earned;
-        this.answers[this.current] = { selected: value, correct: accepted, isRight };
+        this.answers[this.current] = { selected: value, correct: accepted, isRight, qId: q.id };
 
         const input = document.getElementById(`fill-input-${this.quizId}`);
         if (input) {
@@ -288,15 +293,7 @@ class Quiz {
         // Сохраняем результат
         this._saveResult(pct, passed);
 
-        // Начисляем очки в геймификацию
-        if (passed && window.gameSystem) {
-            const pts = this.type === 'final' ? 30 : 10;
-            window.gameSystem.earnXP(pts, `за ${this.type === 'final' ? 'итоговый' : 'мини'}-тест`);
-            window.gameSystem.earnCoins(pts, `за ${this.type === 'final' ? 'итоговый' : 'мини'}-тест`);
-            if (this.type === 'final') {
-                window.gameSystem.updateQuest('weekly_1');
-            }
-        }
+        // Геймификация обрабатывается на сервере — результат придёт в ответе _saveResult
 
         const correctCount = this.answers.filter(a => a && a.isRight).length;
 
@@ -323,11 +320,26 @@ class Quiz {
                     <div class="rstat"><div class="rstat-v">${this.questions.length}</div><div class="rstat-l">Вопросов</div></div>
                 </div>
                 ${passed && this.type === 'final' ? `<div class="results-achievement">🏆 Достижение разблокировано!</div>` : ''}
+                <div class="results-rewards" id="results-rewards-${this.quizId}" style="display:none;"></div>
                 <div class="results-actions">
                     <button class="btn btn--primary" onclick="location.reload()">Пройти снова</button>
                     <button class="btn btn--secondary" onclick="window.scrollTo({top:0,behavior:'smooth'})">К началу страницы</button>
                 </div>
             </div>`;
+    }
+
+    _showReward(reward) {
+        const el = document.getElementById(`results-rewards-${this.quizId}`);
+        if (!el) return;
+        const statusEmoji = { gold: '🥇', silver: '🥈', bronze: '🥉', passed: '✅', failed: '❌' };
+        const parts = [];
+        if (reward.coinsEarned > 0) parts.push(`🪙 +${reward.coinsEarned} монет`);
+        if (reward.xpEarned > 0)    parts.push(`⭐ +${reward.xpEarned} XP`);
+        if (reward.idealBonus)       parts.push(`⚡ Бонус x1.5 за идеал!`);
+        if (reward.isNewStatus)      parts.push(`${statusEmoji[reward.status] || ''} Новый статус: ${reward.status}`);
+        if (parts.length === 0) return;
+        el.style.display = 'flex';
+        el.innerHTML = parts.map(p => `<span class="reward-badge">${p}</span>`).join('');
     }
 
     _saveResult(pct, passed) {
@@ -374,9 +386,17 @@ class Quiz {
                     correctAnswers:  this.answers.filter(a => a?.isRight).length,
                     totalQuestions:  this.questions.length,
                     wrongQuestionIds: wrongIds,
+                    correctQuestionIds: this.answers
+                        .map((ans, idx) => (ans?.isRight && this.questions[idx]?.id !== undefined) ? this.questions[idx].id : null)
+                        .filter(id => id !== null),
                     timeSpent:       0
                 })
-            }).catch(e => console.error('[Quiz] Failed to save progress:', e));
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data?.reward) this._showReward(data.reward);
+            })
+            .catch(e => console.error('[Quiz] Failed to save progress:', e));
         }
     }
 }
@@ -394,523 +414,14 @@ class FinalQuiz extends Quiz {
     }
 }
 
-// ============================================
-// БАНКИ ВОПРОСОВ — §1 Введение в типы
-// ============================================
-
-/** Мини-тест §1: Введение в фундаментальные типы (10 вопросов) */
-const introTypesQuestions = [
-    {
-        type: 'single',
-        question: 'Что такое фундаментальные типы данных в C++?',
-        answers: [
-            'Типы, определённые пользователем через struct и class',
-            'Встроенные типы языка: целые числа, числа с плавающей точкой, символы, bool',
-            'Типы из стандартной библиотеки std::string, std::vector',
-            'Типы, зависящие от операционной системы'
-        ],
-        correct: 1,
-        explanation: 'Фундаментальные (встроенные) типы — это базовые типы, определённые самим стандартом C++: целочисленные, с плавающей точкой, символьные, bool и void.'
-    },
-    {
-        type: 'single',
-        question: 'Какой оператор позволяет узнать размер типа или переменной в байтах?',
-        answers: ['size()', 'sizeof', 'length()', 'bitcount()'],
-        correct: 1,
-        explanation: 'Оператор sizeof возвращает размер типа или объекта в байтах. Например, sizeof(int) обычно равно 4.'
-    },
-    {
-        type: 'code',
-        question: 'Что выведет этот код?',
-        code: `#include <iostream>
-int main() {
-    std::cout << sizeof(char) << " " << sizeof(bool);
-}`,
-        answers: ['1 1', '1 4', '2 1', '4 1'],
-        correct: 0,
-        explanation: 'char всегда занимает ровно 1 байт (гарантия стандарта). bool также обычно 1 байт, хотя стандарт не фиксирует его размер жёстко.'
-    },
-    {
-        type: 'multiple',
-        question: 'Отметьте ВСЕ фундаментальные типы C++:',
-        answers: ['int', 'std::string', 'double', 'bool', 'std::vector<int>'],
-        correct: [0, 2, 3],
-        explanation: 'int, double и bool — фундаментальные типы. std::string и std::vector — это классы из стандартной библиотеки, не фундаментальные типы.'
-    },
-    {
-        type: 'single',
-        question: 'C++ — это язык со статической или динамической типизацией?',
-        answers: [
-            'Динамической — тип переменной определяется во время выполнения',
-            'Статической — тип переменной известен на этапе компиляции',
-            'Нет типизации — C++ untyped язык',
-            'Смешанной — зависит от компилятора'
-        ],
-        correct: 1,
-        explanation: 'C++ — статически типизированный язык. Тип каждой переменной должен быть известен компилятору во время компиляции. Это позволяет ловить ошибки типов ещё до запуска программы.'
-    },
-    {
-        type: 'fill',
-        question: 'Напишите название модификатора, который делает целочисленный тип беззнаковым (только положительные числа):',
-        correct: ['unsigned'],
-        explanation: 'Ключевое слово unsigned убирает знак и удваивает максимальный диапазон положительных значений. Например, unsigned int хранит от 0 до 4 294 967 295.'
-    },
-    {
-        type: 'single',
-        question: 'Что гарантирует стандарт C++ о размерах целочисленных типов?',
-        answers: [
-            'Точные размеры: short=2 байта, int=4 байта, long=8 байт',
-            'Только минимальные размеры: sizeof(short) ≥ 2, sizeof(int) ≥ 2 и т.д.',
-            'Ничего — размеры полностью определяет компилятор',
-            'Размеры одинаковы на всех платформах'
-        ],
-        correct: 1,
-        explanation: 'Стандарт гарантирует только минимальные размеры: short ≥ 16 бит, int ≥ 16 бит, long ≥ 32 бита, long long ≥ 64 бита. Фактические размеры могут быть больше.'
-    },
-    {
-        type: 'code',
-        question: 'Найдите ошибку в коде:',
-        code: `int x = 3.14;
-std::cout << x;`,
-        answers: [
-            'Ошибки нет, x == 3.14',
-            'Нет ошибки компиляции, но x == 3 (усечение дробной части)',
-            'Ошибка компиляции: нельзя присваивать double переменной int',
-            'Нет ошибки, x == 3.0'
-        ],
-        correct: 1,
-        explanation: 'Это неявное сужающее преобразование (narrowing conversion). Компилятор молча усечёт 3.14 до 3. Код скомпилируется (возможно, с предупреждением), но x будет равен 3.'
-    },
-    {
-        type: 'multiple',
-        question: 'Какие из перечисленных модификаторов применимы к типу int?',
-        answers: ['signed', 'unsigned', 'short', 'long', 'float'],
-        correct: [0, 1, 2, 3],
-        explanation: 'К int применимы: signed/unsigned (знаковость) и short/long (размер). float не является модификатором — это отдельный тип.'
-    },
-    {
-        type: 'single',
-        question: 'Какой заголовочный файл нужно подключить для использования std::numeric_limits?',
-        answers: ['<limits.h>', '<cstdlib>', '<limits>', '<numeric>'],
-        correct: 2,
-        explanation: 'Шаблон std::numeric_limits<T> находится в заголовке <limits>. Он позволяет узнать точные характеристики любого числового типа: минимум, максимум, epsilon и т.д.'
-    }
-];
-
-/** Мини-тест §2: Целочисленные типы — long long (10 вопросов) */
-const longLongQuestions = [
-    {
-        type: 'single',
-        question: 'Какой минимальный гарантированный размер типа long long?',
-        answers: ['32 бита', '48 битов', '64 бита', '128 битов'],
-        correct: 2,
-        explanation: 'Стандарт C++11 гарантирует, что long long имеет размер не менее 64 бит (8 байт).'
-    },
-    {
-        type: 'fill',
-        question: 'Какой суффикс используется для целочисленных литералов типа long long? (например: 100___)',
-        correct: ['LL', 'll'],
-        explanation: 'Суффикс LL (или ll) указывает компилятору, что литерал является типом long long. Например: 9000000000LL'
-    },
-    {
-        type: 'code',
-        question: 'Что выведет программа?',
-        code: `#include <iostream>
-int main() {
-    long long x = 9000000000LL;
-    std::cout << x;
-}`,
-        answers: ['9000000000', 'Ошибка компиляции', 'Переполнение: -1294967296', '0'],
-        correct: 0,
-        explanation: '9 миллиардов помещается в long long (макс. ~9.2×10^18). Программа выводит 9000000000.'
-    },
-    {
-        type: 'single',
-        question: 'Максимальное значение signed long long равно приблизительно:',
-        answers: ['2.1 × 10^9', '4.3 × 10^9', '9.2 × 10^18', '1.8 × 10^19'],
-        correct: 2,
-        explanation: 'Максимум signed long long = 2^63 − 1 ≈ 9.22 × 10^18. Это ~9.2 квинтиллиона.'
-    },
-    {
-        type: 'multiple',
-        question: 'Отметьте корректные объявления переменной long long:',
-        answers: [
-            'long long x = 100LL;',
-            'long long x = 100;',
-            'long long x = 100.0;',
-            'long long int x = 100;'
-        ],
-        correct: [0, 1, 3],
-        explanation: 'Все варианты кроме 100.0 корректны (100.0 — double, потребует явного каста). long long и long long int — это одно и то же.'
-    },
-    {
-        type: 'code',
-        question: 'Что произойдёт при выполнении кода?',
-        code: `int a = 2000000000;
-int b = 2000000000;
-long long result = a + b;
-std::cout << result;`,
-        answers: [
-            '4000000000',
-            '-294967296 (переполнение int происходит ДО расширения до long long)',
-            'Ошибка компиляции',
-            'Неопределённое поведение'
-        ],
-        correct: 1,
-        explanation: 'Сложение a + b выполняется как int + int, что переполняется (UB для signed). Результат не определён стандартом, а на практике часто даёт отрицательное число.'
-    },
-    {
-        type: 'fill',
-        question: 'Напишите имя константы из <climits>, которая хранит максимальное значение long long:',
-        correct: ['LLONG_MAX'],
-        explanation: 'LLONG_MAX определена в <climits> и равна 9 223 372 036 854 775 807. Также доступна через std::numeric_limits<long long>::max().'
-    },
-    {
-        type: 'single',
-        question: 'В каком стандарте C++ был официально введён тип long long?',
-        answers: ['C++98', 'C++03', 'C++11', 'C++14'],
-        correct: 2,
-        explanation: 'long long был де-факто расширением GCC до C++11, но официально стал частью стандарта именно в C++11.'
-    },
-    {
-        type: 'code',
-        question: 'Как корректно посчитать произведение двух int и сохранить в long long?',
-        code: `int a = 100000, b = 100000;
-// Выберите правильный вариант:`,
-        answers: [
-            'long long r = a * b;',
-            'long long r = (long long)a * b;',
-            'long long r = long long(a * b);',
-            'long long r = a * (long long)b;'
-        ],
-        correct: 1,
-        explanation: 'Нужно привести хотя бы один операнд к long long ДО умножения. Варианты Б и Г правильны. Вариант А: умножение идёт как int*int и уже переполняется. Вариант В приводит уже переполненный результат.'
-    },
-    {
-        type: 'multiple',
-        question: 'Какие применения типично требуют long long (а не int)?',
-        answers: [
-            'Хранение размера файла в байтах (до нескольких ГБ)',
-            'Счётчик итераций цикла до 1000',
-            'Временны́е метки Unix в миллисекундах',
-            'Идентификаторы записей в большой базе данных',
-            'Цвет пикселя (0–255)'
-        ],
-        correct: [0, 2, 3],
-        explanation: 'long long нужен, когда значения превышают ~2.1 млрд. Размеры файлов, timestamp в мс (≈1.7×10^12) и большие ID требуют 64-битного типа.'
-    }
-];
-
-/** Мини-тест §3: Типы с плавающей точкой (10 вопросов) */
-const floatingPointQuestions = [
-    {
-        type: 'single',
-        question: 'Какой стандарт описывает представление вещественных чисел в C++?',
-        answers: ['ISO 9899', 'IEEE 754', 'POSIX 1003', 'ISO 14882'],
-        correct: 1,
-        explanation: 'Большинство реализаций C++ используют стандарт IEEE 754 для представления чисел float и double.'
-    },
-    {
-        type: 'single',
-        question: 'Сколько байт занимает тип double?',
-        answers: ['4 байта', '6 байт', '8 байт', '10 байт'],
-        correct: 2,
-        explanation: 'double — 64-битное (8 байт) число с двойной точностью по IEEE 754.'
-    },
-    {
-        type: 'fill',
-        question: 'Какой суффикс обозначает литерал типа float? (например: 3.14___)',
-        correct: ['f', 'F'],
-        explanation: 'Суффикс f или F делает числовой литерал типом float. Без суффикса 3.14 имеет тип double.'
-    },
-    {
-        type: 'code',
-        question: 'Что выведет код?',
-        code: `#include <iostream>
-int main() {
-    float a = 0.1f + 0.2f;
-    std::cout << (a == 0.3f);
-}`,
-        answers: ['1 (true)', '0 (false)', 'Ошибка компиляции', 'Неопределённое поведение'],
-        correct: 1,
-        explanation: '0.1 + 0.2 в двоичном IEEE 754 даёт 0.30000001192..., что не равно 0.3f. Сравнение вещественных чисел через == — типичная ловушка.'
-    },
-    {
-        type: 'multiple',
-        question: 'Какие из следующих значений являются специальными в IEEE 754?',
-        answers: ['NaN (Not a Number)', 'Infinity (бесконечность)', '-0.0', '42.0', 'DBL_MAX + 1'],
-        correct: [0, 1, 2],
-        explanation: 'NaN, ±Infinity и -0.0 — специальные значения IEEE 754. 42.0 — обычное число. DBL_MAX + 1 даёт Inf, но сам DBL_MAX не является специальным.'
-    },
-    {
-        type: 'single',
-        question: 'Что такое «машинный эпсилон» (epsilon)?',
-        answers: [
-            'Минимальное положительное число типа',
-            'Наименьшее x > 0 такое, что 1.0 + x ≠ 1.0',
-            'Разность между max и min значениями типа',
-            'Погрешность любого вычисления'
-        ],
-        correct: 1,
-        explanation: 'Машинный эпсилон — это наименьшее число, которое при сложении с 1.0 даёт результат, отличный от 1.0. Для double ≈ 2.22×10^-16.'
-    },
-    {
-        type: 'code',
-        question: 'Как корректно сравнить два вещественных числа?',
-        code: `double a = 0.1 + 0.2;
-double b = 0.3;
-// Выберите правильный способ сравнения`,
-        answers: [
-            'if (a == b)',
-            'if (std::abs(a - b) < 1e-9)',
-            'if (a - b == 0)',
-            'if ((int)a == (int)b)'
-        ],
-        correct: 1,
-        explanation: 'Вещественные числа нужно сравнивать через абсолютную (или относительную) погрешность: |a - b| < epsilon. Прямое сравнение == ненадёжно из-за ошибок округления.'
-    },
-    {
-        type: 'single',
-        question: 'Чему равно sizeof(float) согласно стандарту C++?',
-        answers: [
-            'Всегда 4',
-            'Не определено стандартом, но sizeof(float) ≤ sizeof(double)',
-            'Зависит только от компилятора',
-            'Всегда 8'
-        ],
-        correct: 1,
-        explanation: 'Стандарт не фиксирует точный размер float, но требует sizeof(float) ≤ sizeof(double) ≤ sizeof(long double). На практике float = 4 байта.'
-    },
-    {
-        type: 'fill',
-        question: 'Напишите результат деления 1.0 / 0.0 в C++ (не исключение, а особое значение):',
-        correct: ['inf', 'Inf', 'infinity', '+inf'],
-        explanation: 'Деление ненулевого числа на 0.0 в IEEE 754 даёт +Infinity (inf). Это не исключение и не UB для типов с плавающей точкой.'
-    },
-    {
-        type: 'multiple',
-        question: 'Отметьте верные утверждения о long double:',
-        answers: [
-            'sizeof(long double) >= sizeof(double)',
-            'На x86 Windows long double == double (8 байт)',
-            'long double всегда 16 байт',
-            'На Linux x86-64 long double обычно 10 байт (80-битный формат)'
-        ],
-        correct: [0, 1, 3],
-        explanation: 'long double ≥ double по стандарту. На Windows MSVC long double == double = 8 байт. На Linux/GCC x86-64 — 80-битный расширенный формат (10 байт, выровненный до 12 или 16).'
-    }
-];
-
-/** Мини-тест §4: Символьные типы (10 вопросов) */
-const characterTypesQuestions = [
-    {
-        type: 'single',
-        question: 'Чему равно sizeof(char) по стандарту C++?',
-        answers: ['Зависит от платформы', 'Всегда 1', 'Обычно 2 для Unicode', '4 в C++20'],
-        correct: 1,
-        explanation: 'sizeof(char) == 1 — это единственный тип, размер которого жёстко зафиксирован стандартом.'
-    },
-    {
-        type: 'code',
-        question: 'Что выведет код?',
-        code: `#include <iostream>
-int main() {
-    char c = 'A';
-    std::cout << (int)c;
-}`,
-        answers: ['A', '65', '1', 'Ошибка компиляции'],
-        correct: 1,
-        explanation: "Символ 'A' имеет ASCII-код 65. Приведение к int выводит числовое значение символа."
-    },
-    {
-        type: 'fill',
-        question: 'Какой escape-последовательностью обозначается символ новой строки?',
-        correct: ['\\n', '\n'],
-        explanation: "Символ '\\n' — это escape-последовательность для LF (Line Feed, код 10). Он переводит курсор на новую строку."
-    },
-    {
-        type: 'single',
-        question: 'Является ли тип char знаковым или беззнаковым?',
-        answers: [
-            'Всегда знаковый (signed)',
-            'Всегда беззнаковый (unsigned)',
-            'Определяется реализацией (implementation-defined)',
-            'Беззнаковый на little-endian системах'
-        ],
-        correct: 2,
-        explanation: 'Знаковость обычного char не определена стандартом — это зависит от компилятора и платформы. Для надёжности используйте явно signed char или unsigned char.'
-    },
-    {
-        type: 'multiple',
-        question: 'Какие типы символов введены в C++11 для Unicode?',
-        answers: ['wchar_t', 'char16_t', 'char32_t', 'uchar_t', 'unicode_t'],
-        correct: [1, 2],
-        explanation: 'char16_t (UTF-16) и char32_t (UTF-32) введены в C++11. wchar_t существовал раньше. uchar_t и unicode_t не существуют.'
-    },
-    {
-        type: 'code',
-        question: 'Что выведет код?',
-        code: `#include <iostream>
-int main() {
-    char a = 'a', z = 'z';
-    std::cout << (z - a);
-}`,
-        answers: ['25', '26', '1', 'Ошибка'],
-        correct: 0,
-        explanation: "ASCII-код 'z' = 122, 'a' = 97. Разница = 122 - 97 = 25. Это число букв между a и z (не включая a)."
-    },
-    {
-        type: 'single',
-        question: 'Для чего предназначен тип char8_t (C++20)?',
-        answers: [
-            'Хранение 8-битных целых чисел',
-            'Хранение UTF-8 кодовых единиц с явной семантикой',
-            'Замена unsigned char в низкоуровневом коде',
-            'Хранение символов китайского алфавита'
-        ],
-        correct: 1,
-        explanation: 'char8_t введён в C++20 для явного обозначения UTF-8 кодовых единиц. Это устраняет неоднозначность: обычный char может быть signed/unsigned, а char8_t — всегда беззнаковый и семантически — UTF-8.'
-    },
-    {
-        type: 'fill',
-        question: 'Напишите escape-последовательность для символа табуляции:',
-        correct: ['\\t', '\t'],
-        explanation: "'\\t' — горизонтальная табуляция (HT, код 9). Используется для отступов в тексте."
-    },
-    {
-        type: 'single',
-        question: 'Какой размер имеет wchar_t на Windows (MSVC)?',
-        answers: ['1 байт', '2 байта (UTF-16)', '4 байта (UTF-32)', 'Зависит от настроек'],
-        correct: 1,
-        explanation: 'На Windows wchar_t = 2 байта (UTF-16LE). На Linux/GCC = 4 байта (UTF-32). Это ключевое отличие, делающее wchar_t непортабельным.'
-    },
-    {
-        type: 'multiple',
-        question: 'Какие escape-последовательности корректны в C++?',
-        answers: ["'\\n' — новая строка", "'\\0' — нулевой символ", "'\\r' — возврат каретки", "'\\e' — Escape (ASCII 27)", "'\\q' — двойные кавычки"],
-        correct: [0, 1, 2],
-        explanation: "'\\n', '\\0', '\\r' — стандартные escape-последовательности C++. '\\e' не является стандартной (только GCC-расширение). Для двойных кавычек используется '\\\"', а не '\\q'."
-    }
-];
-
-/** Мини-тест §5: bool и void (10 вопросов) */
-const boolVoidQuestions = [
-    {
-        type: 'single',
-        question: 'Какое числовое значение соответствует true при преобразовании bool → int?',
-        answers: ['0', '1', '-1', 'Зависит от компилятора'],
-        correct: 1,
-        explanation: 'В C++ true всегда преобразуется в 1, false — в 0. Это гарантировано стандартом.'
-    },
-    {
-        type: 'code',
-        question: 'Что выведет программа?',
-        code: `#include <iostream>
-int main() {
-    bool b = 42;
-    std::cout << b;
-}`,
-        answers: ['42', '1', '0', 'Ошибка компиляции'],
-        correct: 1,
-        explanation: 'Любое ненулевое число при преобразовании в bool даёт true, которое при выводе через cout отображается как 1.'
-    },
-    {
-        type: 'fill',
-        question: 'Напишите манипулятор потока для вывода "true"/"false" вместо 1/0:',
-        correct: ['boolalpha', 'std::boolalpha'],
-        explanation: 'std::boolalpha заставляет cout выводить bool как "true" или "false". Отменяется через std::noboolalpha.'
-    },
-    {
-        type: 'single',
-        question: 'Что означает тип возврата void у функции?',
-        answers: [
-            'Функция возвращает нулевое значение',
-            'Функция не возвращает никакого значения',
-            'Функция возвращает указатель',
-            'Функция может вернуть любой тип'
-        ],
-        correct: 1,
-        explanation: 'void означает отсутствие значения. Функция с void в качестве типа возврата не должна содержать return с выражением (или return вообще).'
-    },
-    {
-        type: 'multiple',
-        question: 'Какие выражения имеют тип bool в C++?',
-        answers: [
-            'x > 0 (сравнение)',
-            'x && y (логическое И)',
-            'x + y (сложение двух int)',
-            '!flag (логическое НЕ)',
-            '"hello" (строковый литерал)'
-        ],
-        correct: [0, 1, 3],
-        explanation: 'Операторы сравнения (>, <, ==, !=), логические операторы (&&, ||, !) возвращают bool. Арифметические операции и строковые литералы не дают bool напрямую.'
-    },
-    {
-        type: 'single',
-        question: 'Что такое void* (указатель на void)?',
-        answers: [
-            'Нулевой указатель',
-            'Указатель, который не может ни на что указывать',
-            'Указатель на объект произвольного типа (обобщённый указатель)',
-            'Указатель на void-функцию'
-        ],
-        correct: 2,
-        explanation: 'void* — обобщённый указатель, который может хранить адрес объекта любого типа. Для его разыменования нужен явный каст к конкретному типу.'
-    },
-    {
-        type: 'code',
-        question: 'Что выведет код?',
-        code: `#include <iostream>
-int main() {
-    bool x = true, y = false;
-    std::cout << (x + y) << " " << (x * 5);
-}`,
-        answers: ['true false', '1 5', '1 true', 'Ошибка компиляции'],
-        correct: 1,
-        explanation: 'true преобразуется в 1, false в 0. true + false = 1 + 0 = 1. true * 5 = 1 * 5 = 5. Вывод: "1 5".'
-    },
-    {
-        type: 'single',
-        question: 'Что такое nullptr в C++11?',
-        answers: [
-            'Макрос, равный (void*)0',
-            'Целочисленная константа 0',
-            'Литерал типа std::nullptr_t, не приводимый к int',
-            'Псевдоним для NULL'
-        ],
-        correct: 2,
-        explanation: 'nullptr — типизированный нулевой указатель. Его тип — std::nullptr_t. В отличие от NULL (= 0), nullptr не приводится неявно к int, что предотвращает ошибки перегрузки.'
-    },
-    {
-        type: 'fill',
-        question: 'Напишите ключевое слово C++11 для нулевого указателя (вместо NULL):',
-        correct: ['nullptr'],
-        explanation: 'nullptr — предпочтительная замена NULL в современном C++. Он имеет собственный тип nullptr_t и не вызывает путаницы при перегрузке функций.'
-    },
-    {
-        type: 'multiple',
-        question: 'Что из перечисленного является некорректным (вызовет ошибку компиляции)?',
-        answers: [
-            'void* p = nullptr;',
-            'int x = nullptr;',
-            'bool b = nullptr;',
-            'void* p = (void*)0;',
-            'if (nullptr) {}'
-        ],
-        correct: [1, 2],
-        explanation: 'nullptr нельзя присвоить типу int (в отличие от NULL). bool b = nullptr тоже ошибка. void* p = nullptr и (void*)0 корректны. if(nullptr) — ложное условие, компилируется.'
-    }
-];
-
-// ============================================
 // QUIZ LOADER — загрузка тестов из JSON-файлов
 // ============================================
 
 const QuizLoader = {
     /**
-     * Загружает JSON-тест с сервера и инициализирует Quiz.
+     * Загружает тест с сервера и инициализирует Quiz.
      * @param {string} containerId  — ID DOM-элемента
-     * @param {string} jsonPath     — путь вида '/api/tests/chapter-1/basics/program-structure.json'
+     * @param {string} jsonPath     — путь к API, например '/api/quiz/comments'
      */
     async init(containerId, jsonPath) {
         const container = document.getElementById(containerId);
@@ -967,12 +478,34 @@ const QuizLoader = {
     },
 
     /**
-     * Добавляет к вопросам метаданные для отслеживания ошибок.
+     * Добавляет метаданные и перемешивает варианты ответов.
+     * Для single/code/multiple пересчитывает индекс(ы) correct после перемешивания.
      */
     _wrapQuestions(questions, quizId) {
-        // Патчим Quiz._saveResult чтобы сохранить неправильные вопросы
-        // Делаем это через кастомный атрибут на вопросах
-        return questions.map(q => ({ ...q, _quizId: quizId }));
+        return questions.map(q => {
+            const out = { ...q, _quizId: quizId };
+
+            // Перемешиваем ответы только для типов с вариантами
+            if ((q.type === 'single' || q.type === 'code' || q.type === 'multiple') && Array.isArray(q.answers)) {
+                // Создаём пары [текст, оригинальный_индекс]
+                const indexed = q.answers.map((a, i) => ({ a, i }));
+                QuizLoader._shuffle(indexed);
+
+                out.answers = indexed.map(x => x.a);
+
+                // Строим карту: старый индекс → новый
+                const remap = {};
+                indexed.forEach((x, newIdx) => { remap[x.i] = newIdx; });
+
+                if (q.type === 'multiple') {
+                    out.correct = q.correct.map(c => remap[c]);
+                } else {
+                    out.correct = remap[q.correct];
+                }
+            }
+
+            return out;
+        });
     },
 
     _shuffle(arr) {
@@ -1024,6 +557,24 @@ Quiz.prototype._saveResult = function(pct, passed) {
  * Если их нет — создаёт автоматически.
  */
 window.openQuizModal = async function(quizId, title) {
+    // Fetch first — don't open modal if load fails
+    let data;
+    try {
+        const res = await fetch(`/api/quiz/${quizId}`);
+        if (!res.ok) throw new Error('not found');
+        data = await res.json();
+    } catch {
+        // Show inline error without opening modal
+        const btn = document.querySelector(`[onclick*="openQuizModal('${quizId}'"]`);
+        if (btn) {
+            const orig = btn.textContent;
+            btn.textContent = '❌ Тест недоступен';
+            btn.disabled = true;
+            setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+        }
+        return;
+    }
+
     let overlay = document.getElementById('quiz-modal-overlay');
     if (!overlay) {
         overlay = document.createElement('div');
@@ -1035,23 +586,13 @@ window.openQuizModal = async function(quizId, title) {
                 <div id="quiz-modal-content"></div>
             </div>`;
         document.body.appendChild(overlay);
-        // No backdrop-click close — only X button closes the modal
     }
 
     const content = document.getElementById('quiz-modal-content');
-    content.innerHTML = '<div class="quiz-modal-loading">Загрузка теста…</div>';
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
     document.body.classList.add('modal-open');
-
-    try {
-        const res = await fetch(`/api/quiz/${quizId}`);
-        if (!res.ok) throw new Error('not found');
-        const data = await res.json();
-        window._activeModalQuiz = new ModalQuiz(content, data);
-    } catch {
-        content.innerHTML = '<div class="quiz-modal-loading" style="color:var(--accent-red)">❌ Не удалось загрузить тест.</div>';
-    }
+    window._activeModalQuiz = new ModalQuiz(content, data);
 };
 
 window.closeQuizModal = function(e) {
@@ -1072,7 +613,7 @@ document.addEventListener('keydown', e => {
 class ModalQuiz {
     constructor(container, data) {
         this.container    = container;
-        this.quizId       = data.quizId;
+        this.quizId       = data.quizId || data.id;
         this.title        = data.title;
         this.passingScore = data.passingScore ?? 70;
         this.questions    = this._shuffle(ModalQuiz._pickQuestions(data));
@@ -1100,7 +641,25 @@ class ModalQuiz {
             return a;
         };
 
-        return [...shuffle(wrong), ...shuffle(rest)].slice(0, pick);
+        const selected = [...shuffle(wrong), ...shuffle(rest)].slice(0, pick);
+
+        // Перемешиваем варианты ответов и пересчитываем correct
+        return selected.map(q => {
+            if ((q.type === 'single' || q.type === 'code' || q.type === 'multiple') && Array.isArray(q.answers)) {
+                const indexed = q.answers.map((a, i) => ({ a, i }));
+                shuffle(indexed);
+                const remap = {};
+                indexed.forEach((x, ni) => { remap[x.i] = ni; });
+                return {
+                    ...q,
+                    answers: indexed.map(x => x.a),
+                    correct: q.type === 'multiple'
+                        ? q.correct.map(c => remap[c])
+                        : remap[q.correct]
+                };
+            }
+            return q;
+        });
     }
 
     _render() {
@@ -1258,7 +817,6 @@ class ModalQuiz {
         const correct = Object.values(this.answers).filter(a => a.ok).length;
 
         this._saveProgress(pct, passed);
-        if (window.gameSystem) window.gameSystem.earnXP(passed ? 30 : 0, 'за тест');
 
         this.container.innerHTML = `
             <div class="qm-results">
@@ -1281,6 +839,7 @@ class ModalQuiz {
                     <div><div class="qm-stat-v">${correct}</div><div class="qm-stat-l">Правильных</div></div>
                     <div><div class="qm-stat-v">${this.questions.length}</div><div class="qm-stat-l">Вопросов</div></div>
                 </div>
+                <div class="qm-rewards" id="qm-rewards-${this.quizId}" style="display:none;"></div>
                 <div class="qm-results-actions">
                     <button class="btn-qm btn-qm--check" onclick="openQuizModal('${this.quizId}','${this.title.replace(/'/g,"\\'")}')">Пройти снова</button>
                     <button class="btn-qm btn-qm--next" onclick="closeQuizModal(null)">Закрыть</button>
@@ -1326,9 +885,31 @@ class ModalQuiz {
                 correctAnswers:  Object.values(this.answers).filter(a => a.ok).length,
                 totalQuestions:  this.questions.length,
                 wrongQuestionIds: wrongIds,
+                correctQuestionIds: Object.values(this.answers)
+                    .filter(a => a.ok && a.qId !== undefined)
+                    .map(a => a.qId),
                 timeSpent:       0
             })
-        }).catch(() => {});
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data?.reward) this._showReward(data.reward);
+        })
+        .catch(() => {});
+    }
+
+    _showReward(reward) {
+        const el = document.getElementById(`qm-rewards-${this.quizId}`);
+        if (!el) return;
+        const statusEmoji = { gold: '🥇', silver: '🥈', bronze: '🥉', passed: '✅', failed: '❌' };
+        const parts = [];
+        if (reward.coinsEarned > 0) parts.push(`🪙 +${reward.coinsEarned} монет`);
+        if (reward.xpEarned > 0)    parts.push(`⭐ +${reward.xpEarned} XP`);
+        if (reward.idealBonus)       parts.push(`⚡ Бонус x1.5 за идеал!`);
+        if (reward.isNewStatus)      parts.push(`${statusEmoji[reward.status] || ''} Новый статус: ${reward.status}`);
+        if (parts.length === 0) return;
+        el.style.display = 'flex';
+        el.innerHTML = parts.map(p => `<span class="reward-badge">${p}</span>`).join('');
     }
 
     _typeLabel(t) {

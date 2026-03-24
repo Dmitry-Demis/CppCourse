@@ -585,3 +585,204 @@ body.modal-open .site-footer {
 .qm-stat-v { font-size: 1.5rem; font-weight: var(--fw-bold); color: var(--text-heading); }
 .qm-stat-l { font-size: var(--fs-xs); color: var(--text-secondary); }
 .qm-results-actions { display: flex; justify-content: center; gap: var(--space-3); margin-top: var(--space-5); flex-wrap: wrap; }
+
+/* ============================================
+   QUIZ REWARDS — медали, конфетти, анимации
+   ============================================ */
+
+/* Экран результатов v2 */
+.qm-results-v2 { text-align: center; padding: var(--space-2) 0 var(--space-4); }
+.qm-results-v2 h2 { margin: var(--space-2) 0 var(--space-1); font-size: 1.4rem; }
+
+/* Медаль */
+.qm-medal {
+    font-size: 4rem;
+    display: block;
+    margin: 0 auto var(--space-2);
+    animation: qm-medal-drop .6s cubic-bezier(.34,1.56,.64,1) both;
+    filter: drop-shadow(0 4px 16px rgba(253,230,138,.5));
+}
+@keyframes qm-medal-drop {
+    from { transform: translateY(-40px) scale(.5); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Круговой прогресс */
+.qm-results-circle-v2 {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: var(--space-3) auto;
+}
+.qm-results-circle-v2 svg { width: 100%; height: 100%; }
+.qm-results-pct-v2 {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-heading);
+}
+
+/* Статус-бейдж */
+.qm-status-badge {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 99px;
+    font-size: .8rem;
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+}
+.qm-status--fail   { background: rgba(243,139,168,.15); color: #f38ba8; border: 1px solid rgba(243,139,168,.3); }
+.qm-status--pass   { background: rgba(166,227,161,.15); color: #a6e3a1; border: 1px solid rgba(166,227,161,.3); }
+.qm-status--bronze { background: rgba(205,127,50,.15);  color: #cd7f32; border: 1px solid rgba(205,127,50,.3); }
+.qm-status--silver { background: rgba(192,192,192,.15); color: #c0c0c0; border: 1px solid rgba(192,192,192,.3); }
+.qm-status--gold   { background: rgba(253,230,138,.15); color: #fde68a; border: 1px solid rgba(253,230,138,.3); }
+
+/* Награды */
+.qm-rewards-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    margin: var(--space-3) 0;
+    flex-wrap: wrap;
+}
+.qm-reward-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: .85rem;
+    font-weight: 700;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    animation: qm-chip-pop .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.qm-reward-chip.coins { color: #fde68a; border-color: rgba(253,230,138,.3); }
+.qm-reward-chip.xp    { color: #a78bfa; border-color: rgba(167,139,250,.3); }
+@keyframes qm-chip-pop {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+/* Таблица статусов */
+.qm-milestones {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-3) 0;
+    flex-wrap: wrap;
+}
+.qm-milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 10px;
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    font-size: .7rem;
+    min-width: 56px;
+    opacity: .45;
+    transition: opacity .3s, border-color .3s;
+}
+.qm-milestone.achieved {
+    opacity: 1;
+    border-color: var(--milestone-color, var(--accent-blue));
+    background: rgba(var(--milestone-rgb, 137,180,250), .08);
+}
+.qm-milestone-icon { font-size: 1.2rem; }
+.qm-milestone-label { color: var(--text-secondary); }
+.qm-milestone-xp { font-weight: 700; color: var(--text-heading); }
+
+/* Кнопка "Принять" */
+.btn-qm--accept {
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    color: #fff;
+    font-size: .95rem;
+    padding: 10px 28px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: opacity .15s, transform .1s;
+    box-shadow: 0 4px 16px rgba(167,139,250,.3);
+}
+.btn-qm--accept:hover { opacity: .9; transform: translateY(-1px); }
+.btn-qm--accept:active { transform: translateY(0); }
+
+/* ── Конфетти ── */
+.qm-confetti-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* ── Летящие монеты/звёзды ── */
+.reward-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    font-size: 1.2rem;
+    will-change: transform, opacity;
+    animation: particle-fly var(--dur, 1s) cubic-bezier(.2,.8,.4,1) forwards;
+}
+@keyframes particle-fly {
+    0%   { transform: translate(0,0) scale(1); opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(.4); opacity: 0; }
+}
+
+/* ── Счётчик у профиля ── */
+.reward-counter-popup {
+    position: fixed;
+    z-index: 10001;
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: 99px;
+    padding: 4px 14px;
+    font-size: .85rem;
+    font-weight: 700;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,.3);
+    animation: counter-appear .3s ease both;
+}
+@keyframes counter-appear {
+    from { transform: scale(.5); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+/* ── Reward badges on results screen ─────────────────────────────────────── */
+.results-rewards,
+.qm-rewards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-2);
+}
+
+.reward-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-heading);
+    animation: rewardPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes rewardPop {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+}

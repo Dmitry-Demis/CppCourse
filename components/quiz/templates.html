@@ -1,0 +1,171 @@
+<!--
+  Quiz Component Templates
+  Загружается один раз через QuizTemplates.load(), затем клонируется в JS.
+  Все шаблоны невидимы — они живут в <template> тегах.
+-->
+
+<!-- ── Вопрос (Quiz inline) ─────────────────────────────────────────────── -->
+<template id="tpl-quiz-question">
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <span class="quiz-title"></span>
+        <span class="quiz-counter"></span>
+      </div>
+      <div class="quiz-progress">
+        <div class="quiz-progress-bar"></div>
+      </div>
+    </div>
+    <div class="quiz-body">
+      <div class="quiz-type-badge"></div>
+      <div class="quiz-question"></div>
+      <pre class="quiz-code" hidden><code class="language-cpp"></code></pre>
+      <div class="quiz-answers"></div>
+      <div class="quiz-feedback" hidden></div>
+    </div>
+    <div class="quiz-footer">
+      <div class="quiz-score-display"></div>
+      <div class="quiz-actions">
+        <button class="btn-quiz btn--ghost js-btn-prev" hidden>← Назад</button>
+        <button class="btn-quiz btn--check js-btn-check" hidden>Проверить</button>
+        <button class="btn-quiz btn--primary js-btn-next" hidden></button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- ── Фидбек после ответа (Quiz inline) ────────────────────────────────── -->
+<template id="tpl-quiz-feedback">
+  <div class="feedback-icon"></div>
+  <div class="feedback-body">
+    <strong class="feedback-verdict"></strong>
+    <p class="feedback-explanation"></p>
+    <p class="feedback-extra" hidden></p>
+    <span class="feedback-points" hidden></span>
+  </div>
+</template>
+
+<!-- ── Результаты (Quiz inline) ─────────────────────────────────────────── -->
+<template id="tpl-quiz-results">
+  <div class="quiz-results">
+    <div class="results-emoji"></div>
+    <h2 class="results-title">Результаты теста</h2>
+    <div class="results-circle">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-primary)" stroke-width="8"/>
+        <circle class="results-arc" cx="50" cy="50" r="42" fill="none"
+                stroke-width="8" stroke-linecap="round"
+                transform="rotate(-90 50 50)"/>
+      </svg>
+      <div class="results-pct"></div>
+    </div>
+    <p class="results-msg"></p>
+    <div class="results-stats">
+      <div class="rstat"><div class="rstat-v js-score"></div><div class="rstat-l">Очков</div></div>
+      <div class="rstat"><div class="rstat-v js-correct"></div><div class="rstat-l">Правильных</div></div>
+      <div class="rstat"><div class="rstat-v js-total"></div><div class="rstat-l">Вопросов</div></div>
+    </div>
+    <div class="results-achievement" hidden>🏆 Достижение разблокировано!</div>
+    <div class="results-rewards" hidden></div>
+    <div class="results-actions">
+      <button class="btn btn--primary js-retry">Пройти снова</button>
+      <button class="btn btn--secondary js-to-top">К началу страницы</button>
+    </div>
+  </div>
+</template>
+
+<!-- ── Вопрос (ModalQuiz) ────────────────────────────────────────────────── -->
+<template id="tpl-qm-question">
+  <div class="qm-header">
+    <div class="qm-title"></div>
+    <div class="qm-counter"></div>
+  </div>
+  <div class="qm-progress"><div class="qm-progress-fill"></div></div>
+  <div class="qm-body">
+    <div class="qm-type-badge"></div>
+    <div class="qm-question"></div>
+    <pre class="qm-code" hidden><code class="language-cpp"></code></pre>
+    <div class="qm-answers"></div>
+    <div class="qm-feedback" hidden></div>
+  </div>
+  <div class="qm-footer">
+    <div class="qm-score"></div>
+    <div class="qm-actions">
+      <button class="btn-qm btn-qm--check js-qm-check" hidden>Проверить</button>
+      <button class="btn-qm btn-qm--next  js-qm-next"  hidden></button>
+    </div>
+  </div>
+</template>
+
+<!-- ── Фидбек (ModalQuiz) ────────────────────────────────────────────────── -->
+<template id="tpl-qm-feedback">
+  <span class="qm-fb-icon"></span>
+  <div>
+    <strong class="qm-fb-verdict"></strong>
+    <p class="qm-fb-explanation"></p>
+    <p class="qm-fb-extra" hidden></p>
+    <span class="qm-fb-pts" hidden></span>
+  </div>
+</template>
+
+<!-- ── Результаты (ModalQuiz) ────────────────────────────────────────────── -->
+<template id="tpl-qm-results">
+  <div class="qm-results">
+    <div class="qm-results-emoji"></div>
+    <h2 class="qm-results-heading"></h2>
+    <div class="qm-results-circle">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-primary)" stroke-width="8"/>
+        <circle class="qm-results-arc" cx="50" cy="50" r="42" fill="none"
+                stroke-width="8" stroke-linecap="round"
+                transform="rotate(-90 50 50)"/>
+      </svg>
+      <div class="qm-results-pct"></div>
+    </div>
+    <div class="qm-results-stats">
+      <div><div class="qm-stat-v js-earned"></div><div class="qm-stat-l">Очков</div></div>
+      <div><div class="qm-stat-v js-correct"></div><div class="qm-stat-l">Правильных</div></div>
+      <div><div class="qm-stat-v js-total"></div><div class="qm-stat-l">Вопросов</div></div>
+    </div>
+    <div class="qm-rewards" hidden></div>
+    <div class="qm-results-actions">
+      <button class="btn-qm btn-qm--check js-qm-retry">Пройти снова</button>
+      <button class="btn-qm btn-qm--next  js-qm-close">Закрыть</button>
+    </div>
+  </div>
+</template>
+
+<!-- ── Оверлей модального окна ───────────────────────────────────────────── -->
+<template id="tpl-quiz-modal">
+  <div id="quiz-modal-overlay" class="quiz-modal-overlay">
+    <div class="quiz-modal-box" id="quiz-modal-box">
+      <button class="quiz-modal-close js-modal-close" aria-label="Закрыть">✕</button>
+      <div id="quiz-modal-content"></div>
+    </div>
+  </div>
+</template>
+
+<!-- ── Ответ single/code ─────────────────────────────────────────────────── -->
+<template id="tpl-answer-single">
+  <button class="quiz-answer" type="button">
+    <span class="quiz-answer-letter"></span>
+    <span class="quiz-answer-text"></span>
+  </button>
+</template>
+
+<!-- ── Ответ multiple ────────────────────────────────────────────────────── -->
+<template id="tpl-answer-multiple">
+  <label class="quiz-answer quiz-answer--check">
+    <input type="checkbox">
+    <span class="quiz-answer-letter"></span>
+    <span class="quiz-answer-text"></span>
+  </label>
+</template>
+
+<!-- ── Ответ fill ────────────────────────────────────────────────────────── -->
+<template id="tpl-answer-fill">
+  <div class="quiz-fill-wrap">
+    <input type="text" class="quiz-fill-input"
+           placeholder="Введите ответ…" autocomplete="off" spellcheck="false">
+  </div>
+</template>

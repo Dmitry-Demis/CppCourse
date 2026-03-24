@@ -1,0 +1,134 @@
+/* ── Quiz Widget — карточки тестов и итоговый блок ── */
+
+.quiz-widget-section { margin: 2rem 0; }
+
+/* Сетка карточек мини/стандартных тестов */
+.qw-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.qw-card {
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    transition: border-color .15s;
+}
+.qw-card:hover { border-color: var(--accent-blue); }
+
+.qw-card__icon { font-size: 1.4rem; }
+.qw-card__title { font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--accent-blue); }
+.qw-card__meta  { font-size: .75rem; color: var(--text-muted); }
+.qw-card__desc  { font-size: .8rem; color: var(--text-muted); flex: 1; }
+
+.qw-card__badge {
+    display: inline-block;
+    font-size: .7rem;
+    padding: .15rem .5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    width: fit-content;
+}
+.qw-card__badge--mini     { background: #313244; color: #89b4fa; }
+.qw-card__badge--standard { background: #2a2a3d; color: #a6e3a1; }
+.qw-card__badge--paragraph{ background: #2d2040; color: #cba6f7; }
+.qw-card__badge--chapter  { background: #3d2020; color: #f38ba8; }
+
+.qw-btn {
+    margin-top: .4rem;
+    padding: .5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: opacity .15s;
+    text-align: center;
+}
+.qw-btn:hover { opacity: .85; }
+.qw-btn--mini     { background: var(--accent-blue); color: #1e1e2e; }
+.qw-btn--standard { background: #a6e3a1; color: #1e1e2e; }
+.qw-btn--paragraph{ background: #cba6f7; color: #1e1e2e; }
+.qw-btn--chapter  { background: #f38ba8; color: #1e1e2e; }
+
+/* Итоговый блок — карточка на всю ширину */
+.qw-card--final {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.qw-card--final .qw-card__title { flex: 1; }
+.qw-card--final .qw-card__desc  { flex-basis: 100%; }
+.qw-card--final-paragraph { border-color: #cba6f7; }
+.qw-card--final-chapter   { border-color: #f38ba8; }
+
+/* Итоговый блок (paragraph/chapter) — старый стиль оставляем для совместимости */
+.qw-final {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--border-primary);
+    border-left: 3px solid #cba6f7;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+.qw-final--chapter { border-left-color: #f38ba8; }
+
+.qw-final__info {}
+.qw-final__title { font-size: 1rem; font-weight: 700; color: #cba6f7; margin-bottom: .25rem; }
+.qw-final--chapter .qw-final__title { color: #f38ba8; }
+.qw-final__desc  { font-size: .85rem; color: var(--text-muted); }
+
+/* Модальное окно */
+.qw-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.qw-modal-overlay.active { display: flex; }
+
+.qw-modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 2rem;
+}
+
+.qw-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: .25rem .5rem;
+    border-radius: 4px;
+}
+.qw-modal-close:hover { color: var(--text); background: var(--surface-2); }

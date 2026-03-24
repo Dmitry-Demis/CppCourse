@@ -7,7 +7,6 @@
       "title": "Основы C++",
       "description": "Первые шаги: структура программы, переменные, ввод/вывод, операторы и комментарии",
       "paragraphs": [
-        "first-program",
         "program-structure",
         "comments",
         "variables-and-types",
@@ -15,7 +14,8 @@
         "iostream",
         "uninitialized-variables",
         "keywords-and-naming",
-        "literals-operators-expressions"
+        "literals-operators-expressions",
+        "first-program"
       ]
     },
     {
