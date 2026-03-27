@@ -121,6 +121,213 @@
     }
 
     // ── Анимация открытия (дверь + ключ + стихия) ────────────────────────────
+    // ── 3D ключ через Three.js ───────────────────────────────────────────────
+    function build3DKey(color, colorDim, onReady) {
+        // Загружаем Three.js если ещё нет
+        function withThree(cb) {
+            if (window.THREE) { cb(); return; }
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';
+            s.onload = cb;
+            document.head.appendChild(s);
+        }
+
+        withThree(function () {
+            var T = window.THREE;
+            var W = 420, H = 420;
+
+            var canvas = document.createElement('canvas');
+            canvas.width = W; canvas.height = H;
+            canvas.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) translateY(60px);z-index:10001;pointer-events:none;opacity:0;transition:opacity 0.3s;';
+            document.body.appendChild(canvas);
+
+            var renderer = new T.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(W, H);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = T.PCFSoftShadowMap;
+
+            var scene = new T.Scene();
+            var camera = new T.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.set(0, 0, 7);
+
+            // Освещение
+            var ambient = new T.AmbientLight(0xffffff, 0.3);
+            scene.add(ambient);
+
+            var col = new T.Color(color);
+            var keyLight = new T.DirectionalLight(0xffffff, 2.5);
+            keyLight.position.set(3, 5, 5);
+            keyLight.castShadow = true;
+            scene.add(keyLight);
+
+            var rimLight = new T.PointLight(col, 3, 20);
+            rimLight.position.set(-3, 2, 2);
+            scene.add(rimLight);
+
+            var fillLight = new T.PointLight(new T.Color(colorDim), 1.5, 15);
+            fillLight.position.set(2, -3, 1);
+            scene.add(fillLight);
+
+            // Материал — металл с цветом стихии
+            var mat = new T.MeshStandardMaterial({
+                color: col,
+                metalness: 0.9,
+                roughness: 0.15,
+                emissive: col,
+                emissiveIntensity: 0.12,
+            });
+            var darkMat = new T.MeshStandardMaterial({
+                color: new T.Color(colorDim),
+                metalness: 0.95,
+                roughness: 0.1,
+            });
+
+            var keyGroup = new T.Group();
+            scene.add(keyGroup);
+
+            // Головка ключа (кольцо)
+            var bowOuter = new T.TorusGeometry(0.9, 0.22, 32, 64);
+            var bowMesh  = new T.Mesh(bowOuter, mat);
+            bowMesh.castShadow = true;
+            keyGroup.add(bowMesh);
+
+            // Внутренняя дырка в кольце (тёмный диск)
+            var holeMesh = new T.Mesh(new T.CircleGeometry(0.68, 48), darkMat);
+            holeMesh.position.z = 0.01;
+            keyGroup.add(holeMesh);
+
+            // Стержень
+            var shaftGeo = new T.CylinderGeometry(0.13, 0.13, 2.6, 16);
+            var shaft = new T.Mesh(shaftGeo, mat);
+            shaft.rotation.z = Math.PI / 2;
+            shaft.position.x = 1.95;
+            shaft.castShadow = true;
+            keyGroup.add(shaft);
+
+            // Зубцы
+            var teethData = [
+                { x: 2.8,  y: -0.13, w: 0.18, h: 0.45 },
+                { x: 3.15, y: -0.13, w: 0.18, h: 0.32 },
+                { x: 3.5,  y: -0.13, w: 0.18, h: 0.55 },
+            ];
+            teethData.forEach(function(t) {
+                var geo  = new T.BoxGeometry(t.w, t.h, 0.22);
+                var mesh = new T.Mesh(geo, mat);
+                mesh.position.set(t.x, t.y - t.h / 2, 0);
+                mesh.castShadow = true;
+                keyGroup.add(mesh);
+            });
+
+            // Фаски на стержне (декоративные кольца)
+            [1.4, 2.1, 2.7].forEach(function(px) {
+                var ring = new T.Mesh(new T.TorusGeometry(0.16, 0.04, 8, 24), darkMat);
+                ring.rotation.y = Math.PI / 2;
+                ring.position.x = px;
+                keyGroup.add(ring);
+            });
+
+            // Частицы-искры вокруг ключа
+            var sparkCount = 60;
+            var sparkGeo = new T.BufferGeometry();
+            var sparkPos = new Float32Array(sparkCount * 3);
+            var sparkVel = [];
+            for (var si = 0; si < sparkCount; si++) {
+                var angle = Math.random() * Math.PI * 2;
+                var r = 1.5 + Math.random() * 2;
+                sparkPos[si*3]   = Math.cos(angle) * r;
+                sparkPos[si*3+1] = Math.sin(angle) * r;
+                sparkPos[si*3+2] = (Math.random() - 0.5) * 2;
+                sparkVel.push({ vx: (Math.random()-0.5)*0.04, vy: (Math.random()-0.5)*0.04, vz: (Math.random()-0.5)*0.02, life: Math.random() });
+            }
+            sparkGeo.setAttribute('position', new T.BufferAttribute(sparkPos, 3));
+            var sparkMat = new T.PointsMaterial({ color: col, size: 0.08, transparent: true, opacity: 0.8 });
+            var sparks = new T.Points(sparkGeo, sparkMat);
+            scene.add(sparks);
+
+            // Начальная позиция — ключ снизу, повёрнут
+            keyGroup.position.set(0, -3, 0);
+            keyGroup.rotation.z = -0.4;
+
+            // Анимация
+            var startTime = performance.now();
+            var phase = 'rise'; // rise → spin → insert → done
+            var raf;
+
+            function animate() {
+                raf = requestAnimationFrame(animate);
+                var t = (performance.now() - startTime) / 1000;
+
+                // Фаза 1: подъём (0–0.8s)
+                if (phase === 'rise') {
+                    var p = Math.min(t / 0.8, 1);
+                    var ease = 1 - Math.pow(1 - p, 3);
+                    keyGroup.position.y = -3 + 3 * ease;
+                    keyGroup.rotation.z = -0.4 + 0.4 * ease;
+                    keyGroup.rotation.y = p * Math.PI * 0.5;
+                    canvas.style.opacity = Math.min(p * 3, 1);
+                    if (p >= 1) { phase = 'spin'; startTime = performance.now(); }
+                }
+                // Фаза 2: вращение и покачивание (0–1.2s)
+                else if (phase === 'spin') {
+                    var p2 = Math.min(t / 1.2, 1);
+                    keyGroup.rotation.y = Math.PI * 0.5 + p2 * Math.PI * 2;
+                    keyGroup.rotation.z = Math.sin(t * 4) * 0.08;
+                    keyGroup.position.y = Math.sin(t * 3) * 0.15;
+                    rimLight.intensity = 3 + Math.sin(t * 8) * 1.5;
+                    if (p2 >= 1) { phase = 'insert'; startTime = performance.now(); }
+                }
+                // Фаза 3: вставка в замок (0–0.6s)
+                else if (phase === 'insert') {
+                    var p3 = Math.min(t / 0.6, 1);
+                    var ease3 = p3 < 0.5 ? 2*p3*p3 : 1-Math.pow(-2*p3+2,2)/2;
+                    keyGroup.position.z = ease3 * 2;
+                    keyGroup.position.y = -ease3 * 0.5;
+                    keyGroup.rotation.y = Math.PI * 2.5 + ease3 * Math.PI * 0.5;
+                    keyGroup.scale.setScalar(1 - ease3 * 0.3);
+                    rimLight.intensity = 3 + ease3 * 8;
+                    canvas.style.opacity = 1 - ease3 * 0.8;
+                    if (p3 >= 1) { phase = 'done'; }
+                }
+                else {
+                    cancelAnimationFrame(raf);
+                    onReady();
+                    return;
+                }
+
+                // Искры
+                var positions = sparkGeo.attributes.position.array;
+                for (var si2 = 0; si2 < sparkCount; si2++) {
+                    sparkVel[si2].life += 0.02;
+                    if (sparkVel[si2].life > 1) {
+                        sparkVel[si2].life = 0;
+                        var a2 = Math.random() * Math.PI * 2;
+                        var r2 = 1.5 + Math.random() * 2;
+                        positions[si2*3]   = Math.cos(a2) * r2;
+                        positions[si2*3+1] = Math.sin(a2) * r2;
+                        positions[si2*3+2] = (Math.random()-0.5)*2;
+                    } else {
+                        positions[si2*3]   += sparkVel[si2].vx;
+                        positions[si2*3+1] += sparkVel[si2].vy;
+                        positions[si2*3+2] += sparkVel[si2].vz;
+                    }
+                }
+                sparkGeo.attributes.position.needsUpdate = true;
+                sparkMat.opacity = 0.5 + Math.sin(t * 6) * 0.3;
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Возвращаем cleanup
+            return function cleanup() {
+                cancelAnimationFrame(raf);
+                renderer.dispose();
+                if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+            };
+        });
+    }
+
     function revealContent(gateEl, html) {
         var wrapper = gateEl.closest('[data-slot][data-std]') || gateEl;
         var std = gateEl.dataset.std || '20';
@@ -132,81 +339,83 @@
         gateEl.classList.add('std-gate--charging');
 
         setTimeout(function () {
+            // Дверь
             var door = document.createElement('div');
             door.className = 'sg-door-overlay';
             door.innerHTML = '<div class="sg-door-left"></div><div class="sg-door-right"></div>';
             document.body.appendChild(door);
 
+            // Замочная скважина
             var keyhole = document.createElement('div');
             keyhole.className = 'sg-keyhole';
             keyhole.innerHTML = buildKeyholesvg(elem.color);
             document.body.appendChild(keyhole);
 
-            var keyWrap = document.createElement('div');
-            keyWrap.className = 'sg-key-wrap';
-            keyWrap.innerHTML = buildKeySvg(elem.color, elem.colorDim);
-            document.body.appendChild(keyWrap);
+            // Canvas стихий
+            var fxCanvas = document.createElement('canvas');
+            fxCanvas.id = 'sg-element-canvas';
+            fxCanvas.width = window.innerWidth;
+            fxCanvas.height = window.innerHeight;
+            document.body.appendChild(fxCanvas);
 
-            var canvas = document.createElement('canvas');
-            canvas.id = 'sg-element-canvas';
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            document.body.appendChild(canvas);
-
+            // Вспышка
             var flash = document.createElement('div');
             flash.className = 'sg-element-flash';
             flash.style.background = 'radial-gradient(ellipse at center,' + elem.flash + ' 0%,transparent 70%)';
-            flash.style.setProperty('--flash-delay', '1.5s');
+            flash.style.setProperty('--flash-delay', '1.8s');
             document.body.appendChild(flash);
 
-            setTimeout(function () { canvas.classList.add('sg-canvas--active'); runElementAnimation(canvas, elem.name, elem.color); }, 900);
-            setTimeout(function () { keyhole.classList.add('sg-keyhole--glowing'); }, 950);
+            // 3D ключ — запускаем сразу, он сам вызовет onReady когда закончит
+            var cleanupKey = build3DKey(elem.color, elem.colorDim, function onKeyDone() {
+                // Ключ вставлен — запускаем стихию и открываем дверь
+                setTimeout(function () { keyhole.classList.add('sg-keyhole--glowing'); }, 50);
+                setTimeout(function () { fxCanvas.classList.add('sg-canvas--active'); runElementAnimation(fxCanvas, elem.name, elem.color); }, 100);
 
-            if (elem.shake) {
+                if (elem.shake) {
+                    setTimeout(function () {
+                        document.body.classList.add('sg-shake');
+                        document.body.addEventListener('animationend', function onEnd(e) {
+                            if (e.animationName === 'pageShake') { document.body.classList.remove('sg-shake'); document.body.removeEventListener('animationend', onEnd); }
+                        });
+                    }, 400);
+                }
+
+                setTimeout(function () { door.classList.add('sg-door--open'); }, 600);
+
                 setTimeout(function () {
-                    document.body.classList.add('sg-shake');
-                    document.body.addEventListener('animationend', function onEnd(e) {
-                        if (e.animationName === 'pageShake') { document.body.classList.remove('sg-shake'); document.body.removeEventListener('animationend', onEnd); }
-                    });
+                    [door, keyhole, fxCanvas, flash].forEach(function(n) { if (n && n.parentNode) n.parentNode.removeChild(n); });
+                    gateEl.classList.add('std-gate--dissolve');
+                    setTimeout(function () {
+                        var reveal = document.createElement('div');
+                        reveal.className = 'std-gate__reveal';
+                        reveal.innerHTML = html;
+                        wrapper.replaceWith(reveal);
+                        reveal.getBoundingClientRect();
+                        reveal.classList.add('std-gate__reveal--visible');
+                        if (window.Prism) Prism.highlightAllUnder(reveal);
+                        reveal.querySelectorAll('.code-block[data-example]').forEach(function(b) { new CppCompiler(b).init(); });
+                        if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([reveal]);
+                        reveal.querySelectorAll('.callout').forEach(function(c) { c.classList.add('callout--visible'); });
+                    }, 380);
                 }, 1400);
-            }
-
-            setTimeout(function () { door.classList.add('sg-door--open'); }, 1600);
-
-            setTimeout(function () {
-                [door, keyhole, keyWrap, canvas, flash].forEach(function(n) { if (n.parentNode) n.parentNode.removeChild(n); });
-                gateEl.classList.add('std-gate--dissolve');
-                setTimeout(function () {
-                    var reveal = document.createElement('div');
-                    reveal.className = 'std-gate__reveal';
-                    reveal.innerHTML = html;
-                    wrapper.replaceWith(reveal);
-                    reveal.getBoundingClientRect();
-                    reveal.classList.add('std-gate__reveal--visible');
-                    if (window.Prism) Prism.highlightAllUnder(reveal);
-                    reveal.querySelectorAll('.code-block[data-example]').forEach(function(b) { new CppCompiler(b).init(); });
-                    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([reveal]);
-                    // Принудительно показываем callout-блоки внутри нового контента
-                    reveal.querySelectorAll('.callout').forEach(function(c) { c.classList.add('callout--visible'); });
-                }, 380);
-            }, 2350);
+            });
         }, 300);
     }
 
     function buildKeyholesvg(color) {
-        return '<svg width="80" height="110" viewBox="0 0 80 110">' +
-            '<circle cx="40" cy="32" r="28" fill="none" stroke="' + color + '" stroke-width="4"/>' +
-            '<circle cx="40" cy="32" r="14" fill="' + color + '" opacity="0.25"/>' +
-            '<polygon points="28,58 52,58 46,100 34,100" fill="none" stroke="' + color + '" stroke-width="4" stroke-linejoin="round"/>' +
-            '<line x1="40" y1="18" x2="40" y2="46" stroke="' + color + '" stroke-width="3" opacity="0.6"/>' +
+        return '<svg width="90" height="120" viewBox="0 0 90 120">' +
+            '<defs>' +
+                '<radialGradient id="khg" cx="50%" cy="40%" r="50%">' +
+                    '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.4"/>' +
+                    '<stop offset="100%" stop-color="' + color + '" stop-opacity="0"/>' +
+                '</radialGradient>' +
+            '</defs>' +
+            '<circle cx="45" cy="35" r="30" fill="url(#khg)" stroke="' + color + '" stroke-width="3"/>' +
+            '<circle cx="45" cy="35" r="14" fill="' + color + '" opacity="0.2"/>' +
+            '<circle cx="45" cy="35" r="8"  fill="' + color + '" opacity="0.5"/>' +
+            '<polygon points="32,62 58,62 52,108 38,108" fill="' + color + '" opacity="0.15" stroke="' + color + '" stroke-width="3" stroke-linejoin="round"/>' +
+            '<line x1="45" y1="20" x2="45" y2="50" stroke="' + color + '" stroke-width="2.5" opacity="0.7"/>' +
         '</svg>';
-    }
-
-    function buildKeySvg(color, colorDim) {
-        return '<div class="sg-key" style="--el-color:' + color + ';--el-color-dim:' + colorDim + '">' +
-            '<div class="sg-key__bow"></div><div class="sg-key__shaft"></div>' +
-            '<div class="sg-key__teeth"><div class="sg-key__tooth"></div><div class="sg-key__tooth"></div><div class="sg-key__tooth"></div></div>' +
-        '</div>';
     }
 
     // ── Canvas анимации стихий ────────────────────────────────────────────────

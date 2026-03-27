@@ -1,0 +1,230 @@
+<<<<<<< HEAD
+=======
+/* ── std-gate ───────────────────────────────────────────────────────────────── */
+
+.std-gate { --sg-color: #a78bfa; --sg-border: rgba(167,139,250,0.35); --sg-stripe: rgba(167,139,250,0.045); }
+.std-gate[data-std="11"] { --sg-color: #facc15; --sg-border: rgba(250,204,21,0.35);  --sg-stripe: rgba(250,204,21,0.045); }
+.std-gate[data-std="14"] { --sg-color: #f9e2af; --sg-border: rgba(249,226,175,0.35); --sg-stripe: rgba(249,226,175,0.045); }
+.std-gate[data-std="17"] { --sg-color: #89dceb; --sg-border: rgba(137,220,235,0.35); --sg-stripe: rgba(137,220,235,0.045); }
+.std-gate[data-std="20"] { --sg-color: #cba6f7; --sg-border: rgba(203,166,247,0.35); --sg-stripe: rgba(203,166,247,0.045); }
+.std-gate[data-std="23"] { --sg-color: #a6e3a1; --sg-border: rgba(166,227,161,0.35); --sg-stripe: rgba(166,227,161,0.045); }
+
+.std-gate {
+    position: relative;
+    margin: 1.5rem 0;
+    padding: 2.5rem 2rem;
+    border-radius: 14px;
+    border: 1px dashed var(--sg-border);
+    background-color: rgba(10, 10, 28, 0.55);
+    background-image: repeating-linear-gradient(
+        135deg,
+        var(--sg-stripe) 0px,
+        var(--sg-stripe) 1px,
+        transparent 1px,
+        transparent 14px
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    text-align: center;
+}
+
+.std-gate::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sg-color) 50%, transparent), transparent);
+    pointer-events: none;
+}
+
+.std-gate__glass {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--sg-color) 6%, transparent) 0%, transparent 65%);
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.std-gate__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
+.std-gate__badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--sg-color);
+    background: color-mix(in srgb, var(--sg-color) 14%, #1e1e2e);
+    border: 1px solid color-mix(in srgb, var(--sg-color) 35%, transparent);
+    border-radius: 20px;
+    padding: 3px 14px;
+    margin-bottom: 1.1rem;
+}
+
+.std-gate__lock {
+    font-size: 2.4rem;
+    line-height: 1;
+    margin-bottom: 0.9rem;
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--sg-color) 50%, transparent));
+}
+
+.std-gate__desc {
+    font-size: 0.875rem;
+    color: rgba(200, 200, 220, 0.55);
+    margin: 0 0 1.25rem 0;
+}
+
+.std-gate__cost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--sg-color);
+    background: color-mix(in srgb, var(--sg-color) 10%, rgba(10,10,28,0.8));
+    border: 1px solid color-mix(in srgb, var(--sg-color) 30%, transparent);
+    border-radius: 8px;
+    padding: 5px 16px;
+    margin-bottom: 1rem;
+}
+
+.std-gate__btn {
+    display: inline-block;
+    padding: 0.6rem 2.2rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--sg-color);
+    background: color-mix(in srgb, var(--sg-color) 12%, rgba(10,10,28,0.7));
+    border: 1px solid color-mix(in srgb, var(--sg-color) 45%, transparent);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.std-gate__btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--sg-color) 22%, rgba(10,10,28,0.7));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--sg-color) 25%, transparent);
+}
+.std-gate__btn:disabled { opacity: 0.6; cursor: default; }
+
+/* ── Анимации открытия ──────────────────────────────────────────────────────── */
+
+.sg-door-overlay {
+    position: fixed; inset: 0;
+    z-index: 9998;
+    display: flex;
+    pointer-events: none;
+}
+.sg-door-left, .sg-door-right {
+    flex: 1;
+    background: #07071a;
+    transition: transform 0.55s cubic-bezier(0.7, 0, 0.3, 1);
+}
+.sg-door--open .sg-door-left  { transform: translateX(-100%); }
+.sg-door--open .sg-door-right { transform: translateX(100%); }
+
+.sg-keyhole {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    animation: keyholeAppear 0.4s 0.1s ease forwards;
+    filter: drop-shadow(0 0 12px var(--el-color, #a78bfa));
+}
+@keyframes keyholeAppear {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.sg-keyhole--glowing {
+    filter:
+        drop-shadow(0 0 20px var(--el-color, #a78bfa))
+        drop-shadow(0 0 50px var(--el-color, #a78bfa))
+        drop-shadow(0 0 90px var(--el-color, #a78bfa));
+    transition: filter 0.3s ease;
+}
+
+/* 3D ключ рендерится через Three.js canvas — CSS-ключ не нужен */
+
+#sg-element-canvas {
+    position: fixed; inset: 0;
+    z-index: 9997;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+#sg-element-canvas.sg-canvas--active { opacity: 1; }
+
+.sg-element-flash {
+    position: fixed; inset: 0;
+    z-index: 9996;
+    pointer-events: none;
+    opacity: 0;
+    animation: elementFlash 0.6s var(--flash-delay, 1.8s) ease forwards;
+}
+@keyframes elementFlash {
+    0%  { opacity: 0; }
+    30% { opacity: 1; }
+    100%{ opacity: 0; }
+}
+
+@keyframes pageShake {
+    0%,100% { transform: translateX(0); }
+    15% { transform: translateX(-8px) rotate(-0.5deg); }
+    30% { transform: translateX(7px)  rotate(0.4deg); }
+    45% { transform: translateX(-5px) rotate(-0.3deg); }
+    60% { transform: translateX(4px)  rotate(0.2deg); }
+    75% { transform: translateX(-2px); }
+}
+.sg-shake { animation: pageShake 0.5s ease; }
+
+@keyframes gateCharge {
+    0%  { box-shadow: none; }
+    100%{ box-shadow: 0 0 40px 10px var(--sg-color, #a78bfa); }
+}
+.std-gate--charging { animation: gateCharge 0.3s ease-out forwards; }
+
+@keyframes gateDissolve {
+    0%  { opacity: 1; transform: scale(1);    filter: brightness(1); }
+    100%{ opacity: 0; transform: scale(1.03); filter: brightness(5); }
+}
+.std-gate--dissolve { animation: gateDissolve 0.3s ease-in forwards; }
+
+.std-gate__reveal {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    border-radius: 14px;
+    border: 1px solid rgba(167,139,250,0.2);
+    padding: 1.5rem 1.75rem;
+    background: rgba(167,139,250,0.03);
+    position: relative;
+    overflow: hidden;
+}
+.std-gate__reveal::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(167,139,250,0.07) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease 0.2s 1 forwards;
+    pointer-events: none;
+}
+@keyframes shimmer {
+    0%  { background-position: 200% 0; }
+    100%{ background-position: -200% 0; }
+}
+.std-gate__reveal--visible { opacity: 1; transform: translateY(0) scale(1); }
+.std-gate__reveal > *:first-child { margin-top: 0; }
+.std-gate__reveal > *:last-child  { margin-bottom: 0; }
+>>>>>>> 1b00388 (New)
