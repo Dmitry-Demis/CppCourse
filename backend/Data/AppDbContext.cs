@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User> Users => Set<User>();
     public DbSet<Progress> Progresses => Set<Progress>();
     public DbSet<QuizResult> QuizResults => Set<QuizResult>();
+    public DbSet<PageFeedback> PageFeedbacks => Set<PageFeedback>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {

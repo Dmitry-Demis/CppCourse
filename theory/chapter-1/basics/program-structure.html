@@ -19,7 +19,9 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
-
+    <link rel="stylesheet" href="../../../css/std-gate.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -73,14 +75,16 @@
                     Программа выполняет инструкции последовательно, сверху вниз.
                 </p>
 
-                <div class="info-card">
-                    <div class="info-card__title">ℹ️ Типы инструкций</div>
-                    <ul>
-                        <li><strong>Инструкции объявления</strong> — создают переменные: <code>int x {5};</code></li>
-                        <li><strong>Инструкции выражений</strong> — вычисляют значение: <code>x = x + 1;</code></li>
-                        <li><strong>Инструкции вывода</strong> — выводят данные: <code>std::cout &lt;&lt; x;</code></li>
-                        <li><strong>Инструкции возврата</strong> — завершают функцию: <code>return 0;</code></li>
-                    </ul>
+                <div class="callout callout--info">
+                    <div class="callout__title">Типы инструкций</div>
+                    <div class="callout__body">
+                        <ul>
+                            <li><strong>Инструкции объявления</strong> — создают переменные: <code>int x {5};</code></li>
+                            <li><strong>Инструкции выражений</strong> — вычисляют значение: <code>x = x + 1;</code></li>
+                            <li><strong>Инструкции вывода</strong> — выводят данные: <code>std::cout &lt;&lt; x;</code></li>
+                            <li><strong>Инструкции возврата</strong> — завершают функцию: <code>return 0;</code></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <h2 id="main-function">Функция main()</h2>
@@ -109,13 +113,15 @@
                     Самая частая — <code>#include</code>, которая вставляет содержимое другого файла.
                 </p>
 
-                <div class="info-card">
-                    <div class="info-card__title">?? #include &lt;iostream&gt;</div>
-                    <p>
-                        Подключает стандартную библиотеку ввода/вывода.
-                        Без неё <code>std::cout</code> и <code>std::cin</code> недоступны.
-                        Угловые скобки <code>&lt;&gt;</code> означают системный заголовочный файл.
-                    </p>
+                <div class="callout callout--note">
+                    <div class="callout__title">#include &lt;iostream&gt;</div>
+                    <div class="callout__body">
+                        <p>
+                            Подключает стандартную библиотеку ввода/вывода.
+                            Без неё <code>std::cout</code> и <code>std::cin</code> недоступны.
+                            Угловые скобки <code>&lt;&gt;</code> означают системный заголовочный файл.
+                        </p>
+                    </div>
                 </div>
 
                 <h2 id="return-value">Возвращаемое значение main()</h2>
@@ -126,17 +132,53 @@
                     Любое ненулевое значение сигнализирует об ошибке.
                 </p>
 
-                <div class="warning-block">
-                    <div class="warning-block__title">?? Начиная с C++11</div>
-                    <p>
-                        Если в <code>main()</code> нет явного <code>return</code>,
-                        компилятор автоматически добавляет <code>return 0;</code>.
-                        Для других функций это правило не действует.
-                    </p>
-                </div>
+                <div data-slot="1" data-std="11"></div>
+                <div data-slot="1" data-std="14"></div>
 
                 <h2 id="tests">Проверьте знания</h2>
                 <div class="quiz-widget" data-final="program-structure" data-final-desc="Функция main, инструкции, директивы препроцессора, return"></div>
+
+                <!-- Навигация -->
+
+                
+                <!-- FEEDBACK SECTION -->
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+
+                    <div class="feedback-form">
+                        <textarea
+                            class="feedback-form__textarea"
+                            maxlength="1024"
+                            placeholder="Комментарий (необязательно)…"
+                        ></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+
+                    <div class="feedback-done">
+                        <span class="feedback-done__icon">✓</span>
+                        <span>Спасибо за отзыв!</span>
+                    </div>
+                </section>
 
                 <div class="paragraph-nav"></div>
             </div>
@@ -160,6 +202,7 @@
     <script src="../../../components/quiz-widget.js"></script>
     <script src="../../../js/compiler.js"></script>
     <script src="../../../js/gamification.js"></script>
+    <script src="../../../js/std-gate.js"></script>
     <script>
     (function () {
         const bar = document.getElementById('reading-progress');
@@ -179,6 +222,8 @@
     // openQuizModal / closeQuizModal provided by quiz.js
     </script>
     <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+    <script src="../../../js/core/callout.js"></script>
 </body>
 </html>
 

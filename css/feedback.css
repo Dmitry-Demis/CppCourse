@@ -1,0 +1,163 @@
+/* ===== Секция отзывов ===== */
+.feedback-section {
+    margin-top: 3rem;
+    padding: 2rem 0 1rem;
+    border-top: 1px solid var(--border, #313244);
+    text-align: center;
+}
+
+.feedback-section__title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text, #cdd6f4);
+    margin-bottom: 0.4rem;
+}
+
+.feedback-section__subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted, #6c7086);
+    margin-bottom: 1.5rem;
+}
+
+/* Строка: звёзды + число */
+.feedback-stars-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.feedback-stars {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.feedback-star {
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    color: var(--star-empty, #45475a);
+    transition: color 0.12s, transform 0.1s;
+    flex-shrink: 0;
+}
+
+.feedback-star svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.feedback-star:hover,
+.feedback-star.hovered,
+.feedback-star.selected {
+    color: #cba6f7;
+}
+
+.feedback-star:hover,
+.feedback-star.hovered {
+    transform: scale(1.2);
+}
+
+/* Число рейтинга справа */
+.feedback-rating-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    min-width: 2.8rem;
+    text-align: left;
+    color: var(--text-muted, #6c7086);
+    transition: color 0.25s;
+}
+
+/* Цвет зависит от значения — задаётся через JS */
+.feedback-rating-value[data-rating="1"]  { color: #f38ba8; }
+.feedback-rating-value[data-rating="2"]  { color: #f38ba8; }
+.feedback-rating-value[data-rating="3"]  { color: #fab387; }
+.feedback-rating-value[data-rating="4"]  { color: #fab387; }
+.feedback-rating-value[data-rating="5"]  { color: #f9e2af; }
+.feedback-rating-value[data-rating="6"]  { color: #f9e2af; }
+.feedback-rating-value[data-rating="7"]  { color: #a6e3a1; }
+.feedback-rating-value[data-rating="8"]  { color: #a6e3a1; }
+.feedback-rating-value[data-rating="9"]  { color: #94e2d5; }
+.feedback-rating-value[data-rating="10"] { color: #94e2d5; }
+
+/* Форма комментария */
+.feedback-form {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    animation: feedbackFadeIn 0.2s ease;
+}
+
+.feedback-form.visible { display: flex; }
+
+@keyframes feedbackFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.feedback-form__textarea {
+    width: 100%;
+    max-width: 520px;
+    box-sizing: border-box;
+    background: var(--surface, #1e1e2e);
+    border: 1px solid var(--border, #313244);
+    border-radius: 10px;
+    color: var(--text, #cdd6f4);
+    font-size: 0.9rem;
+    font-family: inherit;
+    padding: 0.75rem 1rem;
+    resize: vertical;
+    min-height: 90px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.feedback-form__textarea:focus { border-color: #cba6f7; }
+.feedback-form__textarea::placeholder { color: var(--text-muted, #6c7086); }
+
+.feedback-form__row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 520px;
+    justify-content: flex-end;
+}
+
+.feedback-form__char {
+    font-size: 0.75rem;
+    color: var(--text-muted, #6c7086);
+    margin-right: auto;
+}
+
+.feedback-form__submit {
+    background: #cba6f7;
+    color: #1e1e2e;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.4rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.feedback-form__submit:hover    { background: #b48ee8; }
+.feedback-form__submit:disabled { opacity: 0.5; cursor: default; }
+
+/* После отправки */
+.feedback-done {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    color: #a6e3a1;
+    font-size: 1rem;
+    animation: feedbackFadeIn 0.3s ease;
+}
+
+.feedback-done.visible  { display: flex; }
+.feedback-done__icon    { font-size: 2rem; }

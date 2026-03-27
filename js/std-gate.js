@@ -36,17 +36,25 @@
         var slot = slotInfo.slot, std = slotInfo.std;
         var costCoins = slotInfo.costCoins, costKeys = slotInfo.costKeys;
         var stdUnlocked = slotInfo.stdUnlocked, itemId = slotInfo.itemId;
+        // soon = атрибуты coins/keys не были указаны в HTML (API вернул 0 по умолчанию,
+        // но мы проверяем оригинальный DOM-элемент)
+        var soon = slotInfo.soon;
         var elem = getElement(std);
 
         var costParts = [];
         if (costCoins > 0) costParts.push('🪙 ' + costCoins.toLocaleString('ru'));
         if (costKeys  > 0) costParts.push('🗝️ ' + costKeys);
-        var costText = costParts.length ? costParts.join(' + ') : 'S O O N';
+
+        var costText = soon
+            ? 'S O O N'
+            : (costParts.length ? costParts.join(' + ') : '');  // пусто = бесплатно
 
         var isu = getIsu();
         var locked = isu && !stdUnlocked;
-        var btnDisabled = locked ? 'disabled' : '';
-        var btnTitle = locked ? 'Сначала разблокируйте стандарт C++' + std + ' в магазине' : 'Купить за ' + costText;
+        var btnDisabled = (locked || soon) ? 'disabled' : '';
+        var btnLabel = soon
+            ? '⏳ Скоро'
+            : (locked ? '🔒 Требуется C++' + std : 'Разблокировать');
 
         el.innerHTML =
             '<div class="std-gate" data-item-id="' + itemId + '" data-slot="' + slot + '" data-std="' + std + '">' +
@@ -55,9 +63,9 @@
                     '<span class="std-gate__badge">C++' + std + '</span>' +
                     '<span class="std-gate__lock">🔒</span>' +
                     '<p class="std-gate__desc">Этот раздел доступен после покупки</p>' +
-                    '<span class="std-gate__cost">' + costText + '</span>' +
-                    '<button class="std-gate__btn" ' + btnDisabled + ' title="' + btnTitle + '" onclick="stdGatePurchase(this)">' +
-                        (locked ? '🔒 Требуется C++' + std : 'Разблокировать') +
+                    (costText ? '<span class="std-gate__cost">' + costText + '</span>' : '') +
+                    '<button class="std-gate__btn" ' + btnDisabled + ' onclick="stdGatePurchase(this)">' +
+                        btnLabel +
                     '</button>' +
                 '</div>' +
             '</div>';
@@ -66,10 +74,21 @@
     // ── Заглушка для <tr data-slot> ──────────────────────────────────────────
     function renderTableRowGate(tr, slotInfo) {
         var std = slotInfo.std, slot = slotInfo.slot;
+        var soon = slotInfo.soon;
         var elem = getElement(std);
         var cols = tr.querySelectorAll('td').length || 5;
         var isu = getIsu();
         var locked = isu && !slotInfo.stdUnlocked;
+
+        var actionHtml = soon
+            ? '<span style="opacity:0.5;font-size:0.75rem;">⏳ Скоро</span>'
+            : (locked
+                ? '<span style="opacity:0.5;font-size:0.75rem;">Требуется C++' + std + '</span>'
+                : '<button onclick="stdGatePurchase(this)" data-slot="' + slot + '" data-std="' + std + '" ' +
+                    'style="background:color-mix(in srgb,' + elem.color + ' 15%,transparent);' +
+                        'border:1px solid color-mix(in srgb,' + elem.color + ' 40%,transparent);' +
+                        'color:' + elem.color + ';border-radius:6px;padding:2px 10px;cursor:pointer;font-size:0.75rem;font-weight:600;">' +
+                    'Разблокировать</button>');
 
         tr.innerHTML = '<td colspan="' + cols + '" style="text-align:center;padding:0.6rem 1rem;">' +
             '<span style="display:inline-flex;align-items:center;gap:0.5rem;' +
@@ -80,13 +99,7 @@
                 '<span style="background:color-mix(in srgb,' + elem.color + ' 15%,transparent);' +
                     'border:1px solid color-mix(in srgb,' + elem.color + ' 30%,transparent);' +
                     'border-radius:4px;padding:1px 6px;font-size:0.65rem;font-weight:700;">C++' + std + '</span>' +
-                (locked
-                    ? '<span style="opacity:0.5;font-size:0.75rem;">Требуется C++' + std + '</span>'
-                    : '<button onclick="stdGatePurchase(this)" data-slot="' + slot + '" data-std="' + std + '" ' +
-                        'style="background:color-mix(in srgb,' + elem.color + ' 15%,transparent);' +
-                            'border:1px solid color-mix(in srgb,' + elem.color + ' 40%,transparent);' +
-                            'color:' + elem.color + ';border-radius:6px;padding:2px 10px;cursor:pointer;font-size:0.75rem;font-weight:600;">' +
-                        'Разблокировать</button>') +
+                actionHtml +
             '</span></td>';
         tr.dataset.gated = '1';
     }
@@ -103,6 +116,7 @@
             tr.replaceWith(newTr);
             setTimeout(function() { newTr.style.background = ''; }, 1000);
             if (window.Prism) Prism.highlightAllUnder(newTr);
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([newTr]);
         }
     }
 
@@ -171,6 +185,9 @@
                     reveal.classList.add('std-gate__reveal--visible');
                     if (window.Prism) Prism.highlightAllUnder(reveal);
                     reveal.querySelectorAll('.code-block[data-example]').forEach(function(b) { new CppCompiler(b).init(); });
+                    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([reveal]);
+                    // Принудительно показываем callout-блоки внутри нового контента
+                    reveal.querySelectorAll('.callout').forEach(function(c) { c.classList.add('callout--visible'); });
                 }, 380);
             }, 2350);
         }, 300);
@@ -322,12 +339,14 @@
             var res = await fetch(API+'/gated/content?page='+encodeURIComponent(page)+'&slot='+encodeURIComponent(slot)+'&std='+encodeURIComponent(std), {headers:{'X-Isu-Number':isu}});
             if (!res.ok) return;
             var html = await res.text();
-            var reveal = document.createElement('div');
+                var reveal = document.createElement('div');
             reveal.className = 'std-gate__reveal std-gate__reveal--visible';
             reveal.innerHTML = html;
             el.replaceWith(reveal);
             if (window.Prism) Prism.highlightAllUnder(reveal);
             reveal.querySelectorAll('.code-block[data-example]').forEach(function(b) { new CppCompiler(b).init(); });
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([reveal]);
+            reveal.querySelectorAll('.callout').forEach(function(c) { c.classList.add('callout--visible'); });
         } catch(e) { console.error('std-gate: ошибка загрузки контента',e); }
     }
 
@@ -355,8 +374,11 @@
             var contentRes = await fetch(API+'/gated/content?page='+encodeURIComponent(page)+'&slot='+encodeURIComponent(slot)+'&std='+encodeURIComponent(std), {headers:{'X-Isu-Number':isu}});
             if (contentRes.ok) {
                 var html = await contentRes.text();
+                console.log('std-gate: контент получен, длина:', html.length);
                 if (tr) revealTableRow(tr, html);
                 else    revealContent(gate, html);
+            } else {
+                console.error('std-gate: /gated/content вернул', contentRes.status);
             }
         } catch(e) { console.error('std-gate: ошибка покупки',e); btn.disabled=false; btn.textContent='Разблокировать'; }
     };
@@ -391,10 +413,16 @@
             var isTr = el.tagName === 'TR';
 
             if (!info) {
-                var fallback = {slot:slot, std:std, costCoins:0, costKeys:0, stdUnlocked:false, itemId:'content:'+page+':'+slot+':'+std};
+                // Слот не найден в API — gated-файл отсутствует → SOON
+                var fallback = {slot:slot, std:std, costCoins:0, costKeys:0, soon:true, stdUnlocked:false, itemId:'content:'+page+':'+slot+':'+std};
                 if (isTr) renderTableRowGate(el, fallback); else renderGate(el, fallback);
                 continue;
             }
+            // soon = API вернул слот, но costCoins и costKeys оба null/undefined (не указаны в gated-файле)
+            // Если costCoins === 0 и costKeys === 0 — может быть бесплатно или soon.
+            // Различаем: сервер теперь передаёт costCoins как число всегда.
+            // Считаем soon только если слот не найден (handled above).
+            info.soon = false;
             if (info.purchased) {
                 if (isTr) await loadContentIntoRow(el, page, slot, std);
                 else      await loadContent(el, page, slot, std);
