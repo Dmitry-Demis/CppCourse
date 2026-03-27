@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
     <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
 
     <style>
@@ -564,6 +565,9 @@ int main() {
                 </div>
 
                 <!-- Навигация между параграфами -->
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="intro-fundamental-types" data-final-desc="Фундаментальные типы, статическая типизация, категории типов"></div>
+
                 <div class="paragraph-nav">
                     <!-- navigation.js заполнит динамически из course-structure.json -->
                 </div>
@@ -592,6 +596,7 @@ int main() {
     <script src="../../../js/course.js"></script><script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
     <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
     <script src="../../../js/compiler.js"></script>
     <script src="../../../js/gamification.js"></script>
     <script src="../../../js/effects.js"></script>

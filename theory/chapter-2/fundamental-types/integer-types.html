@@ -22,9 +22,11 @@
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
     <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/std-gate.css">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 
@@ -86,6 +88,7 @@
         .int-type-card--uint  .int-type-card__header { border-left: 4px solid #94e2d5; }
 
         .std-badge--14 { background: #4a3f1a; color: #f9e2af; }
+        .std-badge--11 { background: #1a3a2a; color: #a6e3a1; }
         .std-badge--17 { background: #1e3a4f; color: #89dceb; }
         .std-badge--20 { background: #2a1e4f; color: #cba6f7; }
         .std-badge--23 { background: #3d1e3d; color: #f5c2e7; }
@@ -284,14 +287,14 @@
                     какой тип выбрать и чего ожидать на конкретной платформе.
                 </p>
 
-                <div class="iso-quote">
+                <!-- <div class="iso-quote">
                     <span class="iso-ref">[basic.fundamental] §6.7.1 — ISO/IEC 14882:2020</span>
                     There are five standard signed integer types:
                     <strong>signed char</strong>, <strong>short int</strong>, <strong>int</strong>,
                     <strong>long int</strong>, and <strong>long long int</strong>.
                     For each of the standard signed integer types, there exists a corresponding
                     (but distinct) unsigned integer type.
-                </div>
+                </div> -->
 
                 <!-- ============================================== -->
                 <h2 id="overview-table">Обзор семейства целочисленных типов</h2>
@@ -318,28 +321,28 @@
                             <tr>
                                 <td><code>short int</code></td>
                                 <td><code>short</code></td>
-                                <td>?$16$ бит</td>
+                                <td>$\ge16$ бит</td>
                                 <td>$2$ байта</td>
                                 <td class="cell-range">$-32\,768$ … $32\,767$</td>
                             </tr>
                             <tr>
                                 <td><code>int</code></td>
                                 <td><code>signed</code></td>
-                                <td>?$16$ бит</td>
+                                <td>$\ge16$ бит</td>
                                 <td>$4$ байта</td>
                                 <td class="cell-range">$-2\,147\,483\,648$ … $2\,147\,483\,647$</td>
                             </tr>
                             <tr>
                                 <td><code>long int</code></td>
                                 <td><code>long</code></td>
-                                <td>?$32$ бита</td>
+                                <td>$\ge32$ бита</td>
                                 <td>$8$ б (Linux) / $4$ б (Windows)</td>
                                 <td class="cell-range">платформенно-зависим</td>
                             </tr>
-                            <tr>
+                            <tr data-slot="2" data-std="11">
                                 <td><code>long long int</code> <span class="std-badge std-badge--11">C++11</span></td>
                                 <td><code>long long</code></td>
-                                <td>?$64$ бита</td>
+                                <td>$\ge64$ бита</td>
                                 <td>$8$ байт</td>
                                 <td class="cell-range">$-9.22 \times 10^{18}$ … $9.22 \times 10^{18}$</td>
                             </tr>
@@ -373,7 +376,7 @@
                         <div class="int-type-card__body">
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (гарантия)</span>
-                                <span class="int-type-card__row-value">? $16$ бит</span>
+                                <span class="int-type-card__row-value">$\ge16$ бит</span>
                             </div>
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (x86-64)</span>
@@ -420,7 +423,7 @@
                     </div>
                 </div>
 
-                <div class="code-block" data-example="chapter-1/integer-types/short.cpp">
+                <div class="code-block" data-example="short">
                     <div class="code-header">
                         <span class="code-lang">C++ — short</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
@@ -499,9 +502,9 @@
                     </div>
                 </div>
 
-                <div class="code-block" data-example="chapter-1/integer-types/int.cpp">
+                <div class="code-block" data-example="int">
                     <div class="code-header">
-                        <span class="code-lang">C++11/14/17/20/23 — int</span>
+                        <span class="code-lang">C++ — int</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
@@ -531,7 +534,7 @@
                         <div class="int-type-card__body">
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Размер (гарантия)</span>
-                                <span class="int-type-card__row-value">? $32$ бита</span>
+                                <span class="int-type-card__row-value">$\ge32$ бита</span>
                             </div>
                             <div class="int-type-card__row">
                                 <span class="int-type-card__row-label">Linux x86-64</span>
@@ -611,95 +614,7 @@
                 </div>
 
                 <!-- -- long long -- -->
-                <h3 id="type-long-long">long long <span class="std-badge std-badge--11">C++11</span></h3>
-                <p>
-                    <span class="key-term">long long</span> — единственный тип, гарантирующий не менее $64$ бит
-                    на <em>любой</em> поддерживаемой платформе.
-                    Его диапазон: $-2^{63}$ до $2^{63}-1$ ? $\pm 9.2 \times 10^{18}$.
-                </p>
-
-                <div class="int-types-grid">
-                    <div class="int-type-card int-type-card--ll">
-                        <div class="int-type-card__header">
-                            <span class="int-type-card__name">long long</span>
-                            <span class="std-badge std-badge--11" style="margin-left:auto">C++11</span>
-                        </div>
-                        <div class="int-type-card__body">
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">Размер (гарантия)</span>
-                                <span class="int-type-card__row-value">? $64$ бита</span>
-                            </div>
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">Размер (x86-64)</span>
-                                <span class="int-type-card__row-value">$8$ байт / $64$ бита</span>
-                            </div>
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">LLONG_MIN</span>
-                                <span class="int-type-card__row-value">$-9\,223\,372\,036\,854\,775\,808$</span>
-                            </div>
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">LLONG_MAX</span>
-                                <span class="int-type-card__row-value">$+9\,223\,372\,036\,854\,775\,807$</span>
-                            </div>
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">Суффикс</span>
-                                <span class="int-type-card__row-value">42LL или 42ll</span>
-                            </div>
-                            <div class="int-type-card__use">
-                                Unix timestamps, ID записей в БД, файловые смещения (&gt;$4$ ГБ), астрономические расчёты.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="int-type-card int-type-card--uint">
-                        <div class="int-type-card__header">
-                            <span class="int-type-card__name">unsigned long long</span>
-                        </div>
-                        <div class="int-type-card__body">
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">Размер (x86-64)</span>
-                                <span class="int-type-card__row-value">$8$ байт / $64$ бита</span>
-                            </div>
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">MIN</span>
-                                <span class="int-type-card__row-value">$0$</span>
-                            </div>
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">ULLONG_MAX</span>
-                                <span class="int-type-card__row-value">$18\,446\,744\,073\,709\,551\,615$</span>
-                            </div>
-                            <div class="int-type-card__row">
-                                <span class="int-type-card__row-label">Суффикс</span>
-                                <span class="int-type-card__row-value">42ULL</span>
-                            </div>
-                            <div class="int-type-card__use">
-                                Криптография, хеш-значения, $64$-битные битовые маски.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="code-block" data-example="chapter-1/integer-types/long-long.cpp">
-                    <div class="code-header">
-                        <span class="code-lang">C++11/14/20/23 — long long</span>
-                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
-                    </div>
-                    <div class="code-content">
-<pre><code class="language-cpp">// загрузка...</code></pre>
-                    </div>
-                </div>
-
-                <div class="code-block" data-example="chapter-2/fundamental-types/integer-types-demo.cpp">
-                    <div class="code-header">
-                        <span class="code-lang">C++ — целочисленные типы демонстрация</span>
-                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
-                    </div>
-                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
-                </div>
-
-                <div class="section-quiz-prompt">
-                    <span class="section-quiz-prompt__text">Проверьте знания по <code>long long</code></span>
-                    <button class="btn-quiz-open" onclick="openQuizModal('integers-longlong','Тест: тип long long')">? Пройти тест ></button>
-                </div>
+                <div data-slot="1" data-std="11"></div>
 
                 <div class="info-card">
                     <div class="info-card__title">?? Продолжение темы</div>
@@ -714,55 +629,11 @@
                     </p>
                 </div>
 
-                <!-- Тесты по типам -->
+                               <!-- Навигация -->
+                
                 <h2 id="tests">Проверьте знания</h2>
-                <p>После каждого типа — отдельный тест. В конце — итоговый тест по всему параграфу.</p>
-
-                <div class="int-tests-grid">
-                    <div class="int-test-card">
-                        <div class="int-test-card__icon">??</div>
-                        <div class="int-test-card__title">short</div>
-                        <div class="int-test-card__desc">10 вопросов: размер, диапазон, integer promotion, overflow</div>
-                        <button class="btn-quiz-open" onclick="openQuizModal('integers-short', 'Тест: тип short')">Пройти тест ></button>
-                    </div>
-                    <div class="int-test-card">
-                        <div class="int-test-card__icon">??</div>
-                        <div class="int-test-card__title">int</div>
-                        <div class="int-test-card__desc">10 вопросов: диапазон, UB, unsigned, применение</div>
-                        <button class="btn-quiz-open" onclick="openQuizModal('integers-int', 'Тест: тип int')">Пройти тест ></button>
-                    </div>
-                    <div class="int-test-card">
-                        <div class="int-test-card__icon">??</div>
-                        <div class="int-test-card__title">long</div>
-                        <div class="int-test-card__desc">10 вопросов: платформенные различия, LLP64 vs LP64</div>
-                        <button class="btn-quiz-open" onclick="openQuizModal('integers-long', 'Тест: тип long')">Пройти тест ></button>
-                    </div>
-                    <div class="int-test-card">
-                        <div class="int-test-card__icon">??</div>
-                        <div class="int-test-card__title">long long</div>
-                        <div class="int-test-card__desc">10 вопросов: 64-битный диапазон, суффиксы, C++11</div>
-                        <button class="btn-quiz-open" onclick="openQuizModal('integers-longlong', 'Тест: тип long long')">Пройти тест ></button>
-                    </div>
-                </div>
-
-                <div class="int-test-final">
-                    <div class="int-test-final__left">
-                        <div class="int-test-final__title">?? Итоговый тест по параграфу</div>
-                        <div class="int-test-final__desc">20 вопросов по всем целочисленным типам: short, int, long, long long, signed/unsigned, overflow, fixed-width типы</div>
-                    </div>
-                    <button class="btn-quiz-open btn-quiz-open--final" onclick="openQuizModal('integers-paragraph', 'Целочисленные типы — итоговый тест')">Пройти итоговый тест ></button>
-                </div>
-
-                <!-- Модальное окно теста -->
-                <div id="quiz-modal-overlay" class="quiz-modal-overlay" onclick="closeQuizModal(event)">
-                    <div class="quiz-modal-box" id="quiz-modal-box">
-                        <button class="quiz-modal-close" onclick="closeQuizModal(null)" aria-label="Закрыть">?</button>
-                        <div id="quiz-modal-content"></div>
-                    </div>
-                </div>
-
-                <!-- Навигация -->
-                <div class="paragraph-nav">
+                <div class="quiz-widget" data-quizzes="integer-types,integers-short,integers-int,integers-long,integers-longlong" data-final="integers-paragraph" data-final-desc="short, int, long, long long, unsigned, диапазоны"></div>
+<div class="paragraph-nav">
                     <!-- navigation.js заполнит динамически из course-structure.json -->
                 </div>
 
@@ -784,8 +655,10 @@
     <script src="../../../js/course.js"></script><script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
     <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
     <script src="../../../js/compiler.js"></script>
     <script src="../../../js/gamification.js"></script>
+    <script src="../../../js/std-gate.js"></script>
     <script>
     function copyCode(btn) {
         const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';

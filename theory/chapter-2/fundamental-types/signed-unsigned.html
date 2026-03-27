@@ -20,9 +20,11 @@
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
     <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/std-gate.css">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
 
@@ -263,73 +265,15 @@ int main() {
                     </div>
                 </div>
 
-                <!-- ============================================== -->
-                <h2 id="cmp-functions">Безопасное сравнение — std::cmp_* <span class="std-badge std-badge--20">C++20</span></h2>
 
-                <p>
-                    C++20 добавил набор функций в <code>&lt;utility&gt;</code> для безопасного сравнения
-                    целых чисел разной знаковости без рисков UB или неожиданных результатов:
-                </p>
+                <!-- STD_GATE slot=2 std=20 — демо signed/unsigned (перенесено в gated) -->
+                <div data-slot="2" data-std="20"></div>
 
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr><th>Функция</th><th>Эквивалент</th><th>Безопасна?</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>std::cmp_equal(a, b)</code></td><td><code>a == b</code></td><td>? да</td></tr>
-                            <tr><td><code>std::cmp_less(a, b)</code></td><td><code>a &lt; b</code></td><td>? да</td></tr>
-                            <tr><td><code>std::cmp_greater(a, b)</code></td><td><code>a &gt; b</code></td><td>? да</td></tr>
-                            <tr><td><code>std::in_range&lt;T&gt;(n)</code></td><td>проверяет, вмещается ли n в тип T</td><td>? да</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-header">
-                        <span class="code-lang">C++20 — std::cmp_less, std::in_range</span>
-                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
-                    </div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;utility&gt;  // std::cmp_less, std::in_range (C++20)
-
-int main() {
-    int          a{-1};
-    unsigned int b{0u};
-
-    // ? Небезопасно: неявное приведение
-    // if (a < b) ...  // false! -1 > UINT_MAX > 0
-
-    // ? C++20: безопасное сравнение
-    if (std::cmp_less(a, b))
-        std::cout &lt;&lt; "-1 &lt; 0 (корректно!)\n";  // выведет
-
-    // ? Проверка диапазона перед приведением
-    int x{42'000};
-    if (std::in_range&lt;short&gt;(x))
-        std::cout &lt;&lt; "42000 вмещается в short\n";
-    else
-        std::cout &lt;&lt; "42000 НЕ вмещается в short\n";  // выведет!
-
-    long long big{9'000'000'000LL};
-    if (std::in_range&lt;int&gt;(big))
-        std::cout &lt;&lt; "вмещается\n";
-    else
-        std::cout &lt;&lt; "9 миллиардов в int не влезает!\n";  // выведет
-
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-                <div class="code-block" data-example="chapter-2/fundamental-types/signed-unsigned-demo.cpp">
-                    <div class="code-header">
-                        <span class="code-lang">C++ — signed/unsigned демонстрация</span>
-                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
-                    </div>
-                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
-                </div>
-
+                <!-- STD_GATE slot=1 std=20 -->
+                <div data-slot="1" data-std="20"></div>
+                <div data-slot="1" data-std="14"></div>
+                <div data-slot="1" data-std="23"></div>
+                <div data-slot="1" data-std="17"></div>
                 <!-- ============================================== -->
                 <h2 id="when-to-use">Когда использовать unsigned?</h2>
 
@@ -396,6 +340,9 @@ int main() {
 }</code></pre>
                     </div>
                 </div>
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="signed-unsigned" data-final-desc="signed vs unsigned, неявные преобразования, std::cmp_less, C++20"></div>
+
 
                 <!-- Навигация -->
                 <div class="paragraph-nav">
@@ -420,8 +367,10 @@ int main() {
     <script src="../../../js/course.js"></script><script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
     <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
     <script src="../../../js/compiler.js"></script>
     <script src="../../../js/gamification.js"></script>
+    <script src="../../../js/std-gate.js"></script>
     <script>
     (function () {
         const bar = document.getElementById('reading-progress');

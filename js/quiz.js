@@ -93,7 +93,7 @@ class Quiz {
                 return q.answers.map((ans, i) => `
                     <button class="quiz-answer" data-index="${i}">
                         <span class="quiz-answer-letter">${String.fromCharCode(65 + i)}</span>
-                        <span>${ans}</span>
+                        <span>${quizMd(ans)}</span>
                     </button>`).join('');
 
             case 'multiple':
@@ -101,7 +101,7 @@ class Quiz {
                     <label class="quiz-answer quiz-answer--check">
                         <input type="checkbox" data-index="${i}" class="quiz-checkbox">
                         <span class="quiz-answer-letter">${String.fromCharCode(65 + i)}</span>
-                        <span>${ans}</span>
+                        <span>${quizMd(ans)}</span>
                     </label>`).join('');
 
             case 'fill':
@@ -115,7 +115,7 @@ class Quiz {
                 return q.answers.map((ans, i) => `
                     <button class="quiz-answer" data-index="${i}">
                         <span class="quiz-answer-letter">${String.fromCharCode(65 + i)}</span>
-                        <span>${this._escape(ans)}</span>
+                        <span>${quizMd(this._escape(ans))}</span>
                     </button>`).join('');
 
             default:
@@ -355,8 +355,14 @@ class Quiz {
             best:    Math.max(pct, prev.best || 0)
         };
         localStorage.setItem(key, JSON.stringify(entry));
-        // Also store best score under a flat key for sidebar indicator
+        // Store best score for quiz-widget
         localStorage.setItem(`quiz_best_${this.quizId}`, JSON.stringify(entry.best));
+        // Store history for median calculation in quiz-widget
+        const histKey = `quiz_hist_${this.quizId}`;
+        const hist = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
+        hist.push(pct);
+        if (hist.length > 20) hist.splice(0, hist.length - 20);
+        localStorage.setItem(histKey, JSON.stringify(hist));
 
         // Флаг прохождения финального теста (для разблокировки следующего параграфа)
         if (passed && this.type === 'final') {
@@ -455,7 +461,7 @@ const QuizLoader = {
      */
     _pickQuestions(data) {
         const all    = data.questions || [];
-        const pick   = data.pick || all.length;
+        const pick   = Math.min(data.pick || all.length, all.length);
         const quizId = data.quizId;
 
         // Загружаем ID неправильно отвеченных вопросов
@@ -625,7 +631,7 @@ class ModalQuiz {
 
     static _pickQuestions(data) {
         const all    = data.questions || [];
-        const pick   = data.pick || all.length;
+        const pick   = Math.min(data.pick || all.length, all.length);
         const quizId = data.quizId;
 
         const wrongIds = new Set(JSON.parse(localStorage.getItem(`quiz_wrong_${quizId}`) || '[]'));
@@ -668,6 +674,14 @@ class ModalQuiz {
         const pct = Math.round(this.current / this.questions.length * 100);
         this.answered = false;
 
+        // Накопленные очки за сессию
+        const earnedPts = Object.values(this.answers).reduce((s, a) => s + a.pts, 0);
+        // Первая попытка = нет истории в localStorage
+        const histKey = `quiz_hist_${this.quizId}`;
+        const hist = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
+        const isFirstAttempt = hist.length === 0;
+        const firstBadge = isFirstAttempt ? `<span class="qm-score-first" title="Первая попытка">⚡</span>` : '';
+
         this.container.innerHTML = `
             <div class="qm-header">
                 <div class="qm-title">${this.title}</div>
@@ -676,13 +690,18 @@ class ModalQuiz {
             <div class="qm-progress"><div class="qm-progress-fill" style="width:${pct}%"></div></div>
             <div class="qm-body">
                 <div class="qm-type-badge qm-type--${q.type}">${this._typeLabel(q.type)}</div>
-                <div class="qm-question">${q.question}</div>
+                <div class="qm-question">${quizMd(q.question)}</div>
                 ${q.code ? `<pre class="qm-code"><code class="language-cpp">${this._esc(q.code)}</code></pre>` : ''}
                 <div class="qm-answers" id="qm-answers"></div>
                 <div class="qm-feedback" id="qm-feedback" style="display:none"></div>
             </div>
             <div class="qm-footer">
-                <div class="qm-score">⭐ ${Object.values(this.answers).reduce((s, a) => s + a.pts, 0)} очков</div>
+                <div class="qm-score">
+                    <span class="qm-score-coin">🪙</span>
+                    <span class="qm-score-val">${earnedPts}</span>
+                    <span style="color:var(--text-tertiary);font-size:.75rem">очков</span>
+                    ${firstBadge}
+                </div>
                 <div class="qm-actions">
                     ${q.type === 'multiple' || q.type === 'fill'
                         ? `<button class="btn-qm btn-qm--check" id="qm-check">Проверить</button>` : ''}
@@ -703,14 +722,14 @@ class ModalQuiz {
             wrap.innerHTML = q.answers.map((a, i) => `
                 <button class="qm-answer" data-i="${i}">
                     <span class="qm-letter">${String.fromCharCode(65 + i)}</span>
-                    <span>${this._esc(a)}</span>
+                    <span>${quizMd(this._esc(a))}</span>
                 </button>`).join('');
         } else if (q.type === 'multiple') {
             wrap.innerHTML = q.answers.map((a, i) => `
                 <label class="qm-answer qm-answer--check">
                     <input type="checkbox" data-i="${i}">
                     <span class="qm-letter">${String.fromCharCode(65 + i)}</span>
-                    <span>${this._esc(a)}</span>
+                    <span>${quizMd(this._esc(a))}</span>
                 </label>`).join('');
         } else if (q.type === 'fill') {
             wrap.innerHTML = `<input class="qm-fill" id="qm-fill-input" placeholder="Введите ответ…" autocomplete="off" spellcheck="false">`;
@@ -816,12 +835,24 @@ class ModalQuiz {
         const passed  = pct >= this.passingScore;
         const correct = Object.values(this.answers).filter(a => a.ok).length;
 
+        // Определяем медаль
+        const medal = pct === 100 ? '🥇' : pct >= 90 ? '🥈' : pct >= 80 ? '🥉' : pct >= 70 ? '✅' : '📚';
+        const statusLabel = pct === 100 ? 'Золото' : pct >= 90 ? 'Серебро' : pct >= 80 ? 'Бронза' : pct >= 70 ? 'Зачёт' : 'Не зачтено';
+        const statusCls   = pct === 100 ? 'gold' : pct >= 90 ? 'silver' : pct >= 80 ? 'bronze' : pct >= 70 ? 'pass' : 'fail';
+
+        // Первая попытка?
+        const histKey = `quiz_hist_${this.quizId}`;
+        const hist = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
+        const isFirstAttempt = hist.length === 0;
+
         this._saveProgress(pct, passed);
 
         this.container.innerHTML = `
             <div class="qm-results">
-                <div class="qm-results-emoji">${pct >= 90 ? '🏆' : pct >= 70 ? '👍' : '📚'}</div>
+                <div class="qm-results-emoji">${medal}</div>
                 <h2>${passed ? 'Тест пройден!' : 'Попробуйте ещё раз'}</h2>
+                <span class="qm-status-badge qm-status--${statusCls}">${statusLabel}</span>
+                ${isFirstAttempt && passed ? `<div class="qm-first-badge">⚡ Первая попытка!</div>` : ''}
                 <div class="qm-results-circle">
                     <svg viewBox="0 0 100 100">
                         <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-primary)" stroke-width="8"/>
@@ -835,11 +866,13 @@ class ModalQuiz {
                     <div class="qm-results-pct">${pct}%</div>
                 </div>
                 <div class="qm-results-stats">
-                    <div><div class="qm-stat-v">${earned}</div><div class="qm-stat-l">Очков</div></div>
                     <div><div class="qm-stat-v">${correct}</div><div class="qm-stat-l">Правильных</div></div>
                     <div><div class="qm-stat-v">${this.questions.length}</div><div class="qm-stat-l">Вопросов</div></div>
                 </div>
-                <div class="qm-rewards" id="qm-rewards-${this.quizId}" style="display:none;"></div>
+                <div class="qm-rewards" id="qm-rewards-${this.quizId}">
+                    <span class="qm-reward-chip coins">🪙 <span id="qm-coins-val">...</span></span>
+                    <span class="qm-reward-chip xp">✦ <span id="qm-xp-val">...</span> XP</span>
+                </div>
                 <div class="qm-results-actions">
                     <button class="btn-qm btn-qm--check" onclick="openQuizModal('${this.quizId}','${this.title.replace(/'/g,"\\'")}')">Пройти снова</button>
                     <button class="btn-qm btn-qm--next" onclick="closeQuizModal(null)">Закрыть</button>
@@ -848,10 +881,17 @@ class ModalQuiz {
     }
 
     _saveProgress(pct, passed) {
-        // Update best score in localStorage for sidebar badge
-        const lsKey = `quiz_best_${this.quizId}`;
-        const prev  = (() => { try { return JSON.parse(localStorage.getItem(lsKey) || '0'); } catch { return 0; } })();
+        // Update best score and attempts history in localStorage
+        const lsKey     = `quiz_best_${this.quizId}`;
+        const histKey   = `quiz_hist_${this.quizId}`;
+        const prev      = (() => { try { return JSON.parse(localStorage.getItem(lsKey) || '0'); } catch { return 0; } })();
         if (pct > prev) localStorage.setItem(lsKey, JSON.stringify(pct));
+
+        // Append to history (keep last 20 attempts)
+        const hist = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
+        hist.push(pct);
+        if (hist.length > 20) hist.splice(0, hist.length - 20);
+        localStorage.setItem(histKey, JSON.stringify(hist));
 
         // Track wrong question IDs for smart re-selection
         const wrongIds = Object.values(this.answers)
@@ -899,17 +939,22 @@ class ModalQuiz {
     }
 
     _showReward(reward) {
-        const el = document.getElementById(`qm-rewards-${this.quizId}`);
-        if (!el) return;
-        const statusEmoji = { gold: '🥇', silver: '🥈', bronze: '🥉', passed: '✅', failed: '❌' };
-        const parts = [];
-        if (reward.coinsEarned > 0) parts.push(`🪙 +${reward.coinsEarned} монет`);
-        if (reward.xpEarned > 0)    parts.push(`⭐ +${reward.xpEarned} XP`);
-        if (reward.idealBonus)       parts.push(`⚡ Бонус x1.5 за идеал!`);
-        if (reward.isNewStatus)      parts.push(`${statusEmoji[reward.status] || ''} Новый статус: ${reward.status}`);
-        if (parts.length === 0) return;
-        el.style.display = 'flex';
-        el.innerHTML = parts.map(p => `<span class="reward-badge">${p}</span>`).join('');
+        const coinsEl = document.getElementById('qm-coins-val');
+        const xpEl    = document.getElementById('qm-xp-val');
+        if (coinsEl) coinsEl.textContent = reward.coinsEarned > 0 ? `+${reward.coinsEarned}` : '0';
+        if (xpEl)    xpEl.textContent    = reward.xpEarned > 0   ? `+${reward.xpEarned}`   : '0';
+
+        // Extra badges for bonus/status
+        const rewardsEl = document.getElementById(`qm-rewards-${this.quizId}`);
+        if (!rewardsEl) return;
+        if (reward.idealBonus) {
+            rewardsEl.insertAdjacentHTML('beforeend', `<span class="qm-reward-chip" style="color:#fab387;border-color:rgba(250,179,135,.3)">⚡ Бонус ×1.5</span>`);
+        }
+        if (reward.isNewStatus) {
+            const statusEmoji = { gold: '🥇', silver: '🥈', bronze: '🥉', passed: '✅' };
+            const e = statusEmoji[reward.status] || '🏅';
+            rewardsEl.insertAdjacentHTML('beforeend', `<span class="qm-reward-chip" style="color:#fde68a;border-color:rgba(253,230,138,.3)">${e} Новый статус!</span>`);
+        }
     }
 
     _typeLabel(t) {

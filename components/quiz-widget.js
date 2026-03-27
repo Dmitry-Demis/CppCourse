@@ -87,18 +87,23 @@
 
     // ── Карточка теста ────────────────────────────────────────────────────
     function buildCard(meta) {
-        const type = meta.type || 'mini';
-        const info = TYPE_LABELS[type] || TYPE_LABELS.mini;
-        const pick = calcPick(meta);
-        const best = getBest(meta.quizId);
+        const type  = meta.type || 'mini';
+        const info  = TYPE_LABELS[type] || TYPE_LABELS.mini;
+        const pick  = calcPick(meta);
+        const stats = getStats(meta.quizId);
 
         const card = document.createElement('div');
         card.className = 'qw-card';
         card.innerHTML = `
-            <div class="qw-card__icon">${best !== null ? scoreEmoji(best) : '❓'}</div>
+            <div class="qw-card__icon">${stats ? scoreEmoji(stats.best) : '❓'}</div>
             <div class="qw-card__title">${esc(meta.title)}</div>
             <div class="qw-card__badge qw-card__badge--${type}">${info.label}</div>
-            <div class="qw-card__desc">${pick} вопросов${best !== null ? ` · Лучший: ${best}%` : ''}</div>
+            <div class="qw-card__desc">${pick} вопросов</div>
+            ${stats ? `<div class="qw-card__stats">
+                <span class="qw-stat"><span class="qw-stat__label">Лучший</span><span class="qw-stat__val">${stats.best}%</span></span>
+                ${stats.median !== null ? `<span class="qw-stat"><span class="qw-stat__label">Медиана</span><span class="qw-stat__val">${stats.median}%</span></span>` : ''}
+                <span class="qw-stat"><span class="qw-stat__label">Попыток</span><span class="qw-stat__val">${stats.attempts}</span></span>
+            </div>` : ''}
             <button class="qw-btn qw-btn--${type}">Пройти тест &gt;</button>`;
 
         card.querySelector('button').addEventListener('click', () => openModal(meta.quizId, meta.title));
@@ -107,20 +112,32 @@
 
     // ── Итоговый блок — такой же стиль как карточка ───────────────────────
     function buildFinal(meta, desc) {
-        const type = meta.type || 'paragraph';
-        const info = TYPE_LABELS[type] || TYPE_LABELS.paragraph;
-        const pick = calcPick(meta);
-        const best = getBest(meta.quizId);
+        const type  = meta.type || 'paragraph';
+        const info  = TYPE_LABELS[type] || TYPE_LABELS.paragraph;
+        const pick  = calcPick(meta);
+        const stats = getStats(meta.quizId);
         const descText = desc || `${pick} вопросов по всем темам`;
+
+        const statsHtml = stats ? `
+            <div class="qw-card__stats">
+                <span class="qw-stat"><span class="qw-stat__label">Лучший</span><span class="qw-stat__val">${stats.best}%</span></span>
+                ${stats.median !== null ? `<span class="qw-stat"><span class="qw-stat__label">Медиана</span><span class="qw-stat__val">${stats.median}%</span></span>` : ''}
+                <span class="qw-stat"><span class="qw-stat__label">Попыток</span><span class="qw-stat__val">${stats.attempts}</span></span>
+            </div>` : '';
 
         const card = document.createElement('div');
         card.className = `qw-card qw-card--final qw-card--final-${type}`;
         card.innerHTML = `
-            <div class="qw-card__icon">${best !== null ? scoreEmoji(best) : '❓'}</div>
-            <div class="qw-card__title">${esc(meta.title)}</div>
-            <div class="qw-card__badge qw-card__badge--${type}">${info.label}</div>
-            <div class="qw-card__desc">${esc(descText)}${best !== null ? ` · Лучший: ${best}%` : ''}</div>
-            <button class="qw-btn qw-btn--${type}">Пройти итоговый тест &gt;</button>`;
+            <div class="qw-card__row">
+                <div class="qw-card__icon">${stats ? scoreEmoji(stats.best) : '❓'}</div>
+                <div class="qw-card__title">${esc(meta.title)}</div>
+                <div class="qw-card__badge qw-card__badge--${type}">${info.label}</div>
+            </div>
+            <div class="qw-card__desc">${esc(descText)} · ${pick} вопросов</div>
+            <div class="qw-card__row">
+                ${statsHtml}
+                <button class="qw-btn qw-btn--${type}" style="margin-top:0">Пройти итоговый тест &gt;</button>
+            </div>`;
 
         card.querySelector('button').addEventListener('click', () => openModal(meta.quizId, meta.title));
         return card;
@@ -180,8 +197,21 @@
     window.closeQuizModal = window.closeQuizModal || function(e) { if (e === null || e === undefined) closeModal(); };
 
     // ── Вспомогательные ───────────────────────────────────────────────────
-    function getBest(quizId) {
-        try { return JSON.parse(localStorage.getItem(`quiz_best_${quizId}`)); } catch { return null; }
+    function getStats(quizId) {
+        try {
+            const best = JSON.parse(localStorage.getItem(`quiz_best_${quizId}`));
+            const hist = JSON.parse(localStorage.getItem(`quiz_hist_${quizId}`) || '[]');
+            if (best === null) return null;
+            let median = null;
+            if (hist.length > 0) {
+                const sorted = [...hist].sort((a, b) => a - b);
+                const mid = Math.floor(sorted.length / 2);
+                median = sorted.length % 2 === 0
+                    ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+                    : sorted[mid];
+            }
+            return { best, median, attempts: hist.length };
+        } catch { return null; }
     }
 
     function scoreEmoji(pct) {

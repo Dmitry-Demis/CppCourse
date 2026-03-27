@@ -1,105 +1,257 @@
 // ============================================
-// CppCompiler — inline compiler widget
-// Для каждого .code-block[data-example] редактор
-// рендерится сразу (не по кнопке).
-// Код подгружается с /api/examples/...
-// Подсветка через highlight.js (если подключён).
+// CppCompiler v5 — CodeMirror 6 (UMD via jsDelivr) + Godbolt
 // ============================================
 
 const CW_COMPILERS = [
-    { id: 'g1320',  label: 'GCC 13.2',   family: 'gcc'   },
-    { id: 'g1220',  label: 'GCC 12.2',   family: 'gcc'   },
-    { id: 'clang1600', label: 'Clang 16', family: 'clang' },
-    { id: 'clang1500', label: 'Clang 15', family: 'clang' },
+    { id: 'g152',      label: 'GCC 15.2'   },
+    { id: 'clang2210', label: 'Clang 22.1' },
 ];
 
-const CW_STDS = ['c++23', 'c++20', 'c++17', 'c++14', 'c++11'];
+// Загружаем CodeMirror через готовый UMD-бандл
+let _cmPromise = null;
+
+function _loadCM() {
+    if (_cmPromise) return _cmPromise;
+    _cmPromise = new Promise((resolve, reject) => {
+        if (window.CodeMirror) { resolve(window.CodeMirror); return; }
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@uiw/codemirror-extensions-langs/dist/index.umd.js';
+        s.onerror = reject;
+        // Используем codemirror-editor-in-chief — полный бандл с C++
+        document.head.appendChild(s);
+        // Вместо этого — используем простой CM5 UMD который точно работает
+    });
+    return _cmPromise;
+}
+
+// Проще и надёжнее — используем CodeMirror 5 (есть нормальный UMD)
+let _cm5Promise = null;
+
+function _loadCM5() {
+    if (_cm5Promise) return _cm5Promise;
+    _cm5Promise = new Promise((resolve, reject) => {
+        if (window.CodeMirror) { resolve(); return; }
+
+        // CSS
+        const link = document.createElement('link');
+        link.rel  = 'stylesheet';
+        link.href = 'https://cdn.jsdelivr.net/npm/codemirror@5/lib/codemirror.min.css';
+        document.head.appendChild(link);
+
+        const linkTheme = document.createElement('link');
+        linkTheme.rel  = 'stylesheet';
+        linkTheme.href = 'https://cdn.jsdelivr.net/npm/codemirror@5/theme/dracula.min.css';
+        document.head.appendChild(linkTheme);
+
+        // Core JS
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/codemirror@5/lib/codemirror.min.js';
+        s.onload = () => {
+            // C++ mode
+            const m = document.createElement('script');
+            m.src = 'https://cdn.jsdelivr.net/npm/codemirror@5/mode/clike/clike.min.js';
+            m.onload  = resolve;
+            m.onerror = reject;
+            document.head.appendChild(m);
+        };
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+    return _cm5Promise;
+}
 
 class CppCompiler {
-    /**
-     * @param {string|HTMLElement} target  — ID контейнера или сам элемент
-     * @param {string} initialCode
-     * @param {object} opts  — { std: 'c++17', compiler: 'g1320' }
-     */
-    constructor(target, initialCode = '', opts = {}) {
-        this.container = typeof target === 'string'
-            ? document.getElementById(target)
-            : target;
-        this.code     = initialCode;
-        this.compiler = opts.compiler || CW_COMPILERS[0].id;
-        this.std      = opts.std      || 'c++17';
-        if (this.container) this._render();
+    constructor(block) {
+        this.block    = block;
+        this.compiler = CW_COMPILERS[0].id;
+        this.std      = 'c++11';
+        this.code     = '';
+        this._cm      = null;
     }
 
-    _render() {
-        const compilerOptions = CW_COMPILERS.map(c =>
-            `<option value="${c.id}" ${c.id === this.compiler ? 'selected' : ''}>${c.label}</option>`
+    // Вычисляет базовый путь примера из URL страницы.
+    // /theory/chapter-2/fundamental-types/integer-types.html → chapter-2/fundamental-types/integer-types
+    _pageBasePath() {
+        const parts = location.pathname
+            .replace(/^\/theory\//, '')
+            .replace(/\.html$/, '')
+            .split('/')
+            .filter(Boolean);
+        return parts.join('/');
+    }
+
+    // Возвращает список путей для попытки загрузки для конкретного стандарта (от точного к базовому).
+    // std="c++17", example="short" →
+    //   chapter-2/.../integer-types/short/short_17.cpp  (версионированный)
+    //   chapter-2/.../integer-types/short/short.cpp     (базовый в папке)
+    //   chapter-2/.../integer-types/short.cpp           (плоский)
+    _candidatePathsForStd(example, std) {
+        const suffix = std.replace('c++', '');
+
+        // Старый формат: полный путь с .cpp
+        if (example.includes('/') || example.endsWith('.cpp')) {
+            const base = example.replace(/\.cpp$/i, '');
+            return [
+                `${base}_${suffix}.cpp`,
+                example.endsWith('.cpp') ? example : `${example}.cpp`,
+            ];
+        }
+
+        // Новый формат: просто имя
+        const pageBase = this._pageBasePath();
+        return [
+            `${pageBase}/${example}/${example}_${suffix}.cpp`,
+            `${pageBase}/${example}/${example}.cpp`,
+            `${pageBase}/${example}.cpp`,
+        ];
+    }
+
+    async _fetchCode(example, std) {
+        for (const candidate of this._candidatePathsForStd(example, std)) {
+            try {
+                const r = await fetch(`/api/examples/${candidate}`);
+                if (r.ok) return (await r.json()).code || '';
+            } catch {}
+        }
+        return null;
+    }
+
+    async init() {
+        const codeEl = this.block.querySelector('pre code');
+        this._example = this.block.dataset.example;
+
+        if (this._example) {
+            const code = await this._fetchCode(this._example, this.std);
+            if (code !== null) this.code = code;
+        }
+        if (!this.code && codeEl) this.code = codeEl.textContent.trim();
+
+        const label = this.block.querySelector('.code-lang')?.textContent || 'C++';
+
+        try {
+            await _loadCM5();
+            this._render(label, true);
+        } catch {
+            this._render(label, false);
+        }
+    }
+
+    async _onStdChange(std) {
+        this.std = std;
+        if (!this._example) return;
+
+        const code = await this._fetchCode(this._example, std);
+        if (code !== null && code !== this._getCode()) {
+            if (this._cm) {
+                this._cm.setValue(code);
+            } else {
+                const ta = this.widget?.querySelector('.cw-ta');
+                if (ta) ta.value = code;
+            }
+        }
+    }
+
+    _render(label, withCM) {
+        const compilerOpts = CW_COMPILERS.map(c =>
+            `<option value="${c.id}">${c.label}</option>`
         ).join('');
 
-        const stdOptions = CW_STDS.map(s =>
-            `<option value="${s}" ${s === this.std ? 'selected' : ''}>${s.toUpperCase()}</option>`
+        // Читаем разблокированные стандарты из магазина
+        const unlockedStds = (() => {
+            try { return JSON.parse(localStorage.getItem('shop_unlocked_stds') || '["c++11"]'); }
+            catch { return ['c++11']; }
+        })();
+        const stdOpts = unlockedStds.map(s =>
+            `<option value="${s}">${s.toUpperCase().replace('C++', 'C++')}</option>`
         ).join('');
 
-        this.container.innerHTML = `
-            <div class="cw">
-                <div class="cw-header">
-                    <span class="cw-label">💻 Редактор</span>
-                    <div class="cw-controls">
-                        <select class="cw-select cw-select--compiler" title="Компилятор">
-                            ${compilerOptions}
-                        </select>
-                        <select class="cw-select cw-select--std" title="Стандарт C++">
-                            ${stdOptions}
-                        </select>
-                        <button class="cw-run" title="Запустить (Ctrl+Enter)">▶ Запустить</button>
-                    </div>
+        const widget = document.createElement('div');
+        widget.className = 'cw';
+        widget.innerHTML = `
+            <div class="cw-header">
+                <span class="cw-label">💻 ${label}</span>
+                <div class="cw-controls">
+                    <select class="cw-select cw-compiler">${compilerOpts}</select>
+                    <select class="cw-select cw-std" title="Стандарт C++">${stdOpts}</select>
+                    <button class="cw-copy">⎘ Копировать</button>
+                    <button class="cw-run" title="Ctrl+Enter">▶ Запустить</button>
                 </div>
-                <textarea class="cw-editor" spellcheck="false">${this._esc(this.code)}</textarea>
-                <div class="cw-output cw-output--empty">Нажмите ▶ Запустить для выполнения кода</div>
-            </div>`;
+            </div>
+            <div class="cw-cm"><textarea class="cw-ta"></textarea></div>
+            <div class="cw-output cw-output--empty">Нажмите ▶ Запустить для выполнения кода</div>`;
 
-        const ta      = this.container.querySelector('.cw-editor');
-        const selComp = this.container.querySelector('.cw-select--compiler');
-        const selStd  = this.container.querySelector('.cw-select--std');
-        const btn     = this.container.querySelector('.cw-run');
-        const out     = this.container.querySelector('.cw-output');
+        this.block.replaceWith(widget);
+        this.widget   = widget;
+        this._out     = widget.querySelector('.cw-output');
+        this._btnRun  = widget.querySelector('.cw-run');
+        this._btnCopy = widget.querySelector('.cw-copy');
+        this._selComp = widget.querySelector('.cw-compiler');
+        this._selStd  = widget.querySelector('.cw-std');
+        const ta      = widget.querySelector('.cw-ta');
+        ta.value      = this.code;
 
-        selComp.addEventListener('change', e => { this.compiler = e.target.value; });
-        selStd.addEventListener('change',  e => { this.std      = e.target.value; });
-        ta.addEventListener('input',       e => { this.code     = e.target.value; });
+        if (withCM && window.CodeMirror) {
+            this._cm = window.CodeMirror.fromTextArea(ta, {
+                mode:        'text/x-c++src',
+                theme:       'dracula',
+                lineNumbers: true,
+                indentUnit:  4,
+                tabSize:     4,
+                indentWithTabs: false,
+                lineWrapping: false,
+                autofocus:   false,
+                extraKeys: {
+                    'Tab': cm => cm.execCommand('indentMore'),
+                    'Shift-Tab': cm => cm.execCommand('indentLess'),
+                    'Ctrl-Enter': () => this._compile(),
+                    'Cmd-Enter':  () => this._compile(),
+                },
+            });
+            this._cm.setValue(this.code);
+        } else {
+            // fallback — plain textarea
+            ta.className = 'cw-ta cw-ta--plain';
+            ta.addEventListener('keydown', e => {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const s = ta.selectionStart;
+                    ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(ta.selectionEnd);
+                    ta.selectionStart = ta.selectionEnd = s + 4;
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); this._compile(); }
+            });
+        }
 
-        ta.addEventListener('keydown', e => {
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                const s = e.target.selectionStart, end = e.target.selectionEnd;
-                e.target.value = e.target.value.slice(0, s) + '    ' + e.target.value.slice(end);
-                e.target.selectionStart = e.target.selectionEnd = s + 4;
-                this.code = e.target.value;
-            }
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                this._compile(btn, out, ta);
-            }
+        this._selComp.addEventListener('change', e => { this.compiler = e.target.value; });
+        this._selStd.addEventListener('change',  e => { this._onStdChange(e.target.value); });
+        this._btnRun.addEventListener('click',   () => this._compile());
+        this._btnCopy.addEventListener('click',  () => {
+            navigator.clipboard.writeText(this._getCode()).then(() => {
+                this._btnCopy.textContent = '✓ Скопировано';
+                setTimeout(() => { this._btnCopy.textContent = '⎘ Копировать'; }, 2000);
+            });
         });
-
-        btn.addEventListener('click', () => this._compile(btn, out, ta));
     }
 
-    async _compile(btn, out, ta) {
-        this.code = ta.value;
-        btn.disabled = true;
-        btn.textContent = '⏳ Компиляция…';
-        out.className = 'cw-output cw-output--running';
-        out.textContent = 'Отправка на сервер…';
+    _getCode() {
+        return this._cm ? this._cm.getValue() : (this.widget?.querySelector('.cw-ta')?.value ?? this.code);
+    }
+
+    async _compile() {
+        const code = this._getCode();
+        this._btnRun.disabled    = true;
+        this._btnRun.textContent = '⏳…';
+        this._out.className      = 'cw-output cw-output--running';
+        this._out.textContent    = 'Компиляция…';
 
         try {
             const res = await fetch(`https://godbolt.org/api/compiler/${this.compiler}/compile`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
                 body: JSON.stringify({
-                    source: this.code,
+                    source: code,
                     options: {
-                        userArguments: `-std=${this.std} -O2`,
+                        userArguments: `-std=${this.std} -O2 -fno-diagnostics-color`,
                         compilerOptions: { executorRequest: true },
                         filters: { execute: true },
                         tools: [], libraries: []
@@ -108,79 +260,48 @@ class CppCompiler {
                     allowStoreCodeDebug: true
                 })
             });
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            if (!res.ok) throw new Error(`Godbolt HTTP ${res.status}`);
             const data = await res.json();
-            if (window.gameSystem) gameSystem.onCodeRun();
-
-            if (data.code !== 0) {
-                const errors = (data.stderr || []).map(l => l.text).join('\n')
-                    || `Ошибка компиляции (код ${data.code})`;
-                out.className = 'cw-output cw-output--error';
-                out.textContent = errors;
-            } else {
-                const output = (data.stdout || []).map(l => l.text).join('\n')
-                    || data.execResult?.stdout
-                    || '(программа выполнена, вывод отсутствует)';
-                out.className = 'cw-output cw-output--ok';
-                out.textContent = output;
-            }
+            if (window.gameSystem) gameSystem.onCodeRun?.();
+            this._showResult(data);
         } catch (err) {
-            out.className = 'cw-output cw-output--error';
-            out.textContent = `Ошибка подключения:\n${err.message}`;
+            this._out.className   = 'cw-output cw-output--error';
+            this._out.textContent = `Ошибка подключения: ${err.message}`;
         } finally {
-            btn.disabled = false;
-            btn.textContent = '▶ Запустить';
+            this._btnRun.disabled    = false;
+            this._btnRun.textContent = '▶ Запустить';
         }
     }
 
-    _esc(s) {
-        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    _stripAnsi(s) {
+        return s.replace(/\x1b\[[0-9;]*[mKGHF]/g, '').replace(/\[[\d;]*[mKGHF]/g, '');
+    }
+
+    _showResult(data) {
+        const strip = arr => (arr || []).map(l => this._stripAnsi(l.text)).filter(Boolean);
+        const buildStderr = strip(data.buildResult?.stderr);
+        const topStderr   = strip(data.stderr);
+        const stderr      = buildStderr.length ? buildStderr : topStderr;
+        const buildCode   = data.buildResult?.code ?? data.code;
+        const compiled    = data.execResult != null || buildCode === 0;
+
+        if (!compiled) {
+            this._out.className   = 'cw-output cw-output--error';
+            this._out.textContent = stderr.length ? stderr.join('\n') : `Ошибка компиляции (код ${buildCode})`;
+            return;
+        }
+
+        const stdout   = strip(data.stdout).join('\n') || data.execResult?.stdout || '(нет вывода)';
+        const warnings = stderr.filter(l => /warning:/i.test(l));
+        const prefix   = warnings.length ? `⚠️ ${warnings.join('\n')}\n\n` : '';
+        this._out.className   = 'cw-output cw-output--ok';
+        this._out.textContent = prefix + stdout;
     }
 }
 
-// ── Загрузка кода с сервера ───────────────────────────────────────────────────
-
-async function _loadExampleCode(path) {
-    try {
-        const res = await fetch(`/api/examples/${path}`);
-        if (!res.ok) return null;
-        const data = await res.json();
-        return data.code;
-    } catch { return null; }
-}
-
-// ── Инициализация всех .code-block[data-example] ─────────────────────────────
-// Для каждого такого блока:
-//   1. Подгружаем код с сервера → вставляем в <pre><code> + подсвечиваем
-//   2. Сразу рендерим редактор CppCompiler под блоком
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const blocks = document.querySelectorAll('.code-block[data-example]');
-
-    await Promise.all(Array.from(blocks).map(async (block, i) => {
-        const examplePath = block.dataset.example;
-        const codeEl      = block.querySelector('pre code');
-        const std         = block.dataset.std      || 'c++17';
-        const compiler    = block.dataset.compiler || CW_COMPILERS[0].id;
-
-        // 1. Загружаем и подсвечиваем код в статическом блоке
-        let code = '';
-        if (codeEl) {
-            const fetched = await _loadExampleCode(examplePath);
-            if (fetched) {
-                code = fetched;
-                codeEl.textContent = fetched;
-                if (window.hljs) hljs.highlightElement(codeEl);
-            } else {
-                code = codeEl.textContent;
-            }
-        }
-
-        // 2. Рендерим редактор сразу под блоком
-        const wrapper = document.createElement('div');
-        wrapper.id = `cw-${i}-${examplePath.replace(/[^a-z0-9]/gi, '-')}`;
-        block.insertAdjacentElement('afterend', wrapper);
-        new CppCompiler(wrapper, code, { std, compiler });
-    }));
+// ── Инициализация ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.code-block[data-example]').forEach(block => {
+        new CppCompiler(block).init();
+    });
 });

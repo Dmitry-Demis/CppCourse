@@ -250,6 +250,30 @@
     text-decoration: none;
 }
 
+/* Para mastery badge — rounded rectangle, фиксированная ширина */
+.para-badge {
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: .65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 5px;
+    white-space: nowrap;
+    line-height: 1.4;
+    min-width: 62px;
+    text-align: center;
+    display: inline-block;
+}
+.para-badge--none   { color: rgba(107,114,128,.5); background: transparent; border: 1px solid transparent; }
+.para-badge--gold   { background: rgba(253,230,138,.15); color: #fde68a; border: 1px solid rgba(253,230,138,.35); }
+.para-badge--silver { background: rgba(209,213,219,.12); color: #d1d5db; border: 1px solid rgba(209,213,219,.3); }
+.para-badge--bronze { background: rgba(205,127,50,.12);  color: #cd7f32; border: 1px solid rgba(205,127,50,.3); }
+.para-badge--pass   { background: rgba(110,231,183,.1);  color: #6ee7b7; border: 1px solid rgba(110,231,183,.25); }
+.para-badge--fail   { background: rgba(243,139,168,.12); color: #f38ba8; border: 1px solid rgba(243,139,168,.3); }
+
+
+
+
 /* === Features Section === */
 .features-section {
     padding: var(--space-16) var(--space-6);

@@ -13,7 +13,7 @@ let _courseCache = null;
 async function loadCourseStructure(base = '') {
     if (_courseCache) return _courseCache;
 
-    const res = await fetch(base + 'course-meta.json');
+    const res = await fetch(base + 'course-meta.json?v=' + Date.now());
     if (!res.ok) throw new Error('course-meta.json not found');
     const meta = await res.json();
 

@@ -360,7 +360,7 @@
         .para-table { width: 100%; border-collapse: collapse; }
         .para-table-head-row {
             display: grid;
-            grid-template-columns: 26px 1fr 52px 80px 72px 80px 96px 58px;
+            grid-template-columns: 26px 1fr 52px 90px 80px 96px 58px;
             gap: 6px; padding: 7px 14px 6px;
             font-size: .6rem; color: var(--text-tertiary);
             text-transform: uppercase; letter-spacing: .07em;
@@ -368,27 +368,44 @@
             margin-bottom: 2px;
         }
         .para-table-head-row > div:not(:nth-child(2)) { text-align: center; }
-        @media(max-width:720px) {
-            .para-table-head-row { grid-template-columns: 26px 1fr 52px 72px 80px 80px; }
-            .para-table-head-row .pth-rating, .para-table-head-row .pth-lastread { display: none; }
-        }
 
-        /* Para row */
-        .para-row {
+        /* Para row — now a grid div, not an <a> */
+        .para-row-grid {
             display: grid;
-            grid-template-columns: 26px 1fr 52px 80px 72px 80px 96px 58px;
-            gap: 6px; align-items: center;
+            grid-template-columns: 26px 1fr 52px 90px 80px 96px 58px;
+            gap: 6px; align-items: start;
             padding: 9px 14px;
             border-radius: 10px;
-            text-decoration: none; color: inherit;
-            transition: background .15s, transform .12s;
+            transition: background .15s;
             margin-bottom: 2px;
         }
-        .para-row:hover { background: rgba(167,139,250,.07); transform: translateX(2px); text-decoration: none; }
-        .para-row.unread { opacity: .65; }
-        @media(max-width:720px) {
-            .para-row { grid-template-columns: 26px 1fr 52px 72px 80px 80px; }
-            .para-row .pr-rating, .para-row .pr-lastread { display: none; }
+        .para-row-grid:hover { background: rgba(167,139,250,.07); }
+        .para-row-grid.unread { opacity: .65; }
+        .pr-name-link {
+            font-weight: 600; font-size: .85rem; color: var(--text-primary);
+            text-decoration: none; display: block;
+        }
+        .pr-name-link:hover { color: #a78bfa; text-decoration: none; }
+
+        /* Para tests toggle */
+        .para-row-wrap { margin-bottom: 2px; }
+        .para-tests-toggle {
+            display: inline-flex; align-items: center; gap: 5px;
+            margin-top: 3px; cursor: pointer;
+            font-size: .68rem; color: var(--text-tertiary);
+            transition: color .15s;
+        }
+        .para-tests-toggle:hover { color: #a78bfa; }
+        .ptt-label { }
+        .ptt-arrow { font-size: .55rem; transition: transform .2s; }
+        /* Detail panel is OUTSIDE the grid row — spans full width */
+        .para-tests-detail {
+            margin: 0 0 4px;
+            background: rgba(255,255,255,.02);
+            border: 1px solid var(--border-primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
         }
 
         /* Star */
@@ -512,8 +529,9 @@
             margin-bottom: 2px;
             background: rgba(255,255,255,.02);
             transition: background .15s;
+            text-decoration: none; color: inherit;
         }
-        .pt-test-row:hover { background: rgba(167,139,250,.07); }
+        .pt-test-row:hover { background: rgba(167,139,250,.07); text-decoration: none; color: inherit; }
         .pt-test-row.pt-not-started { opacity: .5; }
         .pt-test-name { font-size: .82rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .pt-cell { text-align: center; font-size: .75rem; color: var(--text-secondary); }
@@ -646,7 +664,7 @@ async function loadProfile() {
 }
 
 function renderProfile(data, chapters, progressMap) {
-    const coins = GS.get('gs_coins', 0);
+    const coins = data.coins ?? 0;
     const readLabel = '...';
 
     // Guard against missing server data
@@ -715,54 +733,71 @@ async function loadChaptersProgress(isuNumber, chapters, progressMap) {
 
     function fmtTime(secs) {
         if (!secs) return '—';
-        const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), s = secs % 60;
-        if (h > 0) return `${h}ч ${m}м`;
-        if (m > 0) return `${m}м ${s}с`;
-        return `${s}с`;
+        const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+        const pad = n => String(n).padStart(2, '0');
+        if (h > 0) return `${pad(h)}:${pad(m)}:${pad(s)}`;
+        if (m > 0) return `00:${pad(m)}:${pad(s)}`;
+        return `00:00:${pad(s)}`;
+    }
+
+    function fmtDate(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}.${mm}.${yyyy}`;
     }
 
     const CHAPTER_ICONS = ['🔢','📦','➕','🔀','⚙️','🧩','🔗','📐'];
 
-    // ── helpers ──────────────────────────────────────────────────────────────
-    // SVG jug that fills up based on completion %
+    // Повторить — только если есть хотя бы один пройденный тест
+    function reviewBadge(srNextDue, hasTestedAtLeastOne) {
+        if (!hasTestedAtLeastOne) return `<span class="review-badge unread">—</span>`;
+        if (!srNextDue) return `<span class="review-badge ok">—</span>`;
+        const diffDays = Math.round((new Date(srNextDue) - new Date()) / 86400000);
+        if (diffDays < 0)   return `<span class="review-badge overdue">⚠ просрочено</span>`;
+        if (diffDays === 0) return `<span class="review-badge today">📌 сегодня</span>`;
+        if (diffDays === 1) return `<span class="review-badge today">📌 завтра</span>`;
+        if (diffDays <= 3)  return `<span class="review-badge soon">через ${diffDays} дн.</span>`;
+        return `<span class="review-badge ok">через ${diffDays} дн.</span>`;
+    }
+
+    // Медиана из истории попыток (localStorage)
+    function getMedian(quizId) {
+        try {
+            const hist = JSON.parse(localStorage.getItem(`quiz_hist_${quizId}`) || '[]');
+            if (!hist.length) return null;
+            const s = [...hist].sort((a,b) => a-b);
+            const m = Math.floor(s.length / 2);
+            return s.length % 2 === 0 ? Math.round((s[m-1]+s[m])/2) : s[m];
+        } catch { return null; }
+    }
+
+    // SVG jug
     function buildJugSvg(pct) {
-        const W = 36, H = 44;
-        const fillH = Math.round((H - 14) * Math.min(pct, 1));
-        const fillY = H - 6 - fillH;
-        const color = pct >= 0.8 ? '#6ee7b7' : pct >= 0.4 ? '#7eb8f7' : '#a78bfa';
-        const glow  = pct >= 0.8 ? 'rgba(110,231,183,.35)' : pct >= 0.4 ? 'rgba(126,184,247,.3)' : 'rgba(167,139,250,.25)';
-        const uid = 'j' + Math.random().toString(36).slice(2, 7);
-        const jugPath = `M10,4 Q10,2 13,2 L23,2 Q26,2 26,4 L28,10 Q32,12 32,16 L32,38 Q32,42 28,42 L8,42 Q4,42 4,38 L4,16 Q4,12 8,10 Z`;
-        const liquidRect = fillH > 0
-            ? `<rect x="5" y="${fillY}" width="26" height="${fillH + 6}" rx="2" fill="${color}" opacity="0.85"/>`
-            : '';
-        const shine  = `<path d="M13,6 Q12,14 13,22" stroke="rgba(255,255,255,.25)" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-        const spout  = `<path d="M26,8 Q34,6 35,10 Q34,14 28,12" fill="rgba(167,139,250,.3)" stroke="rgba(167,139,250,.4)" stroke-width="0.8"/>`;
-        const handle = `<path d="M4,18 Q0,22 0,28 Q0,34 4,36" fill="none" stroke="rgba(167,139,250,.4)" stroke-width="1.5" stroke-linecap="round"/>`;
+        const W=36,H=44,fillH=Math.round((H-14)*Math.min(pct,1)),fillY=H-6-fillH;
+        const color=pct>=0.8?'#6ee7b7':pct>=0.4?'#7eb8f7':'#a78bfa';
+        const glow=pct>=0.8?'rgba(110,231,183,.35)':pct>=0.4?'rgba(126,184,247,.3)':'rgba(167,139,250,.25)';
+        const uid='j'+Math.random().toString(36).slice(2,7);
+        const jugPath=`M10,4 Q10,2 13,2 L23,2 Q26,2 26,4 L28,10 Q32,12 32,16 L32,38 Q32,42 28,42 L8,42 Q4,42 4,38 L4,16 Q4,12 8,10 Z`;
+        const liq=fillH>0?`<rect x="5" y="${fillY}" width="26" height="${fillH+6}" rx="2" fill="${color}" opacity="0.85"/>`:'';
         return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" class="ch-jug" style="filter:drop-shadow(0 0 6px ${glow})">
             <defs><clipPath id="${uid}"><path d="${jugPath}"/></clipPath></defs>
             <path d="${jugPath}" fill="rgba(255,255,255,.04)" stroke="rgba(167,139,250,.35)" stroke-width="1.2"/>
-            ${spout}${handle}
-            <g clip-path="url(#${uid})">${liquidRect}</g>
-            ${shine}
-            <text x="18" y="${H - 14}" text-anchor="middle" font-size="7" font-weight="700" fill="${color}">${Math.round(pct*100)}%</text>
+            <path d="M26,8 Q34,6 35,10 Q34,14 28,12" fill="rgba(167,139,250,.3)" stroke="rgba(167,139,250,.4)" stroke-width="0.8"/>
+            <path d="M4,18 Q0,22 0,28 Q0,34 4,36" fill="none" stroke="rgba(167,139,250,.4)" stroke-width="1.5" stroke-linecap="round"/>
+            <g clip-path="url(#${uid})">${liq}</g>
+            <path d="M13,6 Q12,14 13,22" stroke="rgba(255,255,255,.25)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <text x="18" y="${H-14}" text-anchor="middle" font-size="7" font-weight="700" fill="${color}">${Math.round(pct*100)}%</text>
         </svg>`;
     }
 
-    function buildChapterHead(ch, idx, jugSvg, badges) {
-        const icon = CHAPTER_ICONS[idx] || '📖';
-        return `<div class="chapter-tile-head open" onclick="toggleChapter(this)">
-            <div class="chapter-tile-icon">${icon}</div>
-            <div class="chapter-tile-info">
-                <div class="chapter-tile-name">Глава ${ch.number}. ${ch.title}</div>
-            </div>
-            ${jugSvg}
-            <div class="ch-badges">${badges}</div>
-            <div class="chapter-tile-arrow">▼</div>
-        </div>`;
-    }
+    let theoryHtml = '';
 
-    // ── ТЕОРИЯ ───────────────────────────────────────────────────────────────
+    // Fetch global avg reading times for rating column
     const allParaIds = chapters.flatMap(ch => (ch.paragraphs || []).map(p => p.id));
     let globalAvgMap = {};
     try {
@@ -772,50 +807,29 @@ async function loadChaptersProgress(isuNumber, chapters, progressMap) {
         });
         if (r.ok) globalAvgMap = await r.json();
     } catch {}
-
-    const avgValues = Object.values(globalAvgMap).filter(v => v > 0);
-    const maxAvg = avgValues.length ? Math.max(...avgValues) : 1;
+    // Rating = avg reading time from DB (real data only, no random)
     function calcRating(paragraphId) {
-        const avg = globalAvgMap[paragraphId] || 0;
-        if (!avg) return null;
+        const avg = globalAvgMap[paragraphId];
+        if (!avg || avg <= 0) return null; // no data → dash
+        const allVals = Object.values(globalAvgMap).filter(v => v > 0);
+        const maxAvg = allVals.length ? Math.max(...allVals) : 1;
         return Math.round(avg / maxAvg * 100) / 10;
     }
 
-    function fmtDate(iso) {
-        if (!iso) return '—';
-        const d = new Date(iso);
-        return d.toLocaleDateString('ru', { day: 'numeric', month: 'short' });
-    }
-
-    function reviewBadge(srNextDue, wasRead) {
-        if (!wasRead) return `<span class="review-badge unread">не изучен</span>`;
-        if (!srNextDue) return `<span class="review-badge ok">—</span>`;
-        const now = new Date();
-        const due = new Date(srNextDue);
-        const diffDays = Math.round((due - now) / 86400000);
-        if (diffDays < 0)   return `<span class="review-badge overdue">⚠ просрочено</span>`;
-        if (diffDays === 0) return `<span class="review-badge today">📌 сегодня</span>`;
-        if (diffDays === 1) return `<span class="review-badge today">📌 завтра</span>`;
-        if (diffDays <= 3)  return `<span class="review-badge soon">через ${diffDays} дн.</span>`;
-        return `<span class="review-badge ok">через ${diffDays} дн.</span>`;
-    }
-
-    let theoryHtml = '';
     chapters.forEach((ch, idx) => {
         const paragraphs = ch.paragraphs || [];
+        const icon = CHAPTER_ICONS[idx] || '📖';
 
-        // Chapter header stats
-        let chTotalSecs = 0, chPassedTests = 0, chTotalTests = 0, chCounted = 0;
+        // Chapter summary
+        let chCounted = 0, chPassedTests = 0, chTotalTests = 0, chTotalSecs = 0;
         paragraphs.forEach(p => {
-            if (typeof p === 'string') p = { id: p, title: p, tests: [] };
             const prog = progressMap[p.id] || {};
             const tests = prog.tests || {};
-            chTotalSecs += prog.totalReadingSeconds || 0;
             const qids = (p.tests || []).map(t => t.quizId).filter(Boolean);
-            chTotalTests  += qids.length;
+            chTotalSecs += prog.totalReadingSeconds || 0;
+            chTotalTests += qids.length;
             chPassedTests += qids.filter(qid => (tests[qid]?.bestScore || 0) >= 70).length;
-            // "counted" = was read (≥1 session) OR has test attempts
-            if ((prog.readingSessionsCount || 0) > 0 || qids.some(qid => (tests[qid]?.attemptsCount || 0) > 0)) chCounted++;
+            if (qids.some(qid => (tests[qid]?.attemptsCount || 0) > 0)) chCounted++;
         });
 
         const jugPct = paragraphs.length ? chCounted / paragraphs.length : 0;
@@ -826,87 +840,125 @@ async function loadChaptersProgress(isuNumber, chapters, progressMap) {
             chCounted > 0 ? `<div class="ch-badge reads"><span class="cb-val">${chCounted}/${paragraphs.length}</span><span class="cb-lbl">изучено</span></div>` : '',
         ].join('');
 
+        // Para rows
+        const rowsHtml = paragraphs.map(p => {
+            const prog = progressMap[p.id] || {};
+            const tests = prog.tests || {};
+            const qids = (p.tests || []).map(t => t.quizId).filter(Boolean);
+            const sessions = prog.readingSessionsCount || 0;
+            const totalSecs = prog.totalReadingSeconds || 0;
+            const srNextDue = prog.srNextDue || null;
+
+            // Tested = at least one test attempted
+            const testedQids = qids.filter(qid => (tests[qid]?.attemptsCount || 0) > 0);
+            const hasTest = testedQids.length > 0;
+
+            // Mastery = avg bestScore across ALL tests (0 for unattempted)
+            let mastery = null;
+            if (qids.length > 0) {
+                if (hasTest) {
+                    mastery = Math.round(
+                        qids.reduce((s, qid) => s + (tests[qid]?.bestScore || 0), 0) / qids.length
+                    );
+                }
+            }
+            const mCls = mastery === null ? 'none' : mastery >= 70 ? 'high' : mastery >= 40 ? 'mid' : 'low';
+
+            const rating = calcRating(p.id);
+            const ratingCls = rating === null ? 'none' : rating >= 7 ? 'high' : rating >= 4 ? 'mid' : 'low';
+
+            const star = hasTest && mastery >= 70 ? '⭐'
+                : hasTest ? '<span style="color:#94a3b8;font-size:.9rem">★</span>'
+                : sessions > 0 ? '<span style="color:rgba(255,255,255,.3);font-size:.9rem">★</span>'
+                : '<span style="color:rgba(255,255,255,.12);font-size:.9rem">★</span>';
+
+            // Tests detail table (collapsible) — placed under the paragraph name column
+            let testsDetail = '';
+            if (qids.length > 0) {
+                const testRows = (p.tests || []).filter(t => t?.quizId).map(t => {
+                    const td = tests[t.quizId];
+                    const done = td && td.attemptsCount > 0;
+                    const pass = done && td.bestScore >= 70;
+                    const bCls = !done ? 'none' : pass ? 'pass' : 'fail';
+                    const median = getMedian(t.quizId);
+                    const mCls2 = median === null ? 'none' : median >= 70 ? 'pass' : 'fail';
+                    const lastDate = done ? fmtDate(td.lastAttemptAt) : '—';
+                    const repeatBadge = reviewBadge(srNextDue, done);
+                    const testHref = `theory/${ch.id}/${ch.groupId}/${p.id}.html#tests`;
+                    return `<a class="pt-test-row${done ? '' : ' pt-not-started'}" href="${testHref}">
+                        <div class="pt-test-name">${td?.testTitle || t.title || t.quizId}</div>
+                        <div class="pt-cell">${done ? td.attemptsCount : '—'}</div>
+                        <div class="pt-cell">${lastDate}</div>
+                        <div class="pt-cell"><span class="pt-score ${bCls}">${done ? td.bestScore+'%' : '—'}</span></div>
+                        <div class="pt-cell"><span class="pt-score ${mCls2}">${median !== null ? median+'%' : '—'}</span></div>
+                        <div class="pt-cell">${repeatBadge}</div>
+                    </a>`;
+                }).join('');
+
+                const detailId = `tests-${ch.id}-${p.id}`;
+                testsDetail = `
+                    <div class="para-tests-detail" id="${detailId}" style="display:none">
+                        <div class="pt-head-row">
+                            <div style="text-align:left">Название теста</div>
+                            <div>Попыток</div>
+                            <div>Последняя дата</div>
+                            <div>Лучший</div>
+                            <div>Медиана</div>
+                            <div>Повторить</div>
+                        </div>
+                        ${testRows}
+                    </div>`;
+            }
+
+            const detailId = qids.length > 0 ? `tests-${ch.id}-${p.id}` : null;
+
+            return `<div class="para-row-wrap">
+                <div class="para-row-grid${sessions > 0 || hasTest ? '' : ' unread'}">
+                    <div class="pr-star">${star}</div>
+                    <div>
+                        <a class="pr-name-link" href="theory/${ch.id}/${ch.groupId}/${p.id}.html">${p.title || p.id}</a>
+                        ${detailId ? `<div class="para-tests-toggle" onclick="toggleParaTests('${detailId}')">
+                            <span class="ptt-label">📋 тесты (${qids.length})</span>
+                            <span class="ptt-arrow" id="arr-${detailId}">▶</span>
+                        </div>` : ''}
+                    </div>
+                    <div class="pr-cell"><strong>${sessions > 0 ? sessions : '—'}</strong></div>
+                    <div class="pr-cell"><strong>${totalSecs > 0 ? fmtTime(totalSecs) : '—'}</strong></div>
+                    <div class="pr-cell">
+                        ${mastery !== null
+                            ? `<div class="mastery-wrap">
+                                <div class="mastery-track"><div class="mastery-fill ${mCls}" style="width:${mastery}%"></div></div>
+                                <span class="mastery-val ${mCls}">${mastery}%</span>
+                               </div>`
+                            : '<span style="color:var(--text-tertiary);font-size:.7rem">—</span>'}
+                    </div>
+                    <div class="pr-cell">${reviewBadge(srNextDue, hasTest)}</div>
+                    <div class="pr-cell pr-rating"><span class="ph-rating-val ${ratingCls}">${rating !== null ? rating.toFixed(1) : '—'}</span></div>
+                </div>
+                ${testsDetail}
+            </div>`;
+        }).join('');
+
         const tableHead = `<div class="para-table-head-row">
             <div></div>
             <div style="text-align:left">Параграф</div>
             <div>Читал</div>
             <div>Время</div>
-            <div class="pth-lastread">Последнее</div>
             <div>Усвоение</div>
             <div>Повторить</div>
-            <div class="pth-rating">Рейтинг</div>
+            <div>Рейтинг</div>
         </div>`;
 
-        const rowsHtml = paragraphs.map(p => {
-            // Support both object {id,title,tests} and plain string (old API)
-            if (typeof p === 'string') p = { id: p, title: p, tests: [] };
-            const prog       = progressMap[p.id] || {};
-            const tests      = prog.tests || {};
-            const totalSecs  = prog.totalReadingSeconds || 0;
-            const sessions   = prog.readingSessionsCount || 0;
-            const lastReadAt = prog.lastReadAt || null;
-            const srNextDue  = prog.srNextDue  || null;
-
-            // Tests: from p.tests[] (loaded dynamically from server)
-            const qids = (p.tests || []).map(t => t.quizId).filter(Boolean);
-
-            // "wasRead" = paragraph was opened for ≥15s (has reading sessions)
-            const wasRead = sessions > 0;
-
-            // "testDone" = at least one test attempted
-            const testDone = qids.some(qid => (tests[qid]?.attemptsCount || 0) > 0);
-
-            // Mastery = avg bestScore across ALL tests (attempted or not — show 0 for unattempted)
-            // If no tests defined for paragraph — mastery based on reading only
-            const doneQids = qids.filter(qid => (tests[qid]?.attemptsCount || 0) > 0);
-            let mastery = null;
-            if (qids.length === 0) {
-                // No tests — mastery = 100% if read, null if not
-                mastery = wasRead ? 100 : null;
-            } else if (doneQids.length > 0) {
-                // Has tests and at least one attempted
-                mastery = Math.min(100, Math.round(
-                    doneQids.reduce((s, qid) => s + (tests[qid]?.bestScore || 0), 0) / doneQids.length
-                ));
-            } else if (wasRead) {
-                // Read but no tests done yet — show 0%
-                mastery = 0;
-            }
-            const mCls = mastery === null ? 'none' : mastery >= 70 ? 'high' : mastery >= 40 ? 'mid' : 'low';
-
-            const rating = calcRating(p.id);
-            const rCls   = rating === null ? 'none' : rating >= 7 ? 'high' : rating >= 4 ? 'mid' : 'low';
-
-            // Star: gold if test passed ≥70%, silver if read+tested, bronze if just read, grey if untouched
-            const star = testDone && mastery >= 70
-                ? '⭐'
-                : testDone
-                    ? '<span style="color:#94a3b8;font-size:.9rem" title="Тест не сдан">★</span>'
-                    : wasRead
-                        ? '<span style="color:rgba(255,255,255,.4);font-size:.9rem" title="Читал, тест не проходил">★</span>'
-                        : '<span style="color:rgba(255,255,255,.15);font-size:.9rem">★</span>';
-
-            return `<a class="para-row${wasRead ? '' : ' unread'}" href="theory/${ch.id}/${ch.groupId}/${p.id}.html">
-                <div class="pr-star">${star}</div>
-                <div><div class="pr-name">${p.title || p.id}</div></div>
-                <div class="pr-cell" title="${sessions > 0 ? `${sessions} сессий · ${fmtTime(totalSecs)} суммарно` : 'Не читал'}"><strong>${sessions > 0 ? sessions : '—'}</strong></div>
-                <div class="pr-cell" title="${totalSecs > 0 ? `${totalSecs} сек. суммарно` : ''}"><strong>${totalSecs > 0 ? fmtTime(totalSecs) : '—'}</strong></div>
-                <div class="pr-cell pr-lastread">${sessions > 0 ? fmtDate(lastReadAt) : '—'}</div>
-                <div class="pr-cell">
-                    ${mastery !== null
-                        ? `<div class="mastery-wrap">
-                            <div class="mastery-track"><div class="mastery-fill ${mCls}" style="width:${mastery}%"></div></div>
-                            <span class="mastery-val ${mCls}">${mastery}%</span>
-                           </div>`
-                        : '<span style="color:var(--text-tertiary);font-size:.7rem">—</span>'}
-                </div>
-                <div class="pr-cell">${reviewBadge(srNextDue, wasRead)}</div>
-                <div class="pr-cell pr-rating"><span class="ph-rating-val ${rCls}">${rating !== null ? rating.toFixed(1) : '—'}</span></div>
-            </a>`;
-        }).join('');
-
         theoryHtml += `<div class="chapter-tile glass">
-            ${buildChapterHead(ch, idx, jugSvg, badges)}
+            <div class="chapter-tile-head open" onclick="toggleChapter(this)">
+                <div class="chapter-tile-icon">${icon}</div>
+                <div class="chapter-tile-info">
+                    <div class="chapter-tile-name">Глава ${ch.number}. ${ch.title}</div>
+                </div>
+                ${jugSvg}
+                <div class="ch-badges">${badges}</div>
+                <div class="chapter-tile-arrow">▼</div>
+            </div>
             <div class="chapter-body open">
                 <div class="theory-dash">
                     ${tableHead}
@@ -916,98 +968,14 @@ async function loadChaptersProgress(isuNumber, chapters, progressMap) {
         </div>`;
     });
 
-    // ── ПРАКТИКА ─────────────────────────────────────────────────────────────
-    let practiceHtml = '';
-    chapters.forEach((ch, idx) => {
-        const paragraphs = ch.paragraphs || [];
+    wrap.innerHTML = theoryHtml || '<div class="empty-state" style="padding:var(--space-6)"><p>Нет данных</p></div>';
 
-        // Collect tests grouped by paragraph
-        const paraTestGroups = [];
-        paragraphs.forEach(p => {
-            if (typeof p === 'string') p = { id: p, title: p, tests: [] };
-            const prog = progressMap[p.id] || {};
-            const tests = prog.tests || {};
-            const pTests = (p.tests || []).filter(t => t?.quizId);
-            if (pTests.length > 0) {
-                paraTestGroups.push({ para: p, tests, pTests, prog });
-            }
-        });
-
-        if (paraTestGroups.length === 0) return;
-
-        const allChTests = paraTestGroups.flatMap(g => g.pTests.map(t => ({ quizId: t.quizId, tests: g.tests })));
-        const chPassed   = allChTests.filter(t => (t.tests[t.quizId]?.bestScore || 0) >= 70).length;
-        const chAttempts = allChTests.reduce((s, t) => s + (t.tests[t.quizId]?.attemptsCount || 0), 0);
-
-        const badges = [
-            `<div class="ch-badge tests"><span class="cb-val">${chPassed}/${allChTests.length}</span><span class="cb-lbl">сдано</span></div>`,
-            chAttempts > 0 ? `<div class="ch-badge reads"><span class="cb-val">${chAttempts}</span><span class="cb-lbl">попыток</span></div>` : '',
-        ].join('');
-
-        // Build detailed table per paragraph
-        const tableHead = `<div class="pt-head-row">
-            <div style="text-align:left">Тест</div>
-            <div>Попыток</div>
-            <div>Последняя дата</div>
-            <div>Лучший</div>
-            <div>Средний</div>
-            <div>Повторить</div>
-        </div>`;
-
-        let tableRows = '';
-        paraTestGroups.forEach(({ para, tests, pTests, prog }) => {
-            tableRows += `<div class="pt-para-label">${para.title}</div>`;
-            pTests.forEach(t => {
-                const td = tests[t.quizId];
-                const done = td && td.attemptsCount > 0;
-                const pass = done && td.bestScore >= 70;
-                const bestCls = !done ? 'none' : pass ? 'pass' : 'fail';
-                const avgCls  = !done ? 'none' : td.averageScore >= 70 ? 'pass' : 'fail';
-                const lastDate = done && td?.lastAttemptAt ? fmtDate(td.lastAttemptAt) : '—';
-                const srNextDue = prog.srNextDue || null;
-                tableRows += `<div class="pt-test-row${done ? '' : ' pt-not-started'}">
-                    <div class="pt-test-name">${t.title || td?.testTitle || t.quizId}</div>
-                    <div class="pt-cell">${done ? td.attemptsCount : '—'}</div>
-                    <div class="pt-cell">${lastDate}</div>
-                    <div class="pt-cell"><span class="pt-score ${bestCls}">${done ? td.bestScore + '%' : '—'}</span></div>
-                    <div class="pt-cell"><span class="pt-score ${avgCls}">${done ? td.averageScore + '%' : '—'}</span></div>
-                    <div class="pt-cell">${reviewBadge(srNextDue, done)}</div>
-                </div>`;
-            });
-        });
-
-        practiceHtml += `<div class="chapter-tile glass">
-            ${buildChapterHead(ch, idx, '', badges)}
-            <div class="chapter-body open">
-                <div class="pt-wrap">
-                    ${tableHead}
-                    ${tableRows}
-                </div>
-            </div>
-        </div>`;
-    });
-
-    wrap.innerHTML = `
-        <div class="course-tabs">
-            <button class="course-tab active" onclick="switchTab(this,'theory-section')">📖 Теория</button>
-            <button class="course-tab" onclick="switchTab(this,'practice-section')">🧪 Практика</button>
-        </div>
-        <div class="course-section active" id="theory-section">${theoryHtml || '<div class="empty-state" style="padding:var(--space-6)"><p>Нет данных</p></div>'}</div>
-        <div class="course-section" id="practice-section">${practiceHtml || '<div class="empty-state" style="padding:var(--space-6)"><p>Нет тестов</p></div>'}</div>`;
-
-    // Animate bars after DOM is ready
     requestAnimationFrame(() => {
-        wrap.querySelectorAll('.bar-fill, .score-bar-fill, .sec-mini-fill').forEach(el => {
-            const w = el.style.width;
-            el.style.width = '0';
-            requestAnimationFrame(() => { el.style.width = w; });
-        });
         if (window.gsap) {
-            gsap.from(wrap.querySelectorAll('.chapter-tile'), { y: 20, opacity: 0, stagger: .07, duration: .45, ease: 'power2.out' });
+            gsap.from(wrap.querySelectorAll('.chapter-tile'), { y:20, opacity:0, stagger:.07, duration:.45, ease:'power2.out' });
         }
     });
 }
-
 function toggleChapter(head) {
     const body = head.nextElementSibling;
     const arrow = head.querySelector('.chapter-tile-arrow');
@@ -1017,11 +985,13 @@ function toggleChapter(head) {
     if (arrow) arrow.textContent = isOpen ? '▶' : '▼';
 }
 
-function switchTab(btn, sectionId) {
-    document.querySelectorAll('.course-tab').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.course-section').forEach(s => s.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(sectionId)?.classList.add('active');
+function toggleParaTests(id) {
+    const el = document.getElementById(id);
+    const arr = document.getElementById('arr-' + id);
+    if (!el) return;
+    const open = el.style.display === 'none';
+    el.style.display = open ? 'block' : 'none';
+    if (arr) arr.textContent = open ? '▼' : '▶';
 }
 
 function counter(id, target) {

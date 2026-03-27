@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин — Курс C++</title>
+    <link rel="stylesheet" href="css/variables.css?v=3">
+    <link rel="stylesheet" href="css/theme-picker.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/gamification.css">
+    <link rel="stylesheet" href="css/shop.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="index.html">Главная</a>
+                <a href="theory/chapter-1/basics/index.html">Глава I</a>
+                <a href="achievements.html">🏆 Достижения</a>
+                <a href="shop.html" class="active">🛒 Магазин</a>
+                <a href="login.html" id="navAuthLink">Вход</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <main class="main-content shop-page">
+            <div class="shop-hero">
+                <h1>🛒 Магазин</h1>
+                <p>Тратьте монеты на расширение возможностей редактора</p>
+                <div class="shop-balance">
+                    <span class="shop-balance__icon">🪙</span>
+                    <span class="shop-balance__amount" id="shopCoins">0</span>
+                    <span class="shop-balance__label">монет</span>
+                    <span class="shop-balance__sep">·</span>
+                    <span class="shop-balance__icon">⭐</span>
+                    <span class="shop-balance__level" id="shopLevel">Уровень 1</span>
+                </div>
+            </div>
+
+            <section class="shop-section">
+                <h2 class="shop-section__title">⚙️ Стандарты C++</h2>
+                <p class="shop-section__desc">Разблокируйте новые стандарты языка для использования в редакторе кода</p>
+                <div class="shop-grid" id="shopGrid"></div>
+            </section>
+        </main>
+    </div>
+
+    <div class="shop-toast" id="shopToast"></div>
+
+    <script src="js/navigation.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+    const SHOP_ITEM_META = {
+        'std_cpp11': { label: 'C++11', icon: '⚡', color: '#facc15' },
+        'std_cpp14': { label: 'C++14', icon: '💧', color: '#38bdf8' },
+        'std_cpp17': { label: 'C++17', icon: '🌪️', color: '#e2e8f0' },
+        'std_cpp20': { label: 'C++20', icon: '🔥', color: '#f97316' },
+        'std_cpp23': { label: 'C++23', icon: '🌿', color: '#84cc16' },
+    };
+
+    let _shopItems = []; // загружается с сервера
+    let _shopCoins = 0;
+    let _shopLevel = 1;
+
+    function getUser() { try { return JSON.parse(localStorage.getItem('cpp_user') || 'null'); } catch { return null; } }
+    function formatPrice(n) {
+        return n >= 1000 ? (n / 1000).toFixed(0) + 'К' : n;
+    }
+
+    function formatDesc(text) {
+        if (!text) return '';
+        return text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    }
+
+    function showToast(msg, ok = true) {
+        const t = document.getElementById('shopToast');
+        t.textContent = msg;
+        t.className = 'shop-toast shop-toast--' + (ok ? 'ok' : 'err') + ' show';
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function renderShop(ownedIds = []) {
+        const coins = _shopCoins;
+        const level = _shopLevel;
+        document.getElementById('shopCoins').textContent = coins.toLocaleString('ru');
+        document.getElementById('shopLevel').textContent = 'Уровень ' + level;
+
+        const grid = document.getElementById('shopGrid');
+        grid.innerHTML = '';
+
+        _shopItems.filter(i => i.itemType === 'std_unlock').forEach(item => {
+            const meta      = SHOP_ITEM_META[item.id] || { label: item.name, icon: '📦', color: '#888' };
+            const owned     = ownedIds.includes(item.id);
+            const canAfford = coins >= item.costCoins;
+            const canLevel  = level >= item.requiredLevel;
+            const locked    = !owned && (!canAfford || !canLevel);
+
+            const card = document.createElement('div');
+            card.className = 'shop-card' + (owned ? ' shop-card--owned' : locked ? ' shop-card--locked' : '');
+            card.style.setProperty('--item-color', meta.color);
+
+            const priceStr = item.costCoins > 0 ? `🪙 ${formatPrice(item.costCoins)}` : '';
+            const keysStr  = item.costKeys  > 0 ? `🔑 ${item.costKeys}` : '';
+            const costStr  = [priceStr, keysStr].filter(Boolean).join(' + ') || 'Бесплатно';
+
+            card.innerHTML = `
+                <div class="shop-card__icon">${meta.icon}</div>
+                <div class="shop-card__label">${meta.label}</div>
+                <div class="shop-card__desc">${formatDesc(item.description)}</div>
+                <div class="shop-card__reqs">
+                    <span class="shop-req ${canAfford || owned ? 'ok' : 'fail'}">${costStr}</span>
+                    <span class="shop-req ${canLevel  || owned ? 'ok' : 'fail'}">⭐ Ур. ${item.requiredLevel}</span>
+                </div>
+                <button class="shop-card__btn" ${owned || locked ? 'disabled' : ''}>
+                    ${owned ? '✓ Куплено' : locked ? '🔒 Недоступно' : 'Купить'}
+                </button>`;
+
+            if (!owned && !locked) {
+                card.querySelector('.shop-card__btn').addEventListener('click', () => buyItem(item, card, ownedIds));
+            }
+            grid.appendChild(card);
+        });
+    }
+
+    async function buyItem(item, card, ownedIds) {
+        const user = getUser();
+        if (!user?.isuNumber) { showToast('Необходимо войти в аккаунт', false); return; }
+
+        const btn = card.querySelector('.shop-card__btn');
+        btn.disabled = true;
+        btn.textContent = '...';
+
+        try {
+            const res = await fetch('/api/shop/purchase', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber },
+                body: JSON.stringify({ itemId: item.id })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.message || 'Ошибка покупки', false);
+                btn.disabled = false;
+                btn.textContent = 'Купить';
+                return;
+            }
+            _shopCoins = data.coins;
+            localStorage.setItem('gs_coins', JSON.stringify(_shopCoins));
+            const meta = SHOP_ITEM_META[item.id] || { label: item.name };
+            showToast(`${meta.label} разблокирован!`);
+            renderShop([...ownedIds, item.id]);
+        } catch (e) {
+            showToast('Ошибка соединения: ' + e.message, false);
+            btn.disabled = false;
+            btn.textContent = 'Купить';
+        }
+    }
+
+    async function initShop() {
+        const user = getUser();
+        if (!user?.isuNumber) { window.location.href = 'login.html'; return; }
+
+        let ownedIds = [];
+        try {
+            const [profileRes, itemsRes] = await Promise.all([
+                fetch(`/api/profile/${user.isuNumber}`),
+                fetch('/api/shop/items')
+            ]);
+            if (profileRes.ok) {
+                const profile = await profileRes.json();
+                _shopCoins = profile.coins;
+                _shopLevel = profile.level;
+                localStorage.setItem('gs_coins', JSON.stringify(_shopCoins));
+                localStorage.setItem('gs_level', JSON.stringify(_shopLevel));
+                ownedIds = (profile.unlockedContentStds || '')
+                    .split(',').filter(Boolean)
+                    .map(std => 'std_' + std.replace('c++', 'cpp'));
+            }
+            if (itemsRes.ok) {
+                _shopItems = await itemsRes.json();
+            }
+        } catch {
+            _shopCoins = (() => { try { return JSON.parse(localStorage.getItem('gs_coins') || '0'); } catch { return 0; } })();
+            _shopLevel = (() => { try { return JSON.parse(localStorage.getItem('gs_level') || '1'); } catch { return 1; } })();
+        }
+
+        renderShop(ownedIds);
+    }
+
+    document.addEventListener('DOMContentLoaded', initShop);
+    </script>
+</body>
+</html>

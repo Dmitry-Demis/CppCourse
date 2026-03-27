@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
     <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
@@ -331,6 +332,9 @@ int main() {
                     </ul>
                     <p>Используйте UBSan (<code>-fsanitize=undefined</code>) в тестах — он поймает большинство проблем с переполнением.</p>
                 </div>
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="integer-overflow" data-final-desc="Переполнение signed/unsigned, UB, wrap-around, безопасные паттерны"></div>
+
 
                 <!-- Навигация -->
                 <div class="paragraph-nav">
@@ -355,6 +359,7 @@ int main() {
     <script src="../../../js/course.js"></script><script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
     <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
     <script src="../../../js/compiler.js"></script>
     <script src="../../../js/gamification.js"></script>
     <script>

@@ -41,6 +41,7 @@
                 <a href="index.html" class="active">Главная</a>
                 <a href="theory/chapter-1/basics/index.html">Глава I</a>
                 <a href="achievements.html">🏆 Достижения</a>
+                <a href="shop.html">🛒 Магазин</a>
                 <a href="register.html">Регистрация</a>
                 <a href="login.html" id="navAuthLink">Вход</a>
             </nav>
@@ -114,6 +115,7 @@
                         <div class="pc-stat" title="Монеты">🪙 <span id="pc-coins">0</span></div>
                         <div class="pc-stat" title="Ключи">🗝️ <span id="pc-keys">0</span></div>
                         <div class="pc-stat" title="Streak">🔥 <span id="pc-streak">0</span></div>
+                        <div class="pc-stat" id="pc-freeze-wrap" title="Заморозки стрика" style="display:none">🧊 <span id="pc-freeze">0</span></div>
                     </div>
                     <button class="pc-missions-btn" onclick="openQuestsPanel()">🎯 Миссии</button>
                 </div>
@@ -176,6 +178,7 @@
     <script src="js/gamification.js"></script>
     <script src="js/code-highlighter.js"></script>
     <script src="js/effects.js"></script>
+    <script src="js/streak.js"></script>
     <script>
         // Update nav based on auth state — only update href, initHeaderUser() handles the name
         const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
@@ -209,6 +212,12 @@
             document.getElementById('pc-keys').textContent    = keys;
             document.getElementById('pc-streak').textContent  = streak;
             document.getElementById('pc-avatar').textContent  = LEVEL_ICONS[level] || '👤';
+
+            const freezeCount = u.freezeCount || 0;
+            if (freezeCount > 0) {
+                const fw = document.getElementById('pc-freeze-wrap');
+                if (fw) { fw.style.display = ''; document.getElementById('pc-freeze').textContent = freezeCount; }
+            }
         }
         initPlayerCard();
 
@@ -252,57 +261,58 @@
                 // Compute per-paragraph mastery from localStorage
                 // quiz_best_${paraId} is saved by quiz.js when a quiz is completed
                 function paraProgress(p) {
-                    try {
-                        const v = localStorage.getItem(`quiz_best_${p.id}`);
-                        const mastery = v !== null ? JSON.parse(v) : null;
-                        // Green dot only if test passed (≥70%)
-                        const passed = mastery !== null && mastery >= 70;
-                        return { passed, mastery };
-                    } catch { return { passed: false, mastery: null }; }
+                    const tests = p.tests && p.tests.length ? p.tests : [{ quizId: p.id }];
+                    const scores = tests.map(t => {
+                        try {
+                            const v = localStorage.getItem(`quiz_best_${t.quizId}`);
+                            return v !== null ? JSON.parse(v) : null;
+                        } catch { return null; }
+                    }).filter(s => s !== null);
+                    if (!scores.length) return { passed: false, mastery: null };
+                    const mastery = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+                    return { passed: mastery >= 70, mastery };
                 }
 
-                // Chapter overall mastery: avg across ALL paragraphs (unpassed = 0)
-                const paraScores = paragraphs.map(p => {
-                    try { const v = localStorage.getItem(`quiz_best_${p.id}`); return v !== null ? JSON.parse(v) : 0; } catch { return 0; }
-                });
+                // Chapter overall mastery: один балл на параграф (среднее его тестов или 0), делим на кол-во параграфов
+                function paraScore(p) {
+                    const tests = p.tests && p.tests.length ? p.tests : [{ quizId: p.id }];
+                    const scores = tests.map(t => {
+                        try {
+                            const v = localStorage.getItem(`quiz_best_${t.quizId}`);
+                            return v !== null ? JSON.parse(v) : null;
+                        } catch { return null; }
+                    }).filter(s => s !== null);
+                    // null (не проходил) → 0
+                    return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+                }
                 const chapterMastery = paragraphs.length > 0
-                    ? Math.round(paraScores.reduce((a, b) => a + b, 0) / paragraphs.length)
+                    ? Math.round(paragraphs.map(paraScore).reduce((a, b) => a + b, 0) / paragraphs.length)
                     : 0;
-                const masteryColor = chapterMastery >= 75 ? '#fde68a' : chapterMastery >= 50 ? '#d1d5db' : chapterMastery >= 25 ? '#cd7f32' : '#6b7280';
+                const masteryColor = chapterMastery >= 90 ? '#fde68a' : chapterMastery >= 80 ? '#cd7f32' : chapterMastery >= 70 ? '#a8b5c8' : '#6b7280';
 
                 const PREVIEW = 6;
                 const hasMore = paragraphs.length > PREVIEW;
                 const cardId = `chapter-card-${ci}`;
 
-                function starHtmlFor(mastery) {
-                    if (mastery !== null && mastery >= 75)
-                        return '<span class="para-star" style="color:#fde68a;filter:drop-shadow(0 0 4px rgba(253,230,138,.6))">★</span>';
-                    if (mastery !== null && mastery >= 50)
-                        return '<span class="para-star" style="color:#d1d5db;filter:drop-shadow(0 0 3px rgba(209,213,219,.4))">★</span>';
-                    if (mastery !== null && mastery >= 25)
-                        return '<span class="para-star" style="color:#cd7f32;filter:drop-shadow(0 0 3px rgba(205,127,50,.4))">★</span>';
-                    return '<span class="para-star" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:rgba(107,114,128,.2);border-radius:3px;font-size:.6rem;color:rgba(107,114,128,.6)">★</span>';
-                }
-
-                function masteryHtmlFor(mastery) {
-                    if (mastery !== null)
-                        return `<span class="para-pct" style="font-size:.68rem;font-weight:700;color:${mastery >= 75 ? '#fde68a' : mastery >= 50 ? '#d1d5db' : mastery >= 25 ? '#cd7f32' : '#6b7280'};margin-left:auto;flex-shrink:0">${mastery}%</span>`;
-                    return `<span class="para-pct" style="font-size:.68rem;color:rgba(107,114,128,.5);margin-left:auto;flex-shrink:0">—</span>`;
+                function masteryBadge(mastery) {
+                    if (mastery === null) return `<span class="para-badge para-badge--none" data-para-badge>—</span>`;
+                    if (mastery === 100) return `<span class="para-badge para-badge--gold"   data-para-badge>🥇 100%</span>`;
+                    if (mastery >= 90)   return `<span class="para-badge para-badge--silver" data-para-badge>🥈 ${mastery}%</span>`;
+                    if (mastery >= 80)   return `<span class="para-badge para-badge--bronze" data-para-badge>🥉 ${mastery}%</span>`;
+                    if (mastery >= 70)   return `<span class="para-badge para-badge--pass"   data-para-badge>✓ ${mastery}%</span>`;
+                    return `<span class="para-badge para-badge--fail" data-para-badge>${mastery}%</span>`;
                 }
 
                 function renderParaList(list) {
                     return list.map(p => {
-                        const { passed, mastery } = paraProgress(p);
+                        const { mastery } = paraProgress(p);
                         const href = `theory/${chapter.id}/${chapter.groupId}/${p.id}.html`;
-                        const readDot = passed
-                            ? '<span class="para-read-dot" title="Тест пройден" style="width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0;margin-right:1px"></span>'
-                            : '<span class="para-read-dot" style="width:6px;height:6px;border-radius:50%;background:transparent;flex-shrink:0;margin-right:1px"></span>';
-                        return `<a class="chapter-section-link" href="${href}" data-para-id="${p.id}" onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:6px;">
-                            ${readDot}
-                            <span style="font-size:.85rem;line-height:1;flex-shrink:0">${starHtmlFor(mastery)}</span>
-                            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title}</span>
-                            ${masteryHtmlFor(mastery)}
-                        </a>`;
+                        return `<div class="para-item" data-para-id="${p.id}">
+                            <a class="chapter-section-link" href="${href}" onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:6px;">
+                                <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.title}">${p.title}</span>
+                                ${masteryBadge(mastery)}
+                            </a>
+                        </div>`;
                     }).join('');
                 }
 
@@ -342,7 +352,7 @@
                 });
             });
 
-            // If logged in — fetch real progress from server and update badges + para stars
+            // If logged in — fetch real progress from server and update badges
             const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
             if (user?.isuNumber) {
                 fetch(`/api/progress/${user.isuNumber}/all`)
@@ -356,8 +366,6 @@
                             const cardEl = document.getElementById(`chapter-card-${ci}`);
                             if (!cardEl) return;
 
-                            // Update chapter mastery badge from server data
-                            // avg across ALL paragraphs (no test attempt = 0)
                             let scoreSum = 0;
                             paragraphs.forEach(p => {
                                 const prog = progressMap[p.id];
@@ -366,10 +374,9 @@
                                 if (attempted.length) {
                                     scoreSum += Math.round(attempted.reduce((s, t) => s + t.bestScore, 0) / attempted.length);
                                 }
-                                // paragraphs with no attempts contribute 0 — already default
                             });
                             const mastery = paragraphs.length > 0 ? Math.round(scoreSum / paragraphs.length) : 0;
-                            const mc = mastery >= 75 ? '#fde68a' : mastery >= 50 ? '#d1d5db' : mastery >= 25 ? '#cd7f32' : '#6b7280';
+                            const mc = mastery >= 90 ? '#fde68a' : mastery >= 80 ? '#cd7f32' : mastery >= 70 ? '#a8b5c8' : '#6b7280';
                             const badge = cardEl.querySelector('.ch-mastery-badge');
                             if (badge) {
                                 badge.style.color = mc;
@@ -377,45 +384,83 @@
                                 badge.textContent = mastery + '%';
                             }
 
-                            // Update per-paragraph stars, mastery% and dot
                             paragraphs.forEach(p => {
                                 const prog = progressMap[p.id];
-                                const link = cardEl.querySelector(`a[data-para-id="${p.id}"]`);
-                                if (!link) return;
-
-                                if (!prog) return;
+                                const paraItem = cardEl.querySelector(`.para-item[data-para-id="${p.id}"]`);
+                                if (!paraItem || !prog) return;
                                 const attempted = Object.values(prog.tests || {}).filter(t => t.attemptsCount > 0);
                                 if (!attempted.length) return;
 
                                 const pMastery = Math.round(attempted.reduce((s, t) => s + t.bestScore, 0) / attempted.length);
-                                const color = pMastery >= 75 ? '#fde68a' : pMastery >= 50 ? '#d1d5db' : pMastery >= 25 ? '#cd7f32' : '#6b7280';
+                                const badge = paraItem.querySelector('[data-para-badge]');
+                                if (!badge) return;
 
-                                // Green dot only if passed ≥70%
-                                if (pMastery >= 70) {
-                                    const dot = link.querySelector('.para-read-dot');
-                                    if (dot) dot.style.background = '#4ade80';
-                                }
-
-                                const starEl = link.querySelector('.para-star');
-                                if (starEl) {
-                                    starEl.style.color = color;
-                                    starEl.style.filter = `drop-shadow(0 0 4px ${color}99)`;
-                                    starEl.style.display = '';
-                                    starEl.style.background = '';
-                                    starEl.style.borderRadius = '';
-                                }
-
-                                const pctEl = link.querySelector('.para-pct');
-                                if (pctEl) {
-                                    pctEl.style.color = color;
-                                    pctEl.style.background = '';
-                                    pctEl.textContent = pMastery + '%';
-                                }
+                                if (pMastery === 100)     { badge.className = 'para-badge para-badge--gold';   badge.textContent = `🥇 100%`; }
+                                else if (pMastery >= 90)  { badge.className = 'para-badge para-badge--silver'; badge.textContent = `🥈 ${pMastery}%`; }
+                                else if (pMastery >= 80)  { badge.className = 'para-badge para-badge--bronze'; badge.textContent = `🥉 ${pMastery}%`; }
+                                else if (pMastery >= 70)  { badge.className = 'para-badge para-badge--pass';   badge.textContent = `✓ ${pMastery}%`; }
+                                else                      { badge.className = 'para-badge para-badge--fail';   badge.textContent = `${pMastery}%`; }
                             });
                         });
                     })
                     .catch(() => {});
             }
+
+            // Плашки стандартов — показываем всем (статус покупки если залогинен)
+            const slotHeaders = user?.isuNumber ? { 'X-Isu-Number': user.isuNumber } : {};
+            fetch('/api/gated/all-slots', { headers: slotHeaders })
+                .then(r => r.ok ? r.json() : null)
+                .then(slots => {
+                    if (!slots?.length) return;
+                    const byPage = {};
+                    slots.forEach(s => {
+                        if (!byPage[s.page]) byPage[s.page] = [];
+                        byPage[s.page].push(s);
+                    });
+
+                    const STD_COLORS = { '14': '#4a3f1a', '17': '#1e3a4f', '20': '#2a1e4f', '23': '#3d1e3d' };
+                    const STD_TEXT   = { '14': '#f9e2af', '17': '#89dceb', '20': '#cba6f7', '23': '#f5c2e7' };
+
+                    structure.chapters.forEach((chapter, ci) => {
+                        const cardEl = document.getElementById(`chapter-card-${ci}`);
+                        if (!cardEl) return;
+                        chapter.paragraphs.forEach(p => {
+                            const pageKey = `${chapter.id}/${chapter.groupId}/${p.id}`;
+                            const pageSlots = byPage[pageKey];
+                            if (!pageSlots?.length) return;
+
+                            const paraItem = cardEl.querySelector(`.para-item[data-para-id="${p.id}"]`);
+                            if (!paraItem) return;
+
+                            // Уникальные стандарты — показываем все (купленные с галочкой)
+                            const stdSet = {};
+                            pageSlots.forEach(s => {
+                                if (!stdSet[s.std]) stdSet[s.std] = { total: 0, purchased: 0 };
+                                stdSet[s.std].total++;
+                                if (s.purchased) stdSet[s.std].purchased++;
+                            });
+
+                            const badgesHtml = Object.entries(stdSet)
+                                .sort(([a], [b]) => Number(a) - Number(b))
+                                .map(([std, info]) => {
+                                    const done = info.purchased >= info.total;
+                                    const bg   = done ? (STD_COLORS[std] || '#1a2a1a') : (STD_COLORS[std] || '#333');
+                                    const col  = STD_TEXT[std] || '#fff';
+                                    const icon = done ? '✓ ' : '';
+                                    return `<span style="background:${bg};color:${col};font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:4px;opacity:${done?'0.6':'1'}">${icon}C++${std}</span>`;
+                                }).join('');
+
+                            if (!badgesHtml) return;
+                            paraItem.querySelectorAll('.std-para-badges').forEach(b => b.remove());
+                            const row = document.createElement('div');
+                            row.className = 'std-para-badges';
+                            row.style.cssText = 'display:flex;gap:4px;padding:2px var(--space-2) 3px var(--space-2);flex-wrap:wrap;';
+                            row.innerHTML = badgesHtml;
+                            paraItem.appendChild(row);
+                        });
+                    });
+                })
+                .catch(() => {});
         }
 
         buildChaptersGrid();

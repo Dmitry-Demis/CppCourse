@@ -30,6 +30,15 @@ const _siteRoot = (() => {
     document.head.appendChild(s);
 }());
 
+// ── streak.js — подключается один раз отсюда на всех страницах ──
+(function () {
+    if (document.getElementById('streak-js')) return;
+    const s = document.createElement('script');
+    s.id  = 'streak-js';
+    s.src = _siteRoot + 'js/streak.js';
+    document.head.appendChild(s);
+}());
+
 document.addEventListener('DOMContentLoaded', async () => {
     initMobileMenu();
     initReadingProgress();
@@ -129,13 +138,42 @@ function buildCourseNav(structure) {
         chapter.paragraphs.forEach((para, idx) => {
             const href = _siteRoot + `theory/${chapter.id}/${chapter.groupId}/${para.id}.html`;
             const isActive = currentPath.endsWith(`/${chapter.groupId}/${para.id}.html`);
-            const testCount = (para.tests || []).length;
+            const tests = para.tests || [];
 
-            let testBadge = '';
-            if (testCount > 0) {
-                const best = (() => { try { const v = localStorage.getItem(`quiz_best_${para.id}`); return v !== null ? JSON.parse(v) : null; } catch { return null; } })();
-                const pctLabel = best !== null ? `<span class="sidebar-section-pct ${best >= 70 ? 'pass' : 'fail'}">${best}%</span>` : '';
-                testBadge = `<span class="sidebar-section-test" title="Есть тест">✎</span>${pctLabel}`;
+            // mini → yellow pencil; paragraph/standard/chapter → pink-purple star
+            const miniTests  = tests.filter(t => t.type === 'mini');
+            const finalTests = tests.filter(t => t.type === 'paragraph' || t.type === 'standard' || t.type === 'chapter');
+
+            let badges = '';
+
+            // Yellow pencil badge for mini/standard tests
+            if (miniTests.length > 0) {
+                const bestMini = miniTests.reduce((best, t) => {
+                    try {
+                        const v = localStorage.getItem(`quiz_best_${t.quizId}`);
+                        const n = v !== null ? JSON.parse(v) : null;
+                        return (n !== null && (best === null || n > best)) ? n : best;
+                    } catch { return best; }
+                }, null);
+                const pct = bestMini !== null
+                    ? `<span class="sb-badge__pct ${bestMini >= 70 ? 'pass' : 'fail'}">${bestMini}%</span>`
+                    : '';
+                badges += `<span class="sb-badge sb-badge--mini" title="${miniTests.length} мини-тест${miniTests.length > 1 ? 'а' : ''}">✎ ${miniTests.length}${pct}</span>`;
+            }
+
+            // Pink-purple badge for paragraph/chapter final tests
+            if (finalTests.length > 0) {
+                const bestFinal = finalTests.reduce((best, t) => {
+                    try {
+                        const v = localStorage.getItem(`quiz_best_${t.quizId}`);
+                        const n = v !== null ? JSON.parse(v) : null;
+                        return (n !== null && (best === null || n > best)) ? n : best;
+                    } catch { return best; }
+                }, null);
+                const pct = bestFinal !== null
+                    ? `<span class="sb-badge__pct ${bestFinal >= 70 ? 'pass' : 'fail'}">${bestFinal}%</span>`
+                    : '';
+                badges += `<span class="sb-badge sb-badge--final" title="Итоговый тест">★ ${finalTests.length}${pct}</span>`;
             }
 
             const sli = document.createElement('li');
@@ -143,7 +181,7 @@ function buildCourseNav(structure) {
             sli.innerHTML = `<a class="sidebar-section-link${isActive ? ' active' : ''}" href="${href}">
                 <span class="sidebar-section-number">§${chapter.number}.${idx + 1}</span>
                 <span class="sidebar-section-title">${para.title}</span>
-                ${testBadge}
+                ${badges ? `<span class="sb-badges">${badges}</span>` : ''}
             </a>`;
             ul.appendChild(sli);
         });
@@ -330,32 +368,9 @@ window.copyCode = function(btn) {
 };
 
 // ------------------------------------------
-// HEADER USER INFO (streak + profile link)
+// HEADER USER INFO — handled by streak.js
 // ------------------------------------------
 function initHeaderUser() {
-    const nav = document.querySelector('.header-nav');
-    if (!nav) return;
-
-    const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
-    if (!user) return;
-
-    // Remove existing profile link if any
-    nav.querySelectorAll('.header-profile-link').forEach(el => el.remove());
-
-    const streak = user.currentStreak ?? 0;
-    const a = document.createElement('a');
-    a.href = _siteRoot + 'profile.html';
-    a.className = 'header-profile-link';
-    a.innerHTML = streak > 0
-        ? `<span class="header-streak">🔥${streak}</span> ${user.firstName}`
-        : user.firstName;
-    a.style.cssText = 'display:inline-flex;align-items:center;gap:6px;';
-    nav.appendChild(a);
+    // streak.js renders the full mini-profile card next to the logo.
+    // This function is kept as a no-op for compatibility.
 }
-
-// Style for streak badge (injected once)
-(function() {
-    const style = document.createElement('style');
-    style.textContent = `.header-streak{background:rgba(250,179,135,.15);color:#fab387;border-radius:99px;padding:2px 8px;font-size:.8rem;font-weight:700;}`;
-    document.head.appendChild(style);
-}());

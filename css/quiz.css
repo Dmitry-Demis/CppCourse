@@ -382,14 +382,14 @@ body.modal-open .site-footer {
     max-width: 680px;
     max-height: 90vh;
     overflow-y: auto;
-    padding: var(--space-6);
+    padding: var(--space-4) var(--space-6) var(--space-6);
     box-shadow: 0 24px 64px rgba(0,0,0,.5);
 }
 
 .quiz-modal-close {
     position: absolute;
-    top: var(--space-4);
-    right: var(--space-4);
+    top: var(--space-3);
+    right: var(--space-3);
     background: transparent;
     border: none;
     color: var(--text-secondary);
@@ -399,23 +399,32 @@ body.modal-open .site-footer {
     padding: 4px 8px;
     border-radius: var(--radius-sm);
     transition: color .15s, background .15s;
+    z-index: 1;
 }
 .quiz-modal-close:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+
+/* Header has right padding to avoid close button overlap */
+.qm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+    gap: var(--space-3);
+    padding: var(--space-2) 2.8rem var(--space-2) 0;
+    min-height: 2.2rem;
+}
 
 .quiz-modal-loading {
     text-align: center;
     padding: var(--space-8);
     color: var(--text-secondary);
 }
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--text-secondary);
+}
 
 /* ── ModalQuiz inner styles ── */
-.qm-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: var(--space-3);
-    gap: var(--space-3);
-}
 .qm-title   { font-weight: var(--fw-semibold); color: var(--text-heading); }
 .qm-counter { font-size: var(--fs-sm); color: var(--text-secondary); white-space: nowrap; }
 
@@ -540,7 +549,36 @@ body.modal-open .site-footer {
     flex-wrap: wrap;
     gap: var(--space-3);
 }
-.qm-score { font-size: var(--fs-sm); color: var(--accent-orange, #fab387); }
+.qm-score {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--fs-sm);
+    flex-shrink: 0;
+}
+.qm-score-coin {
+    display: inline-block;
+    font-size: 1.1rem;
+    animation: coin-spin 2s linear infinite;
+}
+@keyframes coin-spin {
+    0%   { transform: rotateY(0deg); }
+    45%  { transform: rotateY(90deg); }
+    55%  { transform: rotateY(90deg); }
+    100% { transform: rotateY(360deg); }
+}
+.qm-score-val { font-weight: 700; color: #fde68a; }
+.qm-score-xp  { font-weight: 700; color: #a78bfa; }
+
+/* Actions — wrap nicely on small screens */
+.qm-actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex: 1;
+    min-width: 0;
+}
 
 .btn-qm {
     padding: 8px 20px;
@@ -550,10 +588,18 @@ body.modal-open .site-footer {
     cursor: pointer;
     border: none;
     transition: opacity .15s;
+    white-space: nowrap;
 }
 .btn-qm:hover { opacity: .85; }
 .btn-qm--check { background: var(--accent-blue, #89b4fa); color: #1e1e2e; }
 .btn-qm--next  { background: var(--accent-green, #a6e3a1); color: #1e1e2e; }
+
+@media (max-width: 480px) {
+    .qm-footer { flex-direction: column; align-items: stretch; }
+    .qm-actions { justify-content: stretch; }
+    .btn-qm { width: 100%; text-align: center; justify-content: center; }
+    .qm-score { justify-content: center; }
+}
 
 /* Results */
 .qm-results { text-align: center; padding: var(--space-4) 0; }
@@ -785,4 +831,27 @@ body.modal-open .site-footer {
 @keyframes rewardPop {
     from { opacity: 0; transform: scale(0.7); }
     to   { opacity: 1; transform: scale(1); }
+}
+
+/* First attempt badge */
+.qm-first-badge {
+    display: inline-block;
+    margin: 4px 0 8px;
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-size: .75rem;
+    font-weight: 700;
+    background: rgba(250,179,135,.12);
+    color: #fab387;
+    border: 1px solid rgba(250,179,135,.3);
+}
+
+/* Score coin spin indicator in footer */
+.qm-score-first {
+    font-size: .9rem;
+    animation: first-pulse 1s ease-in-out infinite alternate;
+}
+@keyframes first-pulse {
+    from { opacity: .6; transform: scale(.9); }
+    to   { opacity: 1;  transform: scale(1.1); }
 }

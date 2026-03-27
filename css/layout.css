@@ -432,6 +432,46 @@
 .sidebar-section-pct.pass { background: rgba(110,231,183,.12); color: #6ee7b7; }
 .sidebar-section-pct.fail { background: rgba(248,113,113,.12); color: #f87171; }
 
+/* Бейджи тестов в сайдбаре */
+.sb-badges {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 2px;
+}
+.sb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 99px;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+/* Жёлтая ручка — мини/стандартные тесты */
+.sb-badge--mini {
+    background: rgba(250,204,21,.15);
+    color: #facc15;
+    border: 1px solid rgba(250,204,21,.25);
+}
+/* Розово-фиолетовый — итоговый по параграфу */
+.sb-badge--final {
+    background: rgba(192,132,252,.15);
+    color: #c084fc;
+    border: 1px solid rgba(192,132,252,.25);
+}
+.sb-badge__pct {
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 0 3px;
+    border-radius: 99px;
+}
+.sb-badge__pct.pass { background: rgba(110,231,183,.2); color: #6ee7b7; }
+.sb-badge__pct.fail { background: rgba(248,113,113,.2); color: #f87171; }
+
 /* Тост «параграф заблокирован» */
 .nav-locked-toast {
     position: fixed;

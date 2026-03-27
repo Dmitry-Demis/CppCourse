@@ -27,6 +27,20 @@
 .qw-card__meta  { font-size: .75rem; color: var(--text-muted); }
 .qw-card__desc  { font-size: .8rem; color: var(--text-muted); flex: 1; }
 
+.qw-card__stats {
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+.qw-stat {
+    display: inline-flex;
+    flex-direction: column;
+    gap: .1rem;
+    min-width: 3.5rem;
+}
+.qw-stat__label { font-size: .65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .03em; }
+.qw-stat__val   { font-size: .85rem; font-weight: 700; color: var(--text); }
+
 .qw-card__badge {
     display: inline-block;
     font-size: .7rem;
@@ -62,13 +76,16 @@
 /* Итоговый блок — карточка на всю ширину */
 .qw-card--final {
     grid-column: 1 / -1;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    flex-direction: column;
+    gap: .6rem;
 }
-.qw-card--final .qw-card__title { flex: 1; }
-.qw-card--final .qw-card__desc  { flex-basis: 100%; }
+.qw-card--final .qw-card__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
 .qw-card--final-paragraph { border-color: #cba6f7; }
 .qw-card--final-chapter   { border-color: #f38ba8; }
 
@@ -88,7 +105,6 @@
 }
 .qw-final--chapter { border-left-color: #f38ba8; }
 
-.qw-final__info {}
 .qw-final__title { font-size: 1rem; font-weight: 700; color: #cba6f7; margin-bottom: .25rem; }
 .qw-final--chapter .qw-final__title { color: #f38ba8; }
 .qw-final__desc  { font-size: .85rem; color: var(--text-muted); }

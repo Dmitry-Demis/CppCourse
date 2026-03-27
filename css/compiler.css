@@ -16,7 +16,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-2) var(--space-4);
     background: var(--bg-tertiary);
     border-bottom: 1px solid var(--border-primary);
     flex-wrap: wrap;
@@ -35,7 +35,7 @@
 }
 
 .cw-select {
-    padding: 4px 8px;
+    padding: 3px 7px;
     background: var(--bg-card);
     color: var(--text-primary);
     border: 1px solid var(--border-primary);
@@ -46,12 +46,35 @@
 }
 .cw-select:focus { outline: none; border-color: var(--accent-blue); }
 
-/* Run button */
+.cw-std-badge {
+    padding: 3px 8px;
+    background: var(--bg-card);
+    color: var(--text-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    font-family: var(--font-mono);
+}
+
+/* Buttons */
+.cw-copy {
+    padding: 3px 10px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+    white-space: nowrap;
+}
+.cw-copy:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+
 .cw-run {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 14px;
+    gap: 5px;
+    padding: 4px 14px;
     background: var(--accent-green, #a6e3a1);
     color: #1e1e2e;
     border: none;
@@ -62,17 +85,49 @@
     transition: opacity .15s, box-shadow .15s;
     white-space: nowrap;
 }
-.cw-run:hover:not(:disabled) {
-    opacity: .85;
-    box-shadow: 0 0 10px rgba(166,227,161,.35);
-}
+.cw-run:hover:not(:disabled) { opacity: .85; box-shadow: 0 0 10px rgba(166,227,161,.35); }
 .cw-run:disabled { opacity: .5; cursor: not-allowed; }
 
-/* Editor */
-.cw-editor {
+/* Fallback textarea (если CodeMirror не загрузился) */
+.cw-editor--active {
     display: block;
     width: 100%;
-    min-height: 220px;
+    min-height: 160px;
+    padding: var(--space-4);
+    background: var(--code-bg, #1e1e2e);
+    color: var(--text-primary);
+    border: none;
+    border-top: 2px solid var(--accent-purple);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    line-height: 1.65;
+    tab-size: 4;
+    box-sizing: border-box;
+    outline: none;
+    resize: vertical;
+}
+
+/* CodeMirror 5 container */
+.cw-cm {
+    background: var(--code-bg, #1e1e2e);
+}
+.cw-cm .CodeMirror {
+    height: auto;
+    min-height: 140px;
+    font-family: var(--font-mono) !important;
+    font-size: var(--fs-sm) !important;
+    line-height: 1.65 !important;
+    border: none;
+    background: var(--code-bg, #1e1e2e);
+}
+.cw-cm .CodeMirror-scroll { min-height: 140px; }
+.cw-cm .CodeMirror-focused { outline: 2px solid var(--accent-purple); outline-offset: -2px; }
+
+/* Fallback plain textarea */
+.cw-ta--plain {
+    display: block;
+    width: 100%;
+    min-height: 160px;
     padding: var(--space-4);
     background: var(--code-bg, #1e1e2e);
     color: var(--text-primary);
@@ -80,11 +135,13 @@
     font-family: var(--font-mono);
     font-size: var(--fs-sm);
     line-height: 1.65;
-    resize: vertical;
     tab-size: 4;
     box-sizing: border-box;
+    outline: none;
+    resize: vertical;
 }
-.cw-editor:focus { outline: 2px solid var(--accent-purple); outline-offset: -2px; }
+/* скрываем исходную textarea которую CM5 заменяет */
+.cw-cm .cw-ta:not(.cw-ta--plain) { display: none; }
 
 /* Output */
 .cw-output {
@@ -97,31 +154,11 @@
     max-height: 320px;
     overflow-y: auto;
     border-top: 1px solid var(--border-primary);
-    transition: background .2s;
 }
 .cw-output--empty   { color: var(--text-tertiary); font-style: italic; }
 .cw-output--running { color: var(--accent-orange, #fab387); background: var(--bg-tertiary); }
 .cw-output--ok      { color: var(--accent-green,  #a6e3a1); background: var(--bg-tertiary); }
 .cw-output--error   { color: var(--accent-red,    #f38ba8); background: var(--bg-tertiary); }
-
-/* ── btn-run inside code-block header ── */
-.btn-run {
-    background: transparent;
-    color: var(--accent-green, #a6e3a1);
-    border: 1px solid var(--accent-green, #a6e3a1);
-    border-radius: var(--radius-sm);
-    padding: 3px 10px;
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
-    cursor: pointer;
-    transition: background .15s, color .15s;
-    white-space: nowrap;
-}
-.btn-run:hover:not(:disabled) {
-    background: var(--accent-green, #a6e3a1);
-    color: #1e1e2e;
-}
-.btn-run:disabled { opacity: .5; cursor: not-allowed; }
 
 @media (max-width: 600px) {
     .cw-header { flex-direction: column; align-items: stretch; }
