@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Числовые преобразования — Курс C++</title>
+    <meta name="description" content="Числовые преобразования в C++: безопасные, переинтерпретирующие и потери данных. Примеры и диаграммы.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Преобразования типов</div>
+                <h1>Числовые преобразования</h1>
+
+                <p>
+                    <span class="key-term">Числовые преобразования</span> — это все преобразования между числовыми типами,
+                    которые не являются повышениями. В отличие от повышений, они не всегда безопасны.
+                </p>
+
+                <h2 id="five-kinds">Пять видов числовых преобразований</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — виды числовых преобразований</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// 1. Целое → другое целое (не повышение)
+short s = 3;       // int → short
+long l = 3;        // int → long
+char ch = s;       // short → char
+
+// 2. Вещественное → другое вещественное (не повышение)
+float f = 3.0;     // double → float
+long double ld = 3.0; // double → long double
+
+// 3. Вещественное → целое
+int i = 3.5;       // double → int (дробная часть теряется!)
+
+// 4. Целое → вещественное
+double d = 3;      // int → double
+
+// 5. Целое или вещественное → bool
+bool b1 = 3;       // int → bool (0 = false, всё остальное = true)
+bool b2 = 3.0;     // double → bool</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="safety">Три категории безопасности</h2>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 520 160" width="520" height="160" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <!-- Safe -->
+                    <rect x="10" y="10" width="155" height="140" rx="8" fill="rgba(126,231,135,.08)" stroke="var(--accent-green)" stroke-width="1.5"/>
+                    <text x="87" y="35" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-weight="bold" font-family="sans-serif">✅ Безопасные</text>
+                    <text x="87" y="58" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">int → long</text>
+                    <text x="87" y="76" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">short → double</text>
+                    <text x="87" y="94" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">Значение сохраняется</text>
+                    <text x="87" y="110" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">всегда</text>
+                    <!-- Reinterpret -->
+                    <rect x="180" y="10" width="155" height="140" rx="8" fill="rgba(255,166,87,.08)" stroke="var(--accent-orange,#ffa657)" stroke-width="1.5"/>
+                    <text x="257" y="35" text-anchor="middle" fill="var(--accent-orange,#ffa657)" font-size="12" font-weight="bold" font-family="sans-serif">⚠️ Переинтерпрет.</text>
+                    <text x="257" y="58" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">int → unsigned</text>
+                    <text x="257" y="76" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">-5 → 4294967291</text>
+                    <text x="257" y="94" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">Данные не теряются,</text>
+                    <text x="257" y="110" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">но значение меняется</text>
+                    <!-- Lossy -->
+                    <rect x="350" y="10" width="155" height="140" rx="8" fill="rgba(243,139,168,.08)" stroke="#f38ba8" stroke-width="1.5"/>
+                    <text x="427" y="35" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold" font-family="sans-serif">❌ С потерей данных</text>
+                    <text x="427" y="58" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">double → int</text>
+                    <text x="427" y="76" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">3.5 → 3</text>
+                    <text x="427" y="94" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">Дробная часть</text>
+                    <text x="427" y="110" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">или точность теряется</text>
+                </svg>
+                </div>
+
+                <h2 id="lossy-examples">Примеры потери данных</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — потеря данных при преобразовании</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+
+int main()
+{
+    // double → int: дробная часть отбрасывается (не округляется!)
+    int i = 3.9;
+    std::cout &lt;&lt; i &lt;&lt; '\n'; // 3, а не 4!
+
+    // double → float: потеря точности
+    float f = 0.123456789;
+    std::cout &lt;&lt; std::setprecision(9) &lt;&lt; f &lt;&lt; '\n'; // 0.123456791
+
+    // int → char: переполнение
+    int big { 30000 };
+    char c = big; // char: диапазон -128..127
+    std::cout &lt;&lt; static_cast&lt;int&gt;(c) &lt;&lt; '\n'; // 48 (неожиданно!)
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="signed-unsigned">Ловушка: знаковые и беззнаковые</h2>
+
+                <p>
+                    Смешивание знаковых и беззнаковых типов — частый источник ошибок.
+                    Компилятор обычно не предупреждает об этом по умолчанию:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — неожиданный результат со знаковыми/беззнаковыми</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main()
+{
+    // int -5 преобразуется в unsigned int → огромное число
+    unsigned int u { static_cast&lt;unsigned int&gt;(-5) };
+    std::cout &lt;&lt; u &lt;&lt; '\n'; // 4294967291
+
+    // Сравнение: -3 < 5u → false! (потому что -3 → огромное unsigned)
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; (-3 &lt; 5u) &lt;&lt; '\n'; // false (!)
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Лучшая практика</div>
+                    <p>Избегайте смешивания знаковых и беззнаковых типов в арифметических выражениях. Это одна из главных причин избегать <code>unsigned int</code> в обычном коде.</p>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="numeric-conversions" data-final-desc="Числовые преобразования"></div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>
