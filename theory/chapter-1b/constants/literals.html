@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8"><meta name="created" content="2025-03-31">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аргументы по умолчанию — Курс C++</title>
-    <meta name="description" content="Аргументы по умолчанию в C++: синтаксис, правила, взаимодействие с перегрузкой.">
+    <title>Литералы и суффиксы — Курс C++</title>
+    <meta name="description" content="Литералы в C++: типы по умолчанию, суффиксы u L f, научная нотация, строковые литералы, magic numbers.">
     <link rel="stylesheet" href="../../../css/variables.css?v=3">
     <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../../../css/compiler.css">
     <link rel="stylesheet" href="../../../css/feedback.css">
     <link rel="stylesheet" href="../../../css/callout.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -33,10 +33,7 @@
                 </svg>
                 Курс C++
             </a>
-            <nav class="header-nav">
-                <a href="../../../index.html">Главная</a>
-                <a href="#" class="active">Глава</a>
-            </nav>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
             <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -48,107 +45,122 @@
         <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
         <main class="main-content">
             <div class="chapter-content">
-                <div class="section-badge">Перегрузка функций</div>
-                <h1>Аргументы по умолчанию</h1>
+                <div class="section-badge">Константы и constexpr</div>
+                <h1>Литералы и суффиксы</h1>
+
                 <p>
-                    <span class="key-term">Аргумент по умолчанию</span> — значение, которое компилятор подставляет
-                    автоматически, если вызывающий код не передал аргумент для этого параметра.
-                    Удобно, когда у параметра есть «разумное» значение по умолчанию.
+                    <span class="key-term">Литерал</span> — это значение, вписанное прямо в код: <code>5</code>, <code>3.14</code>, <code>'a'</code>, <code>"hello"</code>.
+                    Каждый литерал имеет тип, который компилятор определяет автоматически.
                 </p>
 
-                <h2 id="syntax">Синтаксис</h2>
+                <h2 id="default-types">Типы литералов по умолчанию</h2>
+
+                <div style="overflow-x:auto">
+                <table style="width:100%; border-collapse:collapse; font-size:0.85em">
+                    <thead>
+                        <tr style="background:var(--surface-2); border-bottom:2px solid var(--border)">
+                            <th style="padding:8px; text-align:left">Литерал</th>
+                            <th style="padding:8px; text-align:left">Примеры</th>
+                            <th style="padding:8px; text-align:left">Тип по умолчанию</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Целое число</td>
+                            <td style="padding:8px"><code>5</code>, <code>0</code>, <code>-3</code></td>
+                            <td style="padding:8px"><code>int</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Булево</td>
+                            <td style="padding:8px"><code>true</code>, <code>false</code></td>
+                            <td style="padding:8px"><code>bool</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Вещественное</td>
+                            <td style="padding:8px"><code>1.2</code>, <code>3.14</code></td>
+                            <td style="padding:8px"><code>double</code> (не float!)</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Символ</td>
+                            <td style="padding:8px"><code>'a'</code>, <code>'\n'</code></td>
+                            <td style="padding:8px"><code>char</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px">Строка</td>
+                            <td style="padding:8px"><code>"hello"</code></td>
+                            <td style="padding:8px"><code>const char[N]</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <h2 id="suffixes">Суффиксы для изменения типа</h2>
                 <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — аргументы по умолчанию</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-header"><span class="code-lang">C++ — суффиксы литералов</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
                     <div class="code-content">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
-// y имеет значение по умолчанию 4
-void print(int x, int y = 4)
-{
-    std::cout &lt;&lt; "x=" &lt;&lt; x &lt;&lt; " y=" &lt;&lt; y &lt;&lt; '\n';
-}
-
 int main()
 {
-    print(1, 2); // y = 2 (явный аргумент)
-    print(3);    // y = 4 (значение по умолчанию)
-    // print();  // ошибка: x не имеет значения по умолчанию
+    // Целочисленные суффиксы
+    auto a { 5 };    // int
+    auto b { 5u };   // unsigned int
+    auto c { 5L };   // long
+    auto d { 5LL };  // long long
+    auto e { 5uLL }; // unsigned long long
+
+    // Вещественные суффиксы
+    auto f { 3.14 };  // double (по умолчанию)
+    auto g { 3.14f }; // float (нужен суффикс f!)
+    auto h { 3.14L }; // long double
+
+    // Типичная ошибка: предупреждение компилятора
+    float bad { 4.1 };  // 4.1 — double, конвертируется в float с потерей точности
+    float good { 4.1f }; // правильно: float-литерал
+
     return 0;
-}
-// Вывод:
-// x=1 y=2
-// x=3 y=4</code></pre>
+}</code></pre>
                     </div>
                 </div>
 
-                <h2 id="rules">Правила</h2>
+                <h2 id="scientific">Научная нотация</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — научная нотация</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">double avogadro { 6.02e23 };   // 6.02 × 10²³
+double proton   { 1.6e-19 };   // 1.6 × 10⁻¹⁹
+double pi       { 3.14159 };   // обычная нотация</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="magic-numbers">Магические числа — антипаттерн</h2>
+                <p>
+                    <span class="key-term">Магическое число</span> — литерал без объяснения смысла.
+                    Такой код трудно читать и поддерживать.
+                </p>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — магические числа vs именованные константы</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// Плохо: что такое 30? Почему 30?
+int total { numClassrooms * 30 };
+setMax(30);
+
+// Хорошо: смысл очевиден
+constexpr int studentsPerClass { 30 };
+int total { numClassrooms * studentsPerClass };
+setMax(studentsPerClass);
+
+// Если нужно изменить — меняем в одном месте!</code></pre>
+                    </div>
+                </div>
+
                 <div class="info-card">
-                    <div class="info-card__title">📋 Ключевые правила</div>
-                    <ul>
-                        <li>Только знак <code>=</code>: <code>void f(int x = 5)</code> — OK; скобки и фигурные скобки — нет</li>
-                        <li>Параметры с умолчаниями должны быть <strong>правее</strong> параметров без умолчаний</li>
-                        <li>Явные аргументы всегда передаются <strong>слева направо</strong> — нельзя пропустить средний</li>
-                        <li>Умолчание объявляется один раз — либо в объявлении, либо в определении (не в обоих)</li>
-                    </ul>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — несколько умолчаний</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-void print(int x = 10, int y = 20, int z = 30)
-{
-    std::cout &lt;&lt; x &lt;&lt; ' ' &lt;&lt; y &lt;&lt; ' ' &lt;&lt; z &lt;&lt; '\n';
-}
-
-int main()
-{
-    print(1, 2, 3); // 1 2 3
-    print(1, 2);    // 1 2 30
-    print(1);       // 1 20 30
-    print();        // 10 20 30
-
-    // print(, , 3); // ОШИБКА: нельзя пропускать аргументы
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-                <h2 id="real-use">Живое применение</h2>
-                <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — функция с разумными умолчаниями</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;string&gt;
-
-// Функция вывода с настраиваемым разделителем и переносом строки
-void printList(const std::string&amp; item, char sep = ',', bool newline = true)
-{
-    std::cout &lt;&lt; item &lt;&lt; sep;
-    if (newline) std::cout &lt;&lt; '\n';
-}
-
-int main()
-{
-    printList("apple");          // apple,\n
-    printList("banana", ';');    // banana;\n
-    printList("cherry", ' ', false); // cherry  (без переноса)
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-                <div class="warning-block">
-                    <div class="warning-block__title">Умолчания и перегрузка могут конфликтовать</div>
-                    <p>Если функция с умолчанием и другая перегрузка могут совпасть при одном и том же вызове — компилятор выдаст ошибку неоднозначности.</p>
-                    <pre><code class="language-cpp">void foo(int x = 0) {}
-void foo(double d = 0.0) {}
-foo(); // error: ambiguous — какую вызвать?</code></pre>
+                    <div class="info-card__title">🔗 Подробнее на cppreference</div>
+                    <p>Полный список суффиксов и правил для литералов: <a href="https://en.cppreference.com/w/cpp/language/integer_literal" target="_blank" rel="noopener">integer_literal</a>, <a href="https://en.cppreference.com/w/cpp/language/floating_literal" target="_blank" rel="noopener">floating_literal</a></p>
                 </div>
 
                 <h2 id="tests">Проверьте знания</h2>
-                <div class="quiz-widget" data-final="default-arguments" data-final-desc="Аргументы по умолчанию"></div>
+                <div class="quiz-widget" data-final="literals" data-final-desc="Литералы и суффиксы"></div>
                 <section class="feedback-section">
                     <div class="feedback-section__title">Оцените этот параграф</div>
                     <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>

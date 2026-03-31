@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8"><meta name="created" content="2025-03-31">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аргументы по умолчанию — Курс C++</title>
-    <meta name="description" content="Аргументы по умолчанию в C++: синтаксис, правила, взаимодействие с перегрузкой.">
+    <title>Сравнение строк и операции с символами — Курс C++</title>
+    <meta name="description" content="Сравнение std::string, лексикографический порядок, операции с символами: isupper, tolower, isdigit в C++.">
     <link rel="stylesheet" href="../../../css/variables.css?v=3">
     <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../../../css/compiler.css">
     <link rel="stylesheet" href="../../../css/feedback.css">
     <link rel="stylesheet" href="../../../css/callout.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -33,10 +33,7 @@
                 </svg>
                 Курс C++
             </a>
-            <nav class="header-nav">
-                <a href="../../../index.html">Главная</a>
-                <a href="#" class="active">Глава</a>
-            </nav>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
             <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -48,107 +45,128 @@
         <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
         <main class="main-content">
             <div class="chapter-content">
-                <div class="section-badge">Перегрузка функций</div>
-                <h1>Аргументы по умолчанию</h1>
+                <div class="section-badge">Строки</div>
+                <h1>Сравнение строк и операции с символами</h1>
+
+                <h2 id="compare">Сравнение строк</h2>
                 <p>
-                    <span class="key-term">Аргумент по умолчанию</span> — значение, которое компилятор подставляет
-                    автоматически, если вызывающий код не передал аргумент для этого параметра.
-                    Удобно, когда у параметра есть «разумное» значение по умолчанию.
+                    Строки сравниваются <em>лексикографически</em> — посимвольно, по числовым кодам символов.
+                    Регистр имеет значение: <code>'A'</code> (65) &lt; <code>'a'</code> (97).
                 </p>
-
-                <h2 id="syntax">Синтаксис</h2>
                 <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — аргументы по умолчанию</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-// y имеет значение по умолчанию 4
-void print(int x, int y = 4)
-{
-    std::cout &lt;&lt; "x=" &lt;&lt; x &lt;&lt; " y=" &lt;&lt; y &lt;&lt; '\n';
-}
-
-int main()
-{
-    print(1, 2); // y = 2 (явный аргумент)
-    print(3);    // y = 4 (значение по умолчанию)
-    // print();  // ошибка: x не имеет значения по умолчанию
-    return 0;
-}
-// Вывод:
-// x=1 y=2
-// x=3 y=4</code></pre>
-                    </div>
-                </div>
-
-                <h2 id="rules">Правила</h2>
-                <div class="info-card">
-                    <div class="info-card__title">📋 Ключевые правила</div>
-                    <ul>
-                        <li>Только знак <code>=</code>: <code>void f(int x = 5)</code> — OK; скобки и фигурные скобки — нет</li>
-                        <li>Параметры с умолчаниями должны быть <strong>правее</strong> параметров без умолчаний</li>
-                        <li>Явные аргументы всегда передаются <strong>слева направо</strong> — нельзя пропустить средний</li>
-                        <li>Умолчание объявляется один раз — либо в объявлении, либо в определении (не в обоих)</li>
-                    </ul>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — несколько умолчаний</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-void print(int x = 10, int y = 20, int z = 30)
-{
-    std::cout &lt;&lt; x &lt;&lt; ' ' &lt;&lt; y &lt;&lt; ' ' &lt;&lt; z &lt;&lt; '\n';
-}
-
-int main()
-{
-    print(1, 2, 3); // 1 2 3
-    print(1, 2);    // 1 2 30
-    print(1);       // 1 20 30
-    print();        // 10 20 30
-
-    // print(, , 3); // ОШИБКА: нельзя пропускать аргументы
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-                <h2 id="real-use">Живое применение</h2>
-                <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — функция с разумными умолчаниями</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-header"><span class="code-lang">C++ — операторы сравнения строк</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
                     <div class="code-content">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
-// Функция вывода с настраиваемым разделителем и переносом строки
-void printList(const std::string&amp; item, char sep = ',', bool newline = true)
-{
-    std::cout &lt;&lt; item &lt;&lt; sep;
-    if (newline) std::cout &lt;&lt; '\n';
-}
-
 int main()
 {
-    printList("apple");          // apple,\n
-    printList("banana", ';');    // banana;\n
-    printList("cherry", ' ', false); // cherry  (без переноса)
+    std::string s1 { "hello" };
+    std::string s2 { "Hello" };
+    std::string s3 { "hello" };
+
+    std::cout &lt;&lt; (s1 == s3) &lt;&lt; '\n'; // 1 (true): равны
+    std::cout &lt;&lt; (s1 == s2) &lt;&lt; '\n'; // 0 (false): регистр разный!
+    std::cout &lt;&lt; (s1 &gt; s2)  &lt;&lt; '\n'; // 1 (true): 'h' > 'H' по ASCII
+
+    // Сортировка массива строк:
+    std::string names[] { "Tom", "Alice", "Sam", "Bob" };
+    // Пузырьковая сортировка:
+    for (int i = 0; i &lt; 3; ++i)
+        for (int j = 0; j &lt; 3 - i; ++j)
+            if (names[j] &gt; names[j+1])
+                std::swap(names[j], names[j+1]);
+
+    for (const auto&amp; n : names)
+        std::cout &lt;&lt; n &lt;&lt; '\n'; // Alice Bob Sam Tom
+
     return 0;
 }</code></pre>
                     </div>
                 </div>
 
-                <div class="warning-block">
-                    <div class="warning-block__title">Умолчания и перегрузка могут конфликтовать</div>
-                    <p>Если функция с умолчанием и другая перегрузка могут совпасть при одном и том же вызове — компилятор выдаст ошибку неоднозначности.</p>
-                    <pre><code class="language-cpp">void foo(int x = 0) {}
-void foo(double d = 0.0) {}
-foo(); // error: ambiguous — какую вызвать?</code></pre>
+                <h2 id="char-ops">Операции с символами (&lt;cctype&gt;)</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — функции для работы с символами</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;cctype&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+int main()
+{
+    char c { 'A' };
+    std::cout &lt;&lt; std::isupper(c) &lt;&lt; '\n'; // 1: заглавная
+    std::cout &lt;&lt; std::islower(c) &lt;&lt; '\n'; // 0: не строчная
+    std::cout &lt;&lt; std::isalpha(c) &lt;&lt; '\n'; // 1: буква
+    std::cout &lt;&lt; std::isdigit('5') &lt;&lt; '\n'; // 1: цифра
+    std::cout &lt;&lt; std::isspace(' ') &lt;&lt; '\n'; // 1: пробел
+
+    // Преобразование регистра:
+    std::cout &lt;&lt; (char)std::tolower('A') &lt;&lt; '\n'; // a
+    std::cout &lt;&lt; (char)std::toupper('z') &lt;&lt; '\n'; // Z
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="case-insensitive">Живое применение: сравнение без учёта регистра</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — сравнение строк без учёта регистра</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;cctype&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+bool equalsIgnoreCase(const std::string&amp; a, const std::string&amp; b)
+{
+    if (a.length() != b.length()) return false;
+    for (size_t i {}; i &lt; a.length(); ++i)
+        if (std::tolower(a[i]) != std::tolower(b[i]))
+            return false;
+    return true;
+}
+
+int main()
+{
+    std::cout &lt;&lt; equalsIgnoreCase("HELLO", "hello") &lt;&lt; '\n'; // 1
+    std::cout &lt;&lt; equalsIgnoreCase("Hello", "World") &lt;&lt; '\n'; // 0
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="extract-digits">Живое применение: извлечение цифр из строки</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — извлечение номера телефона</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;cctype&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    std::string text { "Phone: +1(234)456-78-90" };
+    std::string digits;
+
+    for (char c : text)
+        if (std::isdigit(c))
+            digits += c;
+
+    std::cout &lt;&lt; digits &lt;&lt; '\n'; // 12344567890
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">🔗 Документация</div>
+                    <p><a href="https://en.cppreference.com/w/cpp/header/cctype" target="_blank" rel="noopener">Функции &lt;cctype&gt; на cppreference</a> — полный список функций для работы с символами.</p>
                 </div>
 
                 <h2 id="tests">Проверьте знания</h2>
-                <div class="quiz-widget" data-final="default-arguments" data-final-desc="Аргументы по умолчанию"></div>
+                <div class="quiz-widget" data-final="string-compare-chars" data-final-desc="Сравнение строк и операции с символами"></div>
                 <section class="feedback-section">
                     <div class="feedback-section__title">Оцените этот параграф</div>
                     <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Константные переменные — Курс C++</title>
+    <meta name="description" content="const и constexpr в C++: именованные константы, зачем нужны, правила, лучшие практики.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    <div class="page-wrapper">
+        <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Константы и constexpr</div>
+                <h1>Константные переменные</h1>
+
+                <p>
+                    <span class="key-term">Константа</span> — это значение, которое не может измениться после инициализации.
+                    Константы делают программу надёжнее: компилятор не даст случайно изменить значение,
+                    которое должно оставаться неизменным.
+                </p>
+
+                <h2 id="const">Ключевое слово const</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — константные переменные</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main()
+{
+    const double gravity { 9.8 };  // константа: нельзя изменить
+    // gravity = 10.0;             // ОШИБКА: const нельзя присвоить
+
+    const int sidesInSquare { 4 }; // именованная константа
+
+    // Константу можно инициализировать из переменной:
+    int age { 25 };
+    const int constAge { age }; // OK: инициализатор может быть не-const
+    // constAge = 26;           // ОШИБКА
+
+    std::cout &lt;&lt; gravity &lt;&lt; '\n';       // 9.8
+    std::cout &lt;&lt; sidesInSquare &lt;&lt; '\n'; // 4
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="why">Зачем использовать константы</h2>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 480 130" width="480" height="130" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <rect x="10" y="10" width="140" height="110" rx="8" fill="rgba(126,231,135,.08)" stroke="var(--accent-green)" stroke-width="1.5"/>
+                    <text x="80" y="35" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-weight="bold" font-family="sans-serif">✅ С const</text>
+                    <text x="80" y="58" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">const double pi</text>
+                    <text x="80" y="76" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">{ 3.14159 };</text>
+                    <text x="80" y="98" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">Нельзя случайно изменить</text>
+                    <rect x="170" y="10" width="140" height="110" rx="8" fill="rgba(243,139,168,.08)" stroke="#f38ba8" stroke-width="1.5"/>
+                    <text x="240" y="35" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold" font-family="sans-serif">❌ Без const</text>
+                    <text x="240" y="58" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">double pi</text>
+                    <text x="240" y="76" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">{ 3.14159 };</text>
+                    <text x="240" y="98" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">pi = 3.0; // тихая ошибка!</text>
+                    <rect x="330" y="10" width="140" height="110" rx="8" fill="rgba(88,166,255,.08)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="400" y="35" text-anchor="middle" fill="var(--accent-blue)" font-size="12" font-weight="bold" font-family="sans-serif">🔢 Magic number</text>
+                    <text x="400" y="58" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">area = r * r * 3.14;</text>
+                    <text x="400" y="76" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="sans-serif">Что такое 3.14?</text>
+                    <text x="400" y="98" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">Непонятно без контекста</text>
+                </svg>
+                </div>
+
+                <h2 id="no-macros">Константы vs макросы</h2>
+                <p>
+                    В старом коде можно встретить <code>#define PI 3.14159</code>.
+                    Это плохая практика: макросы не имеют типа, не подчиняются правилам области видимости
+                    и могут вызвать неожиданные ошибки.
+                </p>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — константа vs макрос</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// Плохо: макрос
+#define MAX_SIZE 100  // нет типа, нет области видимости, нет отладки
+
+// Хорошо: константная переменная
+constexpr int maxSize { 100 }; // тип int, область видимости, видна отладчику</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="constexpr">constexpr — константа времени компиляции</h2>
+                <p>
+                    <code>constexpr</code> гарантирует, что значение вычисляется на этапе компиляции.
+                    Это быстрее и позволяет использовать значение там, где требуется константное выражение
+                    (например, размер массива).
+                </p>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — constexpr</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main()
+{
+    constexpr double pi { 3.14159265358979 };
+    constexpr int maxStudents { 30 };
+
+    // constexpr можно использовать как размер массива:
+    int scores[maxStudents] {};
+
+    // Вычисление тоже может быть constexpr:
+    constexpr double twoPi { 2.0 * pi }; // вычисляется при компиляции
+
+    std::cout &lt;&lt; "2π = " &lt;&lt; twoPi &lt;&lt; '\n'; // 6.28318...
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 const vs constexpr</div>
+                    <ul>
+                        <li><code>const</code> — значение не изменится, но может быть вычислено в runtime</li>
+                        <li><code>constexpr</code> — значение вычисляется при компиляции, гарантированно</li>
+                        <li>Предпочитайте <code>constexpr</code> для числовых констант</li>
+                    </ul>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Лучшая практика</div>
+                    <p>Делайте переменные константными везде, где это возможно. Используйте <code>constexpr</code> для числовых констант. Избегайте «магических чисел» — давайте константам говорящие имена.</p>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="constants" data-final-desc="Константные переменные"></div>
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row"><div class="feedback-stars">
+                    <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    </div><span class="feedback-rating-value">—</span></div>
+                    <div class="feedback-form"><textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea><div class="feedback-form__row"><span class="feedback-form__char">0 / 1024</span><button class="feedback-form__submit">Отправить</button></div></div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar"><div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div></aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../js/quiz.js"></script><script src="../../../components/quiz-widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script><script src="../../../js/feedback.js"></script>
+</body>
+</html>

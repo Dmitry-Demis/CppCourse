@@ -18,8 +18,21 @@
       ]
     },
     {
-      "id": "chapter-2",
+      "id": "chapter-1b",
       "number": 2,
+      "groupId": "constants",
+      "level": "BEGINNER",
+      "title": "Константы и constexpr",
+      "description": "const, constexpr, литералы, суффиксы, магические числа, константные выражения, static_assert",
+      "paragraphs": [
+        "constants",
+        "literals",
+        "constant-expressions"
+      ]
+    },
+    {
+      "id": "chapter-2",
+      "number": 4,
       "groupId": "fundamental-types",
       "level": "BEGINNER",
       "title": "Целочисленные типы",
@@ -34,7 +47,7 @@
     },
     {
       "id": "chapter-2b",
-      "number": 3,
+      "number": 4,
       "groupId": "numeric-types",
       "level": "BEGINNER",
       "title": "Вещественные, логические и символьные типы",
@@ -50,7 +63,7 @@
     },
     {
       "id": "chapter-3",
-      "number": 4,
+      "number": 5,
       "groupId": "functions",
       "level": "JUNIOR",
       "title": "Функции",
@@ -67,7 +80,7 @@
     },
     {
       "id": "chapter-3b",
-      "number": 5,
+      "number": 6,
       "groupId": "type-conversion",
       "level": "JUNIOR",
       "title": "Преобразования типов",
@@ -83,7 +96,7 @@
     },
     {
       "id": "chapter-3c",
-      "number": 6,
+      "number": 7,
       "groupId": "type-aliases",
       "level": "JUNIOR",
       "title": "Псевдонимы типов и вывод типов",
@@ -96,7 +109,7 @@
     },
     {
       "id": "chapter-4",
-      "number": 7,
+      "number": 8,
       "groupId": "code-organization",
       "level": "JUNIOR",
       "title": "Организация кода",
@@ -111,7 +124,7 @@
     },
     {
       "id": "chapter-5b",
-      "number": 8,
+      "number": 9,
       "groupId": "branching",
       "level": "JUNIOR",
       "title": "Ветвление",
@@ -128,7 +141,7 @@
     },
     {
       "id": "chapter-5",
-      "number": 9,
+      "number": 10,
       "groupId": "control-flow",
       "level": "JUNIOR",
       "title": "Циклы",
@@ -142,7 +155,7 @@
     },
     {
       "id": "chapter-9b",
-      "number": 10,
+      "number": 11,
       "groupId": "vectors",
       "level": "JUNIOR",
       "title": "Массивы и std::vector",
@@ -159,7 +172,7 @@
     },
     {
       "id": "chapter-9c",
-      "number": 11,
+      "number": 12,
       "groupId": "cstyle-arrays",
       "level": "JUNIOR",
       "title": "C-style массивы",
@@ -172,7 +185,7 @@
     },
     {
       "id": "chapter-6b",
-      "number": 12,
+      "number": 13,
       "groupId": "operators-extra",
       "level": "JUNIOR+",
       "title": "Операторы: синтаксис и арифметика",
@@ -192,7 +205,7 @@
     },
     {
       "id": "chapter-6",
-      "number": 13,
+      "number": 14,
       "groupId": "operators",
       "level": "JUNIOR+",
       "title": "Побитовые операторы",
@@ -205,7 +218,7 @@
     },
     {
       "id": "chapter-7",
-      "number": 14,
+      "number": 15,
       "groupId": "scope-linkage",
       "level": "JUNIOR+",
       "title": "Область видимости",
@@ -220,7 +233,7 @@
     },
     {
       "id": "chapter-8",
-      "number": 15,
+      "number": 16,
       "groupId": "scope-linkage",
       "level": "MIDDLE",
       "title": "Время жизни и компоновка",
@@ -237,7 +250,7 @@
     },
     {
       "id": "chapter-9",
-      "number": 16,
+      "number": 17,
       "groupId": "namespaces",
       "level": "MIDDLE",
       "title": "Пространства имён: продвинутые темы",
@@ -249,7 +262,7 @@
     },
     {
       "id": "chapter-11",
-      "number": 17,
+      "number": 18,
       "groupId": "overloading",
       "level": "MIDDLE",
       "title": "Перегрузка функций",
@@ -263,7 +276,7 @@
     },
     {
       "id": "chapter-12",
-      "number": 18,
+      "number": 19,
       "groupId": "templates",
       "level": "MIDDLE+",
       "title": "Шаблоны функций",
@@ -277,7 +290,7 @@
     },
     {
       "id": "chapter-13",
-      "number": 19,
+      "number": 20,
       "groupId": "references",
       "level": "MIDDLE",
       "title": "Ссылки",
@@ -291,7 +304,7 @@
     },
     {
       "id": "chapter-14",
-      "number": 20,
+      "number": 21,
       "groupId": "pointers",
       "level": "MIDDLE+",
       "title": "Указатели",
@@ -305,7 +318,7 @@
     },
     {
       "id": "chapter-10",
-      "number": 21,
+      "number": 22,
       "groupId": "random",
       "level": "MIDDLE",
       "title": "Случайные числа",

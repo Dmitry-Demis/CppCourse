@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>std::string_view — Курс C++</title>
+    <meta name="description" content="std::string_view в C++: что это, зачем нужен, отличие от string, когда использовать, опасности.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    <div class="page-wrapper">
+        <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Строки</div>
+                <h1><code>std::string_view</code></h1>
+
+                <p>
+                    <span class="key-term"><code>std::string_view</code></span> (C++17) — это лёгкий «вид» на строку.
+                    Он не владеет данными и не копирует их — только хранит указатель и длину.
+                    Это делает его очень эффективным для передачи строк в функции.
+                </p>
+
+                <h2 id="what-is">Что такое string_view</h2>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 480 130" width="480" height="130" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <defs><marker id="sva" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="var(--accent-violet)"/></marker></defs>
+                    <!-- string data -->
+                    <rect x="10" y="20" width="280" height="40" rx="4" fill="rgba(88,166,255,.1)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="150" y="45" text-anchor="middle" fill="var(--accent-blue)" font-size="13" font-family="monospace">"Hello, world!"</text>
+                    <text x="150" y="75" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">данные в памяти (std::string или литерал)</text>
+                    <!-- string_view -->
+                    <rect x="320" y="20" width="150" height="60" rx="6" fill="var(--accent-violet-dim)" stroke="var(--accent-violet)" stroke-width="1.5"/>
+                    <text x="395" y="42" text-anchor="middle" fill="var(--accent-violet)" font-size="11" font-weight="bold" font-family="sans-serif">string_view</text>
+                    <text x="395" y="58" text-anchor="middle" fill="var(--text-secondary)" font-size="10" font-family="monospace">ptr → данные</text>
+                    <text x="395" y="72" text-anchor="middle" fill="var(--text-secondary)" font-size="10" font-family="monospace">len = 13</text>
+                    <!-- arrow -->
+                    <line x1="320" y1="45" x2="292" y2="40" stroke="var(--accent-violet)" stroke-width="1.5" marker-end="url(#sva)"/>
+                    <text x="150" y="110" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">string_view не копирует данные — только смотрит на них</text>
+                </svg>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — string_view</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;string&gt;
+#include &lt;string_view&gt;
+#include &lt;iostream&gt;
+
+// Принимает любой тип строки без копирования
+void printLength(std::string_view sv)
+{
+    std::cout &lt;&lt; sv &lt;&lt; " (длина: " &lt;&lt; sv.length() &lt;&lt; ")\n";
+}
+
+int main()
+{
+    std::string s { "Hello, world!" };
+    const char* cstr { "C-style string" };
+
+    printLength(s);      // std::string → string_view (без копии)
+    printLength(cstr);   // const char* → string_view (без копии)
+    printLength("literal"); // литерал → string_view (без копии)
+
+    // Суффикс sv для string_view литерала:
+    using namespace std::string_view_literals;
+    constexpr std::string_view greeting { "Hello"sv };
+    std::cout &lt;&lt; greeting &lt;&lt; '\n';
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="vs-string">string vs string_view</h2>
+
+                <div style="overflow-x:auto">
+                <table style="width:100%; border-collapse:collapse; font-size:0.85em">
+                    <thead>
+                        <tr style="background:var(--surface-2); border-bottom:2px solid var(--border)">
+                            <th style="padding:8px; text-align:left">Свойство</th>
+                            <th style="padding:8px; text-align:left"><code>std::string</code></th>
+                            <th style="padding:8px; text-align:left"><code>std::string_view</code></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Владеет данными</td>
+                            <td style="padding:8px">✅ Да</td>
+                            <td style="padding:8px">❌ Нет (только смотрит)</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Копирование</td>
+                            <td style="padding:8px">Дорогое</td>
+                            <td style="padding:8px">Дешёвое (2 слова)</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Изменение</td>
+                            <td style="padding:8px">✅ Можно</td>
+                            <td style="padding:8px">❌ Нельзя</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Принимает литералы</td>
+                            <td style="padding:8px">Дорого (копирует)</td>
+                            <td style="padding:8px">Дёшево (без копии)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px">Когда использовать</td>
+                            <td style="padding:8px">Нужно хранить/изменять</td>
+                            <td style="padding:8px">Только читать, передавать</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <h2 id="danger">Опасность: висячий string_view</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — ОПАСНО: string_view на уничтоженную строку</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">std::string_view getDangling()
+{
+    std::string local { "hello" }; // локальная строка
+    return local; // ОПАСНО: local уничтожается, string_view висит!
+}
+
+// Правильно: string_view на строковый литерал (живёт всю программу)
+std::string_view getSafe()
+{
+    return "hello"; // OK: литерал живёт всю программу
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Лучшая практика</div>
+                    <p>Используйте <code>std::string_view</code> для параметров функций, которые только читают строку. Не возвращайте <code>string_view</code> на локальную переменную. Для хранения строк используйте <code>std::string</code>.</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">🔗 Документация</div>
+                    <p><a href="https://en.cppreference.com/w/cpp/string/basic_string_view" target="_blank" rel="noopener">std::string_view на cppreference</a></p>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="string-view" data-final-desc="std::string_view"></div>
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row"><div class="feedback-stars">
+                    <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    </div><span class="feedback-rating-value">—</span></div>
+                    <div class="feedback-form"><textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea><div class="feedback-form__row"><span class="feedback-form__char">0 / 1024</span><button class="feedback-form__submit">Отправить</button></div></div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar"><div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div></aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../js/quiz.js"></script><script src="../../../components/quiz-widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script><script src="../../../js/feedback.js"></script>
+</body>
+</html>

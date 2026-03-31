@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8"><meta name="created" content="2025-03-31">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аргументы по умолчанию — Курс C++</title>
-    <meta name="description" content="Аргументы по умолчанию в C++: синтаксис, правила, взаимодействие с перегрузкой.">
+    <title>Поиск и изменение строк — Курс C++</title>
+    <meta name="description" content="Методы std::string: find, rfind, replace, insert, erase, append, substr — поиск и изменение строк в C++.">
     <link rel="stylesheet" href="../../../css/variables.css?v=3">
     <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../../../css/compiler.css">
     <link rel="stylesheet" href="../../../css/feedback.css">
     <link rel="stylesheet" href="../../../css/callout.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -33,10 +33,7 @@
                 </svg>
                 Курс C++
             </a>
-            <nav class="header-nav">
-                <a href="../../../index.html">Главная</a>
-                <a href="#" class="active">Глава</a>
-            </nav>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
             <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -48,107 +45,132 @@
         <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
         <main class="main-content">
             <div class="chapter-content">
-                <div class="section-badge">Перегрузка функций</div>
-                <h1>Аргументы по умолчанию</h1>
+                <div class="section-badge">Строки</div>
+                <h1>Поиск и изменение строк</h1>
+
                 <p>
-                    <span class="key-term">Аргумент по умолчанию</span> — значение, которое компилятор подставляет
-                    автоматически, если вызывающий код не передал аргумент для этого параметра.
-                    Удобно, когда у параметра есть «разумное» значение по умолчанию.
+                    <code>std::string</code> предоставляет богатый набор методов для поиска подстрок,
+                    замены, вставки и удаления символов.
                 </p>
 
-                <h2 id="syntax">Синтаксис</h2>
+                <h2 id="find">Поиск: find и rfind</h2>
                 <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — аргументы по умолчанию</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-// y имеет значение по умолчанию 4
-void print(int x, int y = 4)
-{
-    std::cout &lt;&lt; "x=" &lt;&lt; x &lt;&lt; " y=" &lt;&lt; y &lt;&lt; '\n';
-}
-
-int main()
-{
-    print(1, 2); // y = 2 (явный аргумент)
-    print(3);    // y = 4 (значение по умолчанию)
-    // print();  // ошибка: x не имеет значения по умолчанию
-    return 0;
-}
-// Вывод:
-// x=1 y=2
-// x=3 y=4</code></pre>
-                    </div>
-                </div>
-
-                <h2 id="rules">Правила</h2>
-                <div class="info-card">
-                    <div class="info-card__title">📋 Ключевые правила</div>
-                    <ul>
-                        <li>Только знак <code>=</code>: <code>void f(int x = 5)</code> — OK; скобки и фигурные скобки — нет</li>
-                        <li>Параметры с умолчаниями должны быть <strong>правее</strong> параметров без умолчаний</li>
-                        <li>Явные аргументы всегда передаются <strong>слева направо</strong> — нельзя пропустить средний</li>
-                        <li>Умолчание объявляется один раз — либо в объявлении, либо в определении (не в обоих)</li>
-                    </ul>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — несколько умолчаний</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-void print(int x = 10, int y = 20, int z = 30)
-{
-    std::cout &lt;&lt; x &lt;&lt; ' ' &lt;&lt; y &lt;&lt; ' ' &lt;&lt; z &lt;&lt; '\n';
-}
-
-int main()
-{
-    print(1, 2, 3); // 1 2 3
-    print(1, 2);    // 1 2 30
-    print(1);       // 1 20 30
-    print();        // 10 20 30
-
-    // print(, , 3); // ОШИБКА: нельзя пропускать аргументы
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-                <h2 id="real-use">Живое применение</h2>
-                <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — функция с разумными умолчаниями</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-header"><span class="code-lang">C++ — поиск подстроки</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
                     <div class="code-content">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
-// Функция вывода с настраиваемым разделителем и переносом строки
-void printList(const std::string&amp; item, char sep = ',', bool newline = true)
-{
-    std::cout &lt;&lt; item &lt;&lt; sep;
-    if (newline) std::cout &lt;&lt; '\n';
-}
-
 int main()
 {
-    printList("apple");          // apple,\n
-    printList("banana", ';');    // banana;\n
-    printList("cherry", ' ', false); // cherry  (без переноса)
+    std::string text { "A friend in need is a friend indeed." };
+
+    // find: первое вхождение
+    size_t pos = text.find("friend");
+    std::cout &lt;&lt; pos &lt;&lt; '\n'; // 2
+
+    // find с начальной позицией
+    pos = text.find("friend", 10); // ищем с позиции 10
+    std::cout &lt;&lt; pos &lt;&lt; '\n'; // 22
+
+    // rfind: последнее вхождение
+    pos = text.rfind("friend");
+    std::cout &lt;&lt; pos &lt;&lt; '\n'; // 22
+
+    // Если не найдено — возвращает std::string::npos
+    if (text.find("apple") == std::string::npos)
+        std::cout &lt;&lt; "Не найдено\n";
+
     return 0;
 }</code></pre>
                     </div>
                 </div>
 
-                <div class="warning-block">
-                    <div class="warning-block__title">Умолчания и перегрузка могут конфликтовать</div>
-                    <p>Если функция с умолчанием и другая перегрузка могут совпасть при одном и том же вызове — компилятор выдаст ошибку неоднозначности.</p>
-                    <pre><code class="language-cpp">void foo(int x = 0) {}
-void foo(double d = 0.0) {}
-foo(); // error: ambiguous — какую вызвать?</code></pre>
+                <h2 id="modify">Изменение: replace, insert, erase, append</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — изменение строки</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+int main()
+{
+    std::string text { "Lang: Java" };
+
+    // replace: заменяем 4 символа с позиции 6 на "C++"
+    text.replace(6, 4, "C++");
+    std::cout &lt;&lt; text &lt;&lt; '\n'; // Lang: C++
+
+    // insert: вставляем строку с позиции 5
+    text.insert(5, " (best)");
+    std::cout &lt;&lt; text &lt;&lt; '\n'; // Lang: (best) C++
+
+    // erase: удаляем 7 символов с позиции 5
+    text.erase(5, 7);
+    std::cout &lt;&lt; text &lt;&lt; '\n'; // Lang: C++
+
+    // append: добавляем в конец
+    text.append(" is great!");
+    std::cout &lt;&lt; text &lt;&lt; '\n'; // Lang: C++ is great!
+
+    // substr: извлекаем подстроку
+    std::string sub = text.substr(6, 3); // 3 символа с позиции 6
+    std::cout &lt;&lt; sub &lt;&lt; '\n'; // C++
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="replace-all">Живое применение: замена всех вхождений</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — замена всех вхождений подстроки</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+void replaceAll(std::string&amp; text, const std::string&amp; from, const std::string&amp; to)
+{
+    size_t pos { text.find(from) };
+    while (pos != std::string::npos)
+    {
+        text.replace(pos, from.length(), to);
+        pos = text.find(from, pos + to.length());
+    }
+}
+
+int main()
+{
+    std::string msg { "Message to Tom: Hello, Tom!" };
+    replaceAll(msg, "Tom", "Alice");
+    std::cout &lt;&lt; msg &lt;&lt; '\n'; // Message to Alice: Hello, Alice!
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="find-chars">Поиск символов из набора</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — find_first_of, find_last_of</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">std::string phone { "Phone: +23415678901" };
+std::string digits { "0123456789" };
+
+size_t first = phone.find_first_of(digits); // 8 — первая цифра
+size_t last  = phone.find_last_of(digits);  // 18 — последняя цифра
+
+// Извлекаем номер:
+std::string number = phone.substr(first, last - first + 1);
+std::cout &lt;&lt; number &lt;&lt; '\n'; // 23415678901</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">🔗 Документация</div>
+                    <p><a href="https://en.cppreference.com/w/cpp/string/basic_string/find" target="_blank" rel="noopener">std::string::find</a> · <a href="https://en.cppreference.com/w/cpp/string/basic_string/replace" target="_blank" rel="noopener">replace</a> · <a href="https://en.cppreference.com/w/cpp/string/basic_string/insert" target="_blank" rel="noopener">insert</a> · <a href="https://en.cppreference.com/w/cpp/string/basic_string/erase" target="_blank" rel="noopener">erase</a></p>
                 </div>
 
                 <h2 id="tests">Проверьте знания</h2>
-                <div class="quiz-widget" data-final="default-arguments" data-final-desc="Аргументы по умолчанию"></div>
+                <div class="quiz-widget" data-final="string-search-modify" data-final-desc="Поиск и изменение строк"></div>
                 <section class="feedback-section">
                     <div class="feedback-section__title">Оцените этот параграф</div>
                     <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
