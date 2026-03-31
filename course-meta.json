@@ -5,7 +5,7 @@
       "number": 1,
       "groupId": "basics",
       "title": "Основы C++",
-      "description": "Первые шаги: структура программы, переменные, ввод/вывод, операторы и комментарии",
+      "description": "Структура программы, переменные, типы, ввод/вывод, инициализация, неинициализированные переменные",
       "paragraphs": [
         "program-structure",
         "comments",
@@ -13,8 +13,6 @@
         "initialization-and-assignment",
         "iostream",
         "uninitialized-variables",
-        "keywords-and-naming",
-        "literals-operators-expressions",
         "first-program"
       ]
     },
@@ -22,14 +20,23 @@
       "id": "chapter-2",
       "number": 2,
       "groupId": "fundamental-types",
-      "title": "Фундаментальные типы данных",
-      "description": "Вся система встроенных типов C++: целые, вещественные, символьные, логические, sizeof",
+      "title": "Целочисленные типы",
+      "description": "Целые числа, знаковость, переполнение, типы фиксированной ширины, введение в типы данных",
       "paragraphs": [
         "introduction-to-fundamental-data-types",
         "integer-types",
         "signed-unsigned",
         "integer-overflow",
-        "fixed-width-types",
+        "fixed-width-types"
+      ]
+    },
+    {
+      "id": "chapter-2b",
+      "number": 3,
+      "groupId": "numeric-types",
+      "title": "Вещественные, логические и символьные типы",
+      "description": "Числа с плавающей точкой, bool, char, преобразования типов, sizeof и void",
+      "paragraphs": [
         "floating-point",
         "boolean",
         "character-types",
@@ -40,10 +47,10 @@
     },
     {
       "id": "chapter-3",
-      "number": 3,
+      "number": 4,
       "groupId": "functions",
       "title": "Функции",
-      "description": "Функции в C++: объявление, параметры, возвращаемые значения, перегрузка",
+      "description": "Объявление функций, параметры, возвращаемые значения, предварительные объявления, локальная область видимости",
       "paragraphs": [
         "introduction-to-functions",
         "function-return-values",
@@ -56,10 +63,10 @@
     },
     {
       "id": "chapter-4",
-      "number": 4,
+      "number": 5,
       "groupId": "code-organization",
       "title": "Организация кода",
-      "description": "Разбивка программы на файлы, пространства имён, препроцессор и заголовочные файлы",
+      "description": "Разбивка на файлы, пространства имён, препроцессор, заголовочные файлы и header guards",
       "paragraphs": [
         "multiple-files",
         "namespaces",
@@ -69,11 +76,11 @@
       ]
     },
     {
-      "id": "chapter-5",
-      "number": 5,
-      "groupId": "control-flow",
-      "title": "Управление потоком",
-      "description": "Условные операторы, ветвление, типичные ошибки с `if`, switch, циклы, goto, break/continue, завершение программы",
+      "id": "chapter-5b",
+      "number": 6,
+      "groupId": "branching",
+      "title": "Ветвление",
+      "description": "Введение в управление потоком, if/else, типичные ошибки, switch, goto и завершение программы",
       "paragraphs": [
         "introduction-to-control-flow",
         "if-statements",
@@ -81,20 +88,31 @@
         "switch-basics",
         "switch-fallthrough",
         "goto-statements",
-        "while-loops",
-        "do-while-loops",
-        "for-loops",
-        "break-and-continue",
         "halts"
       ]
     },
     {
-      "id": "chapter-6",
-      "number": 6,
-      "groupId": "operators",
-      "title": "Операторы",
-      "description": "Приоритет и ассоциативность, арифметика, остаток, степень, инкремент, побочные эффекты, запятая, тернарный оператор, сравнение, логические и побитовые операторы",
+      "id": "chapter-5",
+      "number": 7,
+      "groupId": "control-flow",
+      "title": "Циклы",
+      "description": "while, do-while, for, break и continue",
       "paragraphs": [
+        "while-loops",
+        "do-while-loops",
+        "for-loops",
+        "break-and-continue"
+      ]
+    },
+    {
+      "id": "chapter-6b",
+      "number": 8,
+      "groupId": "operators-extra",
+      "title": "Операторы: синтаксис и арифметика",
+      "description": "Именование, литералы, выражения, приоритет, арифметика, остаток, инкремент, запятая, тернарный оператор, сравнение, логические операторы",
+      "paragraphs": [
+        "keywords-and-naming",
+        "literals-operators-expressions",
         "operator-precedence",
         "arithmetic-operators",
         "remainder-and-exponentiation",
@@ -102,7 +120,16 @@
         "comma-operator",
         "conditional-operator",
         "relational-operators",
-        "logical-operators",
+        "logical-operators"
+      ]
+    },
+    {
+      "id": "chapter-6",
+      "number": 9,
+      "groupId": "operators",
+      "title": "Побитовые операторы",
+      "description": "Побитовые операции, битовые флаги и маски",
+      "paragraphs": [
         "bitwise-operators",
         "bit-flags",
         "bit-masks"
@@ -110,30 +137,48 @@
     },
     {
       "id": "chapter-7",
-      "number": 7,
+      "number": 10,
       "groupId": "scope-linkage",
-      "title": "Область видимости, время жизни и компоновка",
-      "description": "Блоки, локальные и глобальные переменные, перекрытие имён, внутренняя и внешняя компоновка, inline, константы, статические переменные, пространства имён",
+      "title": "Область видимости",
+      "description": "Блоки, локальные и глобальные переменные, перекрытие имён, пользовательские пространства имён",
       "paragraphs": [
         "blocks",
-        "namespaces-user-defined",
         "local-variables",
         "global-variables",
         "variable-shadowing",
+        "namespaces-user-defined"
+      ]
+    },
+    {
+      "id": "chapter-8",
+      "number": 11,
+      "groupId": "scope-linkage",
+      "title": "Время жизни и компоновка",
+      "description": "Статические переменные, внутренняя и внешняя компоновка, inline, глобальные константы, опасность глобальных переменных",
+      "paragraphs": [
+        "static-local-variables",
         "linkage-internal",
         "linkage-external",
         "global-variables-evil",
         "inline-functions-variables",
         "global-constants",
-        "static-local-variables",
-        "scope-summary",
+        "scope-summary"
+      ]
+    },
+    {
+      "id": "chapter-9",
+      "number": 12,
+      "groupId": "namespaces",
+      "title": "Пространства имён: продвинутые темы",
+      "description": "using-объявления и директивы, безымянные и inline-пространства имён",
+      "paragraphs": [
         "using-statements",
         "namespaces-advanced"
       ]
     },
     {
-      "id": "chapter-8",
-      "number": 8,
+      "id": "chapter-10",
+      "number": 13,
       "groupId": "random",
       "title": "Случайные числа",
       "description": "Псевдослучайные генераторы, Mersenne Twister, инициализация, распределения и готовый заголовочный файл Random.h",

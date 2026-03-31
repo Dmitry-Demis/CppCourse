@@ -211,7 +211,11 @@
 .chapter-card p {
     font-size: var(--fs-sm);
     color: var(--text-secondary);
-    flex: 1;
+}
+
+/* Chapter Topics List */
+.chapter-topics {
+    margin-top: auto;
 }
 .chapter-card .card-arrow {
     display: flex;
@@ -225,7 +229,7 @@
 
 /* Chapter Topics List */
 .chapter-topics {
-    margin-top: var(--space-4);
+    margin-top: auto;
     padding-top: var(--space-4);
     border-top: 1px solid var(--border-primary);
     display: flex;
