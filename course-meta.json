@@ -177,7 +177,7 @@
       "groupId": "std-array",
       "level": "JUNIOR+",
       "title": "std::array",
-      "description": "Фиксированный массив: объявление, constexpr, CTAD, передача в функции, массивы структур, brace elision, многомерные массивы",
+      "description": "Фиксированный массив: объявление, constexpr, CTAD, длина и индексация, передача в функции, массивы структур, brace elision, многомерные массивы",
       "paragraphs": [
         "array-intro",
         "array-passing",
@@ -191,10 +191,12 @@
       "groupId": "cstyle-arrays",
       "level": "JUNIOR",
       "title": "C-style массивы",
-      "description": "Сырые массивы int[], многомерные массивы, символьные массивы и C-строки",
+      "description": "Сырые массивы int[], деградация массива, многомерные массивы, C-строки, символьные массивы",
       "paragraphs": [
         "cstyle-arrays",
+        "array-decay",
         "multidimensional-arrays",
+        "cstyle-strings",
         "char-arrays"
       ]
     },

@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8"><meta name="created" content="2025-03-31">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Арифметика указателей и индексация — Курс C++</title>
-    <meta name="description" content="Арифметика указателей в C++: ptr+n, ptr-n, ++ptr, индексация через указатель, обход массива.">
+    <title>C-строки — Курс C++</title>
+    <meta name="description" content="C-style строки в C++: char[], null-терминатор, strlen, вывод, ввод, опасности. Почему лучше std::string.">
     <link rel="stylesheet" href="../../../css/variables.css?v=3">
     <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../../../css/compiler.css">
     <link rel="stylesheet" href="../../../css/feedback.css">
     <link rel="stylesheet" href="../../../css/callout.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔢</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
 </head>
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
@@ -55,145 +55,128 @@
 
         <main class="main-content">
             <div class="chapter-content">
-                <div class="section-badge">Указатели</div>
-                <h1>Арифметика указателей и индексация</h1>
+                <div class="section-badge">C-style массивы</div>
+                <h1>C-строки</h1>
 
                 <p>
-                    Указатели — не просто адреса. К ним можно применять арифметические операции,
-                    что позволяет перемещаться по памяти и обходить массивы без явных индексов.
+                    C-строка — это просто массив символов (<code>char[]</code>), заканчивающийся специальным
+                    символом <span class="key-term">null-терминатором</span> (<code>'\0'</code>).
+                    Это наследие языка C, которое до сих пор встречается в старом коде.
                 </p>
 
-                <h2 id="arithmetic">Арифметика указателей</h2>
+                <h2 id="null-terminator">Null-терминатор: зачем он нужен</h2>
 
                 <p>
-                    <code>ptr + n</code> возвращает адрес объекта, который находится на <code>n</code> позиций
-                    <em>вперёд</em> от <code>ptr</code>. Шаг зависит от типа: для <code>int*</code> это 4 байта,
-                    для <code>double*</code> — 8 байт.
+                    Когда C-строка деградирует в указатель, информация о длине теряется.
+                    Null-терминатор позволяет функциям (например, <code>std::cout</code>) знать,
+                    где строка заканчивается.
                 </p>
-
-                <div class="code-block">
-                    <div class="code-header">
-                        <span class="code-lang">C++ — арифметика указателей</span>
-                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
-                    </div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-int main()
-{
-    int x {};
-    const int* ptr { &amp;x }; // предположим, адрес 0x1000
-
-    std::cout &lt;&lt; ptr     &lt;&lt; '\n'; // 0x1000
-    std::cout &lt;&lt; ptr + 1 &lt;&lt; '\n'; // 0x1004 (следующий int)
-    std::cout &lt;&lt; ptr + 2 &lt;&lt; '\n'; // 0x1008
-
-    std::cout &lt;&lt; ptr - 1 &lt;&lt; '\n'; // 0x0FFC (предыдущий int)
-
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
 
                 <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
-                <svg viewBox="0 0 480 80" width="480" height="80" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
-                    <text x="10" y="15" fill="var(--text-secondary)" font-size="10" font-family="sans-serif">Память (int = 4 байта):</text>
-                    <rect x="10" y="20" width="80" height="35" rx="3" fill="var(--surface-3)" stroke="var(--border)" stroke-width="1"/>
-                    <text x="50" y="42" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="monospace">0x0FFC</text>
-                    <text x="50" y="60" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="sans-serif">ptr-1</text>
-
-                    <rect x="95" y="20" width="80" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="2"/>
-                    <text x="135" y="42" text-anchor="middle" fill="var(--accent-blue)" font-size="10" font-weight="bold" font-family="monospace">0x1000</text>
-                    <text x="135" y="60" text-anchor="middle" fill="var(--accent-blue)" font-size="9" font-weight="bold" font-family="sans-serif">ptr</text>
-
-                    <rect x="180" y="20" width="80" height="35" rx="3" fill="var(--surface-3)" stroke="var(--border)" stroke-width="1"/>
-                    <text x="220" y="42" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="monospace">0x1004</text>
-                    <text x="220" y="60" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="sans-serif">ptr+1</text>
-
-                    <rect x="265" y="20" width="80" height="35" rx="3" fill="var(--surface-3)" stroke="var(--border)" stroke-width="1"/>
-                    <text x="305" y="42" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="monospace">0x1008</text>
-                    <text x="305" y="60" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="sans-serif">ptr+2</text>
-
-                    <text x="360" y="42" fill="var(--text-muted)" font-size="10" font-family="sans-serif">← шаг = sizeof(int) = 4</text>
+                <svg viewBox="0 0 420 80" width="420" height="80" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <text x="10" y="15" fill="var(--text-secondary)" font-size="11" font-family="sans-serif">"hello" — 6 элементов (5 символов + '\0')</text>
+                    <rect x="10" y="20" width="45" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="32" y="42" text-anchor="middle" fill="var(--accent-blue)" font-size="16" font-family="monospace">h</text>
+                    <text x="32" y="58" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="monospace">[0]</text>
+                    <rect x="60" y="20" width="45" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="82" y="42" text-anchor="middle" fill="var(--accent-blue)" font-size="16" font-family="monospace">e</text>
+                    <rect x="110" y="20" width="45" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="132" y="42" text-anchor="middle" fill="var(--accent-blue)" font-size="16" font-family="monospace">l</text>
+                    <rect x="160" y="20" width="45" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="182" y="42" text-anchor="middle" fill="var(--accent-blue)" font-size="16" font-family="monospace">l</text>
+                    <rect x="210" y="20" width="45" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="232" y="42" text-anchor="middle" fill="var(--accent-blue)" font-size="16" font-family="monospace">o</text>
+                    <text x="232" y="58" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="monospace">[4]</text>
+                    <rect x="260" y="20" width="45" height="35" rx="3" fill="var(--accent-orange-dim)" stroke="var(--accent-orange)" stroke-width="2"/>
+                    <text x="282" y="42" text-anchor="middle" fill="var(--accent-orange)" font-size="14" font-weight="bold" font-family="monospace">\0</text>
+                    <text x="282" y="58" text-anchor="middle" fill="var(--accent-orange)" font-size="9" font-weight="bold" font-family="monospace">[5]</text>
+                    <text x="320" y="35" fill="var(--accent-orange)" font-size="10" font-family="sans-serif">← null-терминатор</text>
+                    <text x="320" y="50" fill="var(--text-muted)" font-size="10" font-family="sans-serif">конец строки</text>
                 </svg>
                 </div>
 
-                <h2 id="subscript">Индексация через указатель</h2>
-
-                <p>
-                    Оператор <code>ptr[n]</code> — это синтаксический сахар для <code>*(ptr + n)</code>.
-                    Именно поэтому массивы в C++ индексируются с нуля: <code>arr[0]</code> = <code>*(arr + 0)</code> = <code>*arr</code>.
-                </p>
-
                 <div class="code-block">
                     <div class="code-header">
-                        <span class="code-lang">C++ — индексация = арифметика + разыменование</span>
+                        <span class="code-lang">C++ — C-строки</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
+<pre><code class="language-cpp">#include &lt;cstring&gt; // strlen
+#include &lt;iostream&gt;
 
 int main()
 {
-    const int arr[] { 9, 7, 5, 3, 1 };
-    const int* ptr { arr }; // ptr указывает на arr[0]
+    // Инициализация строковым литералом — компилятор добавляет '\0'
+    const char str[] { "hello" }; // char[6]: 'h','e','l','l','o','\0'
 
-    // Эти выражения эквивалентны:
-    std::cout &lt;&lt; arr[2]      &lt;&lt; '\n'; // 5
-    std::cout &lt;&lt; *(arr + 2)  &lt;&lt; '\n'; // 5
-    std::cout &lt;&lt; ptr[2]      &lt;&lt; '\n'; // 5
-    std::cout &lt;&lt; *(ptr + 2)  &lt;&lt; '\n'; // 5
+    // Вывод: std::cout читает до '\0'
+    std::cout &lt;&lt; str &lt;&lt; '\n'; // hello
 
-    // Указатель на середину массива:
-    const int* mid { &amp;arr[2] }; // указывает на arr[2]
-    std::cout &lt;&lt; mid[0]  &lt;&lt; '\n'; // 5 (arr[2])
-    std::cout &lt;&lt; mid[1]  &lt;&lt; '\n'; // 3 (arr[3])
-    std::cout &lt;&lt; mid[-1] &lt;&lt; '\n'; // 7 (arr[1]) — отрицательный индекс!
+    // Длина строки (без '\0'):
+    std::cout &lt;&lt; std::strlen(str) &lt;&lt; '\n'; // 5
+
+    // Изменение отдельных символов:
+    char mutable_str[] { "hello" };
+    mutable_str[0] = 'H';
+    std::cout &lt;&lt; mutable_str &lt;&lt; '\n'; // Hello
+
+    // Нельзя присвоить новую строку целиком:
+    // mutable_str = "world"; // ОШИБКА компиляции
 
     return 0;
 }</code></pre>
                     </div>
                 </div>
 
-                <h2 id="traversal">Обход массива через указатель</h2>
-
-                <p>
-                    Классический паттерн: <code>begin</code> и <code>end</code> указатели.
-                    Именно так работают range-based for циклы под капотом.
-                </p>
+                <h2 id="const-ptr">Символьные константы: const char*</h2>
 
                 <div class="code-block">
                     <div class="code-header">
-                        <span class="code-lang">C++ — обход через begin/end</span>
+                        <span class="code-lang">C++ — const char* vs constexpr string_view</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
 <pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;iterator&gt; // std::size
+#include &lt;string_view&gt;
 
 int main()
 {
-    constexpr int arr[] { 9, 7, 5, 3, 1 };
+    // Старый способ: const char*
+    const char* name1 { "Alex" }; // указатель на строковый литерал
 
-    const int* begin { arr };                    // указывает на arr[0]
-    const int* end   { arr + std::size(arr) };   // указывает на один-за-последним
+    // Современный способ: constexpr string_view (предпочтительно)
+    constexpr std::string_view name2 { "Alex" };
 
-    for (; begin != end; ++begin)
-        std::cout &lt;&lt; *begin &lt;&lt; ' '; // 9 7 5 3 1
-    std::cout &lt;&lt; '\n';
+    std::cout &lt;&lt; name1 &lt;&lt; '\n'; // Alex
+    std::cout &lt;&lt; name2 &lt;&lt; '\n'; // Alex
 
-    // Это эквивалентно range-for:
-    for (int x : arr)
-        std::cout &lt;&lt; x &lt;&lt; ' ';
+    // Опасность с const char*:
+    // std::cout &lt;&lt; &amp;name1[0]; // выведет адрес как строку — OK
+    // char c { 'Q' };
+    // std::cout &lt;&lt; &amp;c; // ОПАСНО: нет null-терминатора!
 
     return 0;
 }</code></pre>
                     </div>
                 </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Используй std::string и std::string_view</div>
+                    <p>В современном C++ C-строки (<code>char[]</code>, <code>const char*</code>) следует избегать. Используй <code>std::string</code> для изменяемых строк и <code>constexpr std::string_view</code> для строковых констант.</p>
+                </div>
+
+                <h2 id="when-used">Когда C-строки всё ещё встречаются</h2>
+
+                <ul>
+                    <li>В старом коде (legacy codebase)</li>
+                    <li>При работе с C API (например, <code>printf</code>, системные вызовы)</li>
+                    <li>Строковые литералы в коде — это всегда <code>const char[]</code></li>
+                    <li>Глобальные constexpr массивы символов</li>
+                </ul>
 
                 <div class="info-card">
-                    <div class="info-card__title">Почему индексы начинаются с 0</div>
-                    <p>Потому что <code>arr[n]</code> = <code>*(arr + n)</code>. Первый элемент — это <code>*(arr + 0)</code> = <code>*arr</code>. Нулевой индекс делает математику проще и эффективнее.</p>
+                    <div class="info-card__title">Ссылка на cppreference</div>
+                    <p><a href="https://en.cppreference.com/w/cpp/string/byte" target="_blank" rel="noopener">cppreference — Null-terminated byte strings</a></p>
                 </div>
 
                 <section class="feedback-section">
