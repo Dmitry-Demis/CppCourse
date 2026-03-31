@@ -329,7 +329,7 @@
                 card.addEventListener('click', () => { location.href = chapterIndex; });
                 card.innerHTML = `
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-                        <span class="card-number">Глава ${chapter.number} <span style="font-size:.7rem;font-weight:500;opacity:.6">(${paragraphs.length} пар.)</span></span>
+                        <span class="card-number">Глава ${chapter.number} <span style="font-size:.7rem;font-weight:500;opacity:.6">(${paragraphs.length} §§)</span></span>
                         <span class="ch-mastery-badge" style="font-size:.72rem;font-weight:800;color:${masteryColor};background:rgba(255,255,255,.06);padding:2px 8px;border-radius:99px;border:1px solid ${masteryColor}33" data-target="${chapterMastery}">0%</span>
                     </div>
                     <h3>${chapter.title}</h3>

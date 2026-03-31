@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Итоговая таблица: область видимости, время жизни, компоновка — Курс C++</title>
+    <meta name="description" content="Сводная таблица всех видов переменных C++ по области видимости, времени жизни и компоновке.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава VII</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Глава VII</div>
+                <h1>Итоговая таблица: область видимости, время жизни, компоновка</h1>
+
+                <p>
+                    Три ключевых свойства переменной в C++ — <span class="key-term">область видимости</span>,
+                    <span class="key-term">время жизни</span> и <span class="key-term">компоновка</span> — независимы
+                    друг от друга. Эта страница собирает всё в одном месте.
+                </p>
+
+                <h2 id="scope-summary">Область видимости</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">📋 Виды области видимости</div>
+                    <ul>
+                        <li><strong>Блочная (локальная)</strong> — от точки объявления до конца блока. Локальные переменные, параметры функций, типы объявленные внутри блока.</li>
+                        <li><strong>Глобальная</strong> — от точки объявления до конца файла. Глобальные переменные, функции, типы в пространстве имён.</li>
+                    </ul>
+                </div>
+
+                <h2 id="duration-summary">Время жизни</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">📋 Виды времени жизни</div>
+                    <ul>
+                        <li><strong>Автоматическое</strong> — создаётся при объявлении, уничтожается при выходе из блока. Локальные переменные, параметры.</li>
+                        <li><strong>Статическое</strong> — создаётся при запуске программы, уничтожается при завершении. Глобальные переменные, статические локальные переменные.</li>
+                        <li><strong>Динамическое</strong> — управляется программистом через <code>new</code>/<code>delete</code>.</li>
+                    </ul>
+                </div>
+
+                <h2 id="linkage-summary">Компоновка</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">📋 Виды компоновки</div>
+                    <ul>
+                        <li><strong>Нет компоновки</strong> — каждое объявление — отдельный объект. Локальные переменные.</li>
+                        <li><strong>Внутренняя</strong> — одно объявление в пределах одной единицы трансляции. <code>static</code> глобальные, <code>const</code>/<code>constexpr</code> глобальные, безымянные пространства имён.</li>
+                        <li><strong>Внешняя</strong> — одно объявление во всей программе. Неконстантные глобальные, функции, <code>extern const</code>, <code>inline const</code>.</li>
+                    </ul>
+                </div>
+
+                <h2 id="full-table">Полная таблица переменных</h2>
+
+                <div style="overflow-x:auto">
+                <table style="width:100%; border-collapse:collapse; font-size:0.85em">
+                    <thead>
+                        <tr style="background:var(--surface-2); border-bottom:2px solid var(--border)">
+                            <th style="padding:8px; text-align:left">Тип</th>
+                            <th style="padding:8px; text-align:left">Пример</th>
+                            <th style="padding:8px; text-align:left">Область</th>
+                            <th style="padding:8px; text-align:left">Время жизни</th>
+                            <th style="padding:8px; text-align:left">Компоновка</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Локальная</td>
+                            <td style="padding:8px"><code>int x;</code></td>
+                            <td style="padding:8px">Блочная</td>
+                            <td style="padding:8px">Автоматическое</td>
+                            <td style="padding:8px">Нет</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Статическая локальная</td>
+                            <td style="padding:8px"><code>static int s_x;</code></td>
+                            <td style="padding:8px">Блочная</td>
+                            <td style="padding:8px">Статическое</td>
+                            <td style="padding:8px">Нет</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Параметр функции</td>
+                            <td style="padding:8px"><code>void f(int x)</code></td>
+                            <td style="padding:8px">Блочная</td>
+                            <td style="padding:8px">Автоматическое</td>
+                            <td style="padding:8px">Нет</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Внутренняя глобальная</td>
+                            <td style="padding:8px"><code>static int g_x;</code></td>
+                            <td style="padding:8px">Глобальная</td>
+                            <td style="padding:8px">Статическое</td>
+                            <td style="padding:8px">Внутренняя</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Внешняя глобальная</td>
+                            <td style="padding:8px"><code>int g_x;</code></td>
+                            <td style="padding:8px">Глобальная</td>
+                            <td style="padding:8px">Статическое</td>
+                            <td style="padding:8px">Внешняя</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Inline глобальная (C++17)</td>
+                            <td style="padding:8px"><code>inline int g_x;</code></td>
+                            <td style="padding:8px">Глобальная</td>
+                            <td style="padding:8px">Статическое</td>
+                            <td style="padding:8px">Внешняя</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Внутренняя const глобальная</td>
+                            <td style="padding:8px"><code>constexpr int g_x { 1 };</code></td>
+                            <td style="padding:8px">Глобальная</td>
+                            <td style="padding:8px">Статическое</td>
+                            <td style="padding:8px">Внутренняя</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:8px">Внешняя const глобальная</td>
+                            <td style="padding:8px"><code>extern const int g_x { 1 };</code></td>
+                            <td style="padding:8px">Глобальная</td>
+                            <td style="padding:8px">Статическое</td>
+                            <td style="padding:8px">Внешняя</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px">Inline const глобальная (C++17)</td>
+                            <td style="padding:8px"><code>inline constexpr int g_x { 1 };</code></td>
+                            <td style="padding:8px">Глобальная</td>
+                            <td style="padding:8px">Статическое</td>
+                            <td style="padding:8px">Внешняя</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <h2 id="storage-class">Спецификаторы класса хранения</h2>
+
+                <p>
+                    <code>static</code>, <code>extern</code>, <code>mutable</code>, <code>thread_local</code> —
+                    это <em>спецификаторы класса хранения</em>. Они одновременно задают время жизни и компоновку.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — предварительные объявления</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// Предварительные объявления:
+void foo(int x);          // функция
+extern int g_y;           // неконстантная глобальная
+extern const int g_y;     // const глобальная
+// extern constexpr int g_y; — НЕЛЬЗЯ</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="scope-summary" data-final-desc="Итоговая таблица: область видимости, время жизни, компоновка"></div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () { const bar = document.getElementById('reading-progress'); if (!bar) return; window.addEventListener('scroll', () => { const h = document.documentElement.scrollHeight - document.documentElement.clientHeight; bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%'; }, { passive: true }); })();
+    function copyCode(btn) { const code = btn.closest('.code-block')?.querySelector('code')?.textContent || ''; navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Скопировано!'; setTimeout(() => btn.textContent = 'Копировать', 2000); }); }
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>
