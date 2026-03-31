@@ -164,6 +164,8 @@
             }
             _shopCoins = data.coins;
             localStorage.setItem('gs_coins', JSON.stringify(_shopCoins));
+            // Invalidate compiler std cache so it re-fetches on next page load
+            localStorage.removeItem('shop_unlocked_stds');
             const meta = SHOP_ITEM_META[item.id] || { label: item.name };
             showToast(`${meta.label} разблокирован!`);
             renderShop([...ownedIds, item.id]);

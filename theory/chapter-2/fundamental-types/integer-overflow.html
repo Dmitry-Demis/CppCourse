@@ -104,7 +104,7 @@
                 <h2 id="signed-overflow">Знаковое переполнение — UB</h2>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">?? Переполнение signed — неопределённое поведение (Undefined Behaviour)</div>
+                    <div class="warning-block__title">Переполнение signed — неопределённое поведение (Undefined Behaviour)</div>
                     <p>
                         Стандарт C++ явно указывает: переполнение <em>знакового</em> целого — это
                         <strong>UB</strong>. Компилятор не обязан ничего делать — он вправе
@@ -326,7 +326,7 @@ int main() {
                 <h2 id="compiler-flags">Флаги компилятора для обнаружения</h2>
 
                 <div class="info-card">
-                    <div class="info-card__title">?? Флаги для поиска переполнений</div>
+                    <div class="info-card__title">Флаги для поиска переполнений</div>
                     <ul>
                         <li><code>-fsanitize=signed-integer-overflow</code> — runtime-детектор для signed UB</li>
                         <li><code>-fsanitize=unsigned-integer-overflow</code> — для unsigned wrap-around</li>
@@ -392,7 +392,7 @@ int main() {
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">?? Содержание</div>
+                <div class="toc-title">Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>

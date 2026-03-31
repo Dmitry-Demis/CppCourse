@@ -303,12 +303,14 @@
                     return `<span class="para-badge para-badge--fail" data-para-badge>${mastery}%</span>`;
                 }
 
-                function renderParaList(list) {
-                    return list.map(p => {
+                function renderParaList(list, startIndex) {
+                    return list.map((p, i) => {
                         const { mastery } = paraProgress(p);
                         const href = `theory/${chapter.id}/${chapter.groupId}/${p.id}.html`;
+                        const paraNum = `§${chapter.number}.${startIndex + i + 1}`;
                         return `<div class="para-item" data-para-id="${p.id}">
                             <a class="chapter-section-link" href="${href}" onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:6px;">
+                                <span class="para-num" style="flex-shrink:0;font-family:var(--font-mono);font-size:.65rem;color:var(--card-color,var(--accent-violet));font-weight:700;min-width:2.8em">${paraNum}</span>
                                 <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.title}">${p.title}</span>
                                 ${masteryBadge(mastery)}
                             </a>
@@ -316,8 +318,8 @@
                     }).join('');
                 }
 
-                const previewHtml = renderParaList(paragraphs.slice(0, PREVIEW));
-                const restHtml = hasMore ? renderParaList(paragraphs.slice(PREVIEW)) : '';
+                const previewHtml = renderParaList(paragraphs.slice(0, PREVIEW), 0);
+                const restHtml = hasMore ? renderParaList(paragraphs.slice(PREVIEW), PREVIEW) : '';
 
                 const card = document.createElement('div');
                 card.className = 'chapter-card';
@@ -468,6 +470,7 @@
     <script>
         // GSAP Animations
         document.addEventListener('DOMContentLoaded', function() {
+            if (!window.gsap) return; // fallback: CSS opacity:1 handles visibility
             // Hero animations
             gsap.from('.hero-badge', {
                 opacity: 0,
@@ -498,7 +501,8 @@
                 duration: 0.6,
                 delay: 0.6,
                 stagger: 0.1,
-                ease: 'power2.out'
+                ease: 'power2.out',
+                clearProps: 'opacity,transform'
             });
             
             // Feature cards

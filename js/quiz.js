@@ -972,3 +972,36 @@ class ModalQuiz {
         return arr;
     }
 }
+
+// ── Sync wrong questions from server on page load ─────────────────────────────
+// When navigating to a theory page via #tests link from profile,
+// we pre-populate quiz_wrong_* from the server's lastWrongQuestions
+// so the quiz widget prioritises those questions in the next session.
+(async function syncWrongQuestionsFromServer() {
+    const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+    if (!user?.isuNumber) return;
+
+    const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+    const lastPart = parts[parts.length - 1] || '';
+    const paragraphId = lastPart.replace(/\.html$/, '');
+    if (!paragraphId || paragraphId === 'unknown') return;
+
+    try {
+        const res = await fetch(`/api/progress/${user.isuNumber}/${paragraphId}`, {
+            headers: { 'X-Isu-Number': user.isuNumber }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const tests = data.tests || {};
+
+        // For each test in this paragraph, merge server's lastWrongQuestions into localStorage
+        Object.entries(tests).forEach(([testId, stats]) => {
+            const serverWrong = stats.lastWrongQuestions || [];
+            if (serverWrong.length === 0) return;
+            const key = `quiz_wrong_${testId}`;
+            const existing = new Set(JSON.parse(localStorage.getItem(key) || '[]'));
+            serverWrong.forEach(id => existing.add(id));
+            localStorage.setItem(key, JSON.stringify([...existing]));
+        });
+    } catch { /* silent */ }
+})();

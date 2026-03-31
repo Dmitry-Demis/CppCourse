@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2026-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Остаток и возведение в степень — Курс C++</title>
+    <meta name="description" content="Оператор остатка (%) в C++, отрицательные операнды, возведение в степень через std::pow и целочисленная реализация.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%</text></svg>">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="index.html" class="active">Глава VI</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава VI</div>
+                <h1>Остаток и возведение в степень</h1>
+
+                <h2 id="remainder">Оператор остатка (%)</h2>
+
+                <p>
+                    Оператор <code>%</code> возвращает остаток от целочисленного деления.
+                    Например, <code>7 % 4 = 3</code>, потому что <code>7 / 4 = 1</code> с остатком <code>3</code>.
+                    Оператор работает только с целыми операндами.
+                </p>
+
+                <p>
+                    Чаще всего он используется для проверки делимости:
+                    если <code>x % y == 0</code>, то <code>x</code> делится на <code>y</code> без остатка.
+                </p>
+
+                <div class="code-block" data-example="chapter-6/operators/remainder.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — оператор остатка</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="negative">Остаток с отрицательными числами</h2>
+
+                <p>
+                    Результат <code>x % y</code> всегда имеет знак первого операнда (<code>x</code>).
+                    Например: <code>-6 % 4 = -2</code>, а <code>6 % -4 = 2</code>.
+                </p>
+
+                <div class="callout callout--tip">
+                    <div class="callout__title">Лучшая практика</div>
+                    <div class="callout__body">
+                        <p>
+                            Сравнивайте результат <code>%</code> с <code>0</code>, а не с <code>1</code>.
+                            Функция <code>isOdd(x)</code> через <code>x % 2 == 1</code> сломается
+                            на отрицательных числах — используйте <code>x % 2 != 0</code>.
+                        </p>
+                    </div>
+                </div>
+
+                <h2 id="exponentiation">Возведение в степень</h2>
+
+                <p>
+                    В C++ нет оператора возведения в степень (<code>^</code> — это побитовый XOR).
+                    Для вещественных чисел используйте <code>std::pow()</code> из <code>&lt;cmath&gt;</code>:
+                </p>
+
+                <div class="code-block" data-example="chapter-6/operators/pow.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — std::pow</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <div class="callout callout--warning">
+                    <div class="callout__title">Переполнение</div>
+                    <div class="callout__body">
+                        <p>
+                            Целочисленное возведение в степень почти всегда переполняет тип.
+                            Именно поэтому такой функции нет в стандартной библиотеке.
+                            Используйте <code>std::int64_t</code> и проверяйте переполнение.
+                        </p>
+                    </div>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="remainder-and-exponentiation" data-final-desc="оператор %, отрицательные операнды, std::pow"></div>
+
+                <!-- FEEDBACK SECTION -->
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done">
+                        <span class="feedback-done__icon">✓</span>
+                        <span>Спасибо за отзыв!</span>
+                    </div>
+                </section>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

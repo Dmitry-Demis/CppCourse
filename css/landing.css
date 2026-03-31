@@ -90,6 +90,11 @@
     flex-wrap: wrap;
 }
 
+/* Ensure buttons are always visible even if GSAP fails */
+.hero-actions .btn {
+    opacity: 1;
+}
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -223,6 +228,8 @@
     margin-top: var(--space-4);
     padding-top: var(--space-4);
     border-top: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
 }
 
 .chapter-sections-list {

@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
+    <link rel="stylesheet" href="../../../css/std-gate.css">
     <link rel="stylesheet" href="../../../css/feedback.css">
     <link rel="stylesheet" href="../../../css/callout.css">
 </head>
@@ -70,7 +71,7 @@
                 <p>Базовая форма:</p>
 
                 <div class="info-card">
-                    <div class="info-card__title">?? Синтаксис</div>
+                    <div class="info-card__title">Синтаксис</div>
                     <pre style="margin:0"><code class="language-cpp">if (условие)
     инструкция_если_истина;
 
@@ -103,7 +104,7 @@ else
                 </p>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">?? Ловушка отступов</div>
+                    <div class="warning-block__title">Ловушка отступов</div>
                     <p>
                         Отступ не влияет на логику. Только <code>{ }</code> объединяют инструкции в блок.
                         Без блока вторая строка выполняется <em>всегда</em>, независимо от условия.
@@ -127,7 +128,7 @@ else
                 </p>
 
                 <div class="info-card">
-                    <div class="info-card__title">?? Почему это не компилируется</div>
+                    <div class="info-card__title">Почему это не компилируется</div>
                     <pre style="margin:0"><code class="language-cpp">if (true)
     int x{ 5 };   // x живёт только внутри неявного блока
 else
@@ -162,7 +163,7 @@ std::cout &lt;&lt; x;   // ошибка: x не существует здесь<
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">?? Когда else не нужен</div>
+                    <div class="info-card__title">Когда else не нужен</div>
                     <p>
                         Если каждая ветка заканчивается <code>return</code>, <code>else</code> не добавляет смысла —
                         после первого <code>return</code> функция уже завершилась. Многие разработчики
@@ -175,6 +176,10 @@ else if (b) return 'b';  // else здесь лишний
 if (a) return 'a';
 if (b) return 'b';       // чище</code></pre>
                 </div>
+                <h2 id="cpp17">Расширения C++17</h2>
+
+                <div data-slot="1" data-std="17"></div>
+
                 <h2 id="tests">Проверьте знания</h2>
                 <div class="quiz-widget" data-final="if-statements" data-final-desc="if/else, блоки, неявные блоки, if-else vs if-if"></div>
 
@@ -226,7 +231,7 @@ if (b) return 'b';       // чище</code></pre>
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">?? Содержание</div>
+                <div class="toc-title">Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
@@ -243,6 +248,7 @@ if (b) return 'b';       // чище</code></pre>
     <script src="../../../components/quiz-widget.js"></script>
     <script src="../../../js/compiler.js"></script>
     <script src="../../../js/gamification.js"></script>
+    <script src="../../../js/std-gate.js"></script>
     <script>
     (function () {
         const bar = document.getElementById('reading-progress');

@@ -1,0 +1,237 @@
+7.10 — Sharing global constants across multiple files (using inline variables)
+Alex December 14, 2024
+
+In some applications, certain symbolic constants may need to be used throughout your code (not just in one location). These can include physics or mathematical constants that don’t change (e.g. pi or Avogadro’s number), or application-specific “tuning” values (e.g. friction or gravity coefficients). Instead of redefining these constants in every file that needs them (a violation of the “Don’t Repeat Yourself” rule), it’s better to declare them once in a central location and use them wherever needed. That way, if you ever need to change them, you only need to change them in one place, and those changes can be propagated out.
+
+    Video Player is loading.
+        Now Playing
+
+x
+video of: Split ZIP Files Using 7-Zip | Create Multipart Archives in Windows
+Split ZIP Files Using 7-Zip | Create Multipart Archives in Windows
+Watch on
+Video channel logo
+Split ZIP Files Using 7-Zip | Create Multipart Archives in Windows
+
+This lesson discusses the most common ways to do this.
+
+Global constants as internal variables
+
+Prior to C++17, the following is the easiest and most common solution:
+
+    Create a header file to hold these constants
+    Inside this header file, define a namespace (discussed in lesson 7.2 -- User-defined namespaces and the scope resolution operator)
+    Add all your constants inside the namespace (make sure they’re constexpr)
+    #include the header file wherever you need it
+
+For example:
+
+constants.h:
+
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+// Define your own namespace to hold constants
+namespace constants
+{
+    // Global constants have internal linkage by default
+    constexpr double pi { 3.14159 };
+    constexpr double avogadro { 6.0221413e23 };
+    constexpr double myGravity { 9.2 }; // m/s^2 -- gravity is light on this planet
+    // ... other related constants
+}
+#endif
+
+Then use the scope resolution operator (::) with the namespace name to the left, and your variable name to the right in order to access your constants in .cpp files:
+Ezoic
+
+main.cpp:
+
+#include "constants.h" // include a copy of each constant in this file
+
+#include <iostream>
+
+int main()
+{
+    std::cout << "Enter a radius: ";
+    double radius{};
+    std::cin >> radius;
+
+    std::cout << "The circumference is: " << 2 * radius * constants::pi << '\n';
+
+    return 0;
+}
+
+When this header gets #included into a .cpp file, each of these variables defined in the header will be copied into that code file at the point of inclusion. Because these variables live outside of a function, they’re treated as global variables within the file they are included into, which is why you can use them anywhere in that file.
+
+Because const globals have internal linkage, each .cpp file gets an independent version of the global variable that the linker can’t see. In most cases, because these are constexpr, the compiler will simply optimize the variables away.
+Ezoic
+
+While this is simple (and fine for smaller programs), every time constants.h gets #included into a different code file, each of these variables is copied into the including code file. Therefore, if constants.h gets included into 20 different code files, each of these variables is duplicated 20 times. Header guards won’t stop this from happening, as they only prevent a header from being included more than once into a single including file, not from being included one time into multiple different code files. This introduces two challenges:
+
+    Changing a single constant value would require recompiling every file that includes the constants header, which can lead to lengthy rebuild times for larger projects.
+    If the constants are large in size and can’t be optimized away, this can use a lot of memory.
+
+Advantages:
+
+    Works prior to C++17.
+    Can be used in constant expressions in any translation unit that includes them.
+
+Downsides:
+
+    Changing anything in the header file requires recompiling files including the header.
+    Each translation unit including the header gets its own copy of the variable.
+
+Global constants as external variables
+
+If you’re actively changing values or adding new constants, the prior solution might be problematic, at least until things settle.
+Ezoic
+
+One way to avoid these problems is by turning these constants into external variables, since we can then have a single variable (initialized once) that is shared across all files. In this method, we’ll define the constants in a .cpp file (to ensure the definitions only exist in one place), and put forward declarations in the header (which will be included by other files).
+
+constants.cpp:
+
+#include "constants.h"
+
+namespace constants
+{
+    // We use extern to ensure these have external linkage
+    extern constexpr double pi { 3.14159 };
+    extern constexpr double avogadro { 6.0221413e23 };
+    extern constexpr double myGravity { 9.2 }; // m/s^2 -- gravity is light on this planet
+}
+
+constants.h:
+
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+namespace constants
+{
+    // Since the actual variables are inside a namespace, the forward declarations need to be inside a namespace as well
+    // We can't forward declare variables as constexpr, but we can forward declare them as (runtime) const
+    extern const double pi;
+    extern const double avogadro;
+    extern const double myGravity;
+}
+
+#endif
+
+Use in the code file stays the same:
+Ezoic
+
+main.cpp:
+
+#include "constants.h" // include all the forward declarations
+
+#include <iostream>
+
+int main()
+{
+    std::cout << "Enter a radius: ";
+    double radius{};
+    std::cin >> radius;
+
+    std::cout << "The circumference is: " << 2 * radius * constants::pi << '\n';
+
+    return 0;
+}
+
+Now the symbolic constants will get instantiated only once (in constants.cpp) instead of in each code file where constants.h is #included, and all uses of these constants will be linked to the version instantiated in constants.cpp. Any changes made to constants.cpp will require recompiling only constants.cpp.
+
+However, there are a couple of downsides to this method. First, because only the variable definitions are constexpr (the forward declarations aren’t, and can’t be), these constants are constant expressions only within the file they are actually defined in (constants.cpp). In other files, the compiler will only see the forward declaration, which doesn’t define a constexpr value (and must be resolved by the linker). This means outside of the file where they are defined, these variables can’t be used in a constant expression. Second, because constant expressions can typically be optimized more than runtime expressions, the compiler may not be able to optimize these as much.
+
+Key insight
+
+In order for variables to be usable in compile-time contexts, such as array sizes, the compiler has to see the variable’s definition (not just a forward declaration).
+
+Because the compiler compiles each source file individually, it can only see variable definitions that appear in the source file being compiled (which includes any included headers). For example, variable definitions in constants.cpp are not visible when the compiler compiles main.cpp. For this reason, constexpr variables cannot be separated into header and source file, they have to be defined in the header file.
+Ezoic
+
+Given the above downsides, prefer defining your constants in a header file (either per the prior section, or per the next section). If you find that the values for your constants are changing a lot (e.g. because you are tuning the program) and this is leading to long compilation times, you can temporarily move just the offending constants into a .cpp file (using this method) as needed.
+
+Advantages:
+
+    Works prior to C++17.
+    Only one copy of each variable is required.
+    Only requires recompilation of one file if the value of a constant changes.
+
+Disadvantages:
+
+    Forward declarations and variable definitions are in separate files, and must be kept in sync.
+    Variables not usable in constant expressions outside of the file in which they are defined.
+
+Global constants as inline variables C++17
+Ezoic
+
+In lesson 7.9 -- Inline functions and variables, we covered inline variables, which are variables that can have more than one definition, so long as those definitions are identical. By making our constexpr variables inline, we can define them in a header file and then #include them into any .cpp file that requires them. This avoids both ODR violations and the downside of duplicated variables.
+
+A reminder
+
+Constexpr functions are implicitly inline, but constexpr variables are not implicitly inline. If you want an inline constexpr variable, you must explicitly mark it as inline.
+
+Key insight
+
+Inline variables have external linkage by default, so that they are visible to the linker. This is necessary so the linker can de-duplicate the definitions.
+
+Non-inline constexpr variables have internal linkage. If included into multiple translation units, each translation unit will get its own copy of the variable. This is not an ODR violation because they are not exposed to the linker.
+
+constants.h:
+Ezoic
+
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+// define your own namespace to hold constants
+namespace constants
+{
+    inline constexpr double pi { 3.14159 }; // note: now inline constexpr
+    inline constexpr double avogadro { 6.0221413e23 };
+    inline constexpr double myGravity { 9.2 }; // m/s^2 -- gravity is light on this planet
+    // ... other related constants
+}
+#endif
+
+main.cpp:
+
+#include "constants.h"
+
+#include <iostream>
+
+int main()
+{
+    std::cout << "Enter a radius: ";
+    double radius{};
+    std::cin >> radius;
+
+    std::cout << "The circumference is: " << 2 * radius * constants::pi << '\n';
+
+    return 0;
+}
+
+We can include constants.h into as many code files as we want, but these variables will only be instantiated once and shared across all code files.
+Ezoic
+
+This method does retain the downside of requiring every file that includes the constants header be recompiled if any constant value is changed.
+
+Advantages:
+
+    Can be used in constant expressions in any translation unit that includes them.
+    Only one copy of each variable is required.
+
+Downsides:
+
+    Only works in C++17 onward.
+    Changing anything in the header file requires recompiling files including the header.
+
+Best practice
+
+If you need global constants and your compiler is C++17 capable, prefer defining inline constexpr global variables in a header file.
+
+A reminder
+
+Use std::string_view for constexpr strings. We cover this in lesson 5.8 -- Introduction to std::string_view.
+
+Related content
+
+We summarize the scope, duration, and linkage of various kinds of variables in lesson 7.12 -- Scope, duration, and linkage summary.

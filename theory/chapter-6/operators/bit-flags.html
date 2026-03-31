@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2026-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Битовые флаги и std::bitset — Курс C++</title>
+    <meta name="description" content="Битовые флаги в C++: std::bitset, нумерация битов, методы set/reset/flip/test, экономия памяти.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚩</text></svg>">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="index.html" class="active">Глава VI</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава VI</div>
+                <h1>Битовые флаги и std::bitset</h1>
+
+                <p>
+                    Обычно переменная хранит одно значение. Но можно использовать каждый бит
+                    переменной как независимый булев флаг. Это называется
+                    <span class="key-term">битовыми флагами</span> и позволяет хранить
+                    до 8 булевых значений в одном байте.
+                </p>
+
+                <h2 id="numbering">Нумерация битов</h2>
+
+                <p>
+                    Биты нумеруются справа налево, начиная с 0:
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">Позиции битов</div>
+                    <pre style="margin:0"><code>7 6 5 4 3 2 1 0   ← позиция
+0 0 0 0 0 1 0 1   ← значение (биты 0 и 2 установлены)</code></pre>
+                </div>
+
+                <h2 id="bitset">std::bitset</h2>
+
+                <p>
+                    Самый удобный способ работы с битовыми флагами — <code>std::bitset</code>
+                    из заголовка <code>&lt;bitset&gt;</code>. Он предоставляет четыре ключевых метода:
+                </p>
+
+                <div class="info-card">
+                    <div class="info-card__title">Методы std::bitset</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:0.9em">
+                        <thead><tr style="border-bottom:1px solid var(--border)">
+                            <th style="padding:4px 8px;text-align:left">Метод</th>
+                            <th style="padding:4px 8px;text-align:left">Действие</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr><td style="padding:4px 8px"><code>test(pos)</code></td><td style="padding:4px 8px">Проверить бит на позиции pos (0 или 1)</td></tr>
+                            <tr><td style="padding:4px 8px"><code>set(pos)</code></td><td style="padding:4px 8px">Установить бит в 1 (ничего не делает, если уже 1)</td></tr>
+                            <tr><td style="padding:4px 8px"><code>reset(pos)</code></td><td style="padding:4px 8px">Сбросить бит в 0 (ничего не делает, если уже 0)</td></tr>
+                            <tr><td style="padding:4px 8px"><code>flip(pos)</code></td><td style="padding:4px 8px">Инвертировать бит</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block" data-example="chapter-6/operators/bitset-basic.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — основы std::bitset</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">#include &lt;bitset&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    std::bitset&lt;8&gt; bits{ 0b0000'0101 }; // биты 0 и 2 установлены
+    bits.set(3);   // установить бит 3 → 0000 1101
+    bits.flip(4);  // инвертировать бит 4 → 0001 1101
+    bits.reset(4); // сбросить бит 4 → 0000 1101
+
+    std::cout &lt;&lt; "Все биты: " &lt;&lt; bits &lt;&lt; '\n';
+    std::cout &lt;&lt; "Бит 3: " &lt;&lt; bits.test(3) &lt;&lt; '\n'; // 1
+    std::cout &lt;&lt; "Бит 4: " &lt;&lt; bits.test(4) &lt;&lt; '\n'; // 0
+
+    return 0;
+}</code></pre></div>
+                </div>
+
+                <h2 id="named-flags">Именованные флаги</h2>
+
+                <p>
+                    Давайте флагам осмысленные имена — это делает код читаемым:
+                </p>
+
+                <div class="code-block" data-example="chapter-6/operators/bitset-named.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — именованные битовые флаги</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">#include &lt;bitset&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    constexpr int isHungry   { 0 };
+    constexpr int isSad      { 1 };
+    constexpr int isHappy    { 3 };
+    constexpr int isLaughing { 4 };
+
+    std::bitset&lt;8&gt; me{ 0b0000'0101 };
+    me.set(isHappy);
+    me.flip(isLaughing);
+    me.reset(isLaughing);
+
+    std::cout &lt;&lt; "Я счастлив: " &lt;&lt; me.test(isHappy) &lt;&lt; '\n';
+    std::cout &lt;&lt; "Я смеюсь: "  &lt;&lt; me.test(isLaughing) &lt;&lt; '\n';
+
+    return 0;
+}</code></pre></div>
+                </div>
+
+                <h2 id="query">Дополнительные методы запроса</h2>
+
+                <div class="code-block" data-example="chapter-6/operators/bitset-query.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — size, count, all, any, none</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">#include &lt;bitset&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    std::bitset&lt;8&gt; bits{ 0b0000'1101 };
+    std::cout &lt;&lt; bits.size()  &lt;&lt; " бит в bitset\n";   // 8
+    std::cout &lt;&lt; bits.count() &lt;&lt; " бита установлено\n"; // 3
+
+    std::cout &lt;&lt; std::boolalpha;
+    std::cout &lt;&lt; "Все: "  &lt;&lt; bits.all()  &lt;&lt; '\n'; // false
+    std::cout &lt;&lt; "Есть:  " &lt;&lt; bits.any()  &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; "Нет:   " &lt;&lt; bits.none() &lt;&lt; '\n'; // false
+
+    return 0;
+}</code></pre></div>
+                </div>
+
+                <div class="callout callout--note">
+                    <div class="callout__title">Размер std::bitset</div>
+                    <div class="callout__body">
+                        <p>
+                            <code>std::bitset</code> оптимизирован для скорости, а не для экономии памяти.
+                            <code>std::bitset&lt;8&gt;</code> обычно занимает 4 или 8 байт (до ближайшего
+                            <code>sizeof(size_t)</code>), а не 1 байт. Используйте его для удобства,
+                            а не для экономии памяти.
+                        </p>
+                    </div>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="bit-flags" data-final-desc="std::bitset, set/reset/flip/test, именованные флаги"></div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2025-03-17">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Завершение программы — Курс C++</title>
+    <meta name="description" content="Функции завершения программы в C++: std::exit, std::atexit, std::abort, std::terminate, нормальное и аварийное завершение.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="index.html" class="active">Глава V</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава V</div>
+                <h1>Завершение программы</h1>
+
+                <p>
+                    C++ предоставляет несколько функций для явного завершения программы.
+                    Понимание разницы между ними важно для корректной обработки ресурсов.
+                </p>
+
+                <h2 id="exit">std::exit()</h2>
+
+                <p>
+                    <code>std::exit(код)</code> завершает программу <span class="key-term">нормально</span>.
+                    Перед завершением она:
+                </p>
+                <ul>
+                    <li>вызывает функции, зарегистрированные через <code>std::atexit</code>;</li>
+                    <li>сбрасывает буферы потоков ввода/вывода;</li>
+                    <li>освобождает статические объекты.</li>
+                </ul>
+
+                <div class="callout callout--warning">
+                    <div class="callout__title">std::exit не уничтожает локальные переменные</div>
+                    <div class="callout__body">
+                        <p>
+                            Деструкторы локальных переменных при вызове <code>std::exit</code>
+                            <strong>не вызываются</strong>. Если локальные объекты управляют ресурсами
+                            (файлы, сетевые соединения, мьютексы), они не будут корректно освобождены.
+                            Это одна из причин предпочитать исключения явному вызову <code>std::exit</code>.
+                        </p>
+                    </div>
+                </div>
+
+                <h2 id="atexit">std::atexit()</h2>
+
+                <p>
+                    <code>std::atexit(функция)</code> регистрирует функцию очистки,
+                    которая будет вызвана при нормальном завершении программы.
+                    Можно зарегистрировать несколько функций — они вызываются в порядке,
+                    <em>обратном</em> регистрации (LIFO).
+                </p>
+
+                <div class="code-block" data-example="chapter-5/control-flow/halts-atexit.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — std::atexit и std::exit</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
+                </div>
+
+                <h2 id="abort">std::abort() и std::terminate()</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">Аварийное завершение</div>
+                    <table style="width:100%; border-collapse:collapse; margin:0">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding:6px 8px; border-bottom:1px solid var(--border)">Функция</th>
+                                <th style="text-align:left; padding:6px 8px; border-bottom:1px solid var(--border)">Поведение</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:6px 8px"><code>std::exit(n)</code></td>
+                                <td style="padding:6px 8px">Нормальное завершение, вызывает atexit-функции</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 8px"><code>std::abort()</code></td>
+                                <td style="padding:6px 8px">Аварийное завершение, atexit-функции не вызываются, генерирует SIGABRT</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 8px"><code>std::terminate()</code></td>
+                                <td style="padding:6px 8px">Вызывается при необработанном исключении, по умолчанию вызывает abort()</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="recommendation">Рекомендация</h2>
+
+                <div class="callout callout--note">
+                    <div class="callout__title">Предпочитайте исключения</div>
+                    <div class="callout__body">
+                        <p>
+                            Явные вызовы <code>std::exit</code> и <code>std::abort</code>
+                            обходят механизм деструкторов и нарушают принцип RAII.
+                            В большинстве случаев правильнее выбросить исключение:
+                            оно позволяет вызывающему коду обработать ошибку,
+                            а деструкторы корректно освободят ресурсы при раскрутке стека.
+                        </p>
+                    </div>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="halts" data-final-desc="std::exit, std::atexit, std::abort, std::terminate, нормальное и аварийное завершение"></div>
+
+                <!-- FEEDBACK SECTION -->
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done">
+                        <span class="feedback-done__icon">✓</span>
+                        <span>Спасибо за отзыв!</span>
+                    </div>
+                </section>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

@@ -65,6 +65,7 @@ class CppCompiler {
         this.block    = block;
         this.compiler = CW_COMPILERS[0].id;
         this.std      = 'c++11';
+        this.arch     = 'x64';
         this.code     = '';
         this._cm      = null;
     }
@@ -134,6 +135,64 @@ class CppCompiler {
         } catch {
             this._render(label, false);
         }
+
+        // Sync unlocked stds from server (non-blocking)
+        this._syncStds();
+    }
+
+    // Fetches unlocked stds from server and updates the select.
+    // Falls back to cached localStorage value. C++11 is always available.
+    async _syncStds() {
+        const STD_ORDER = ['c++11', 'c++14', 'c++17', 'c++20', 'c++23'];
+        const CACHE_KEY = 'shop_unlocked_stds';
+        const CACHE_TTL = 5 * 60 * 1000; // 5 min
+
+        const cached = (() => {
+            try {
+                const raw = localStorage.getItem(CACHE_KEY);
+                if (!raw) return null;
+                const { stds, ts } = JSON.parse(raw);
+                if (Date.now() - ts < CACHE_TTL) return stds;
+                return null;
+            } catch { return null; }
+        })();
+
+        let stds = cached;
+
+        if (!stds) {
+            try {
+                const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+                if (user?.isuNumber) {
+                    const r = await fetch(`/api/profile/${user.isuNumber}`);
+                    if (r.ok) {
+                        const profile = await r.json();
+                        // unlockedContentStds = "c++11,c++14" or ""
+                        const fromServer = (profile.unlockedContentStds || '')
+                            .split(',').map(s => s.trim()).filter(Boolean);
+                        // Always include c++11
+                        stds = ['c++11', ...fromServer.filter(s => s !== 'c++11')];
+                        // Sort by STD_ORDER
+                        stds = STD_ORDER.filter(s => stds.includes(s));
+                        localStorage.setItem(CACHE_KEY, JSON.stringify({ stds, ts: Date.now() }));
+                    }
+                }
+            } catch {}
+        }
+
+        if (!stds || !stds.length) stds = ['c++11'];
+
+        // Update the select if it exists
+        if (!this._selStd) return;
+        const current = this._selStd.value;
+        this._selStd.innerHTML = stds.map(s =>
+            `<option value="${s}"${s === current ? ' selected' : ''}>${s.toUpperCase()}</option>`
+        ).join('');
+
+        // If current std is no longer available, reset to c++11
+        if (!stds.includes(current)) {
+            this._selStd.value = 'c++11';
+            this.std = 'c++11';
+        }
     }
 
     async _onStdChange(std) {
@@ -156,13 +215,19 @@ class CppCompiler {
             `<option value="${c.id}">${c.label}</option>`
         ).join('');
 
-        // Читаем разблокированные стандарты из магазина
+        // Читаем разблокированные стандарты из кеша (обновится через _syncStds)
         const unlockedStds = (() => {
-            try { return JSON.parse(localStorage.getItem('shop_unlocked_stds') || '["c++11"]'); }
-            catch { return ['c++11']; }
+            try {
+                const raw = localStorage.getItem('shop_unlocked_stds');
+                if (!raw) return ['c++11'];
+                const parsed = JSON.parse(raw);
+                // Поддержка старого формата (массив) и нового ({ stds, ts })
+                const stds = Array.isArray(parsed) ? parsed : (parsed.stds || ['c++11']);
+                return stds.length ? stds : ['c++11'];
+            } catch { return ['c++11']; }
         })();
         const stdOpts = unlockedStds.map(s =>
-            `<option value="${s}">${s.toUpperCase().replace('C++', 'C++')}</option>`
+            `<option value="${s}">${s.toUpperCase()}</option>`
         ).join('');
 
         const widget = document.createElement('div');
@@ -173,22 +238,40 @@ class CppCompiler {
                 <div class="cw-controls">
                     <select class="cw-select cw-compiler">${compilerOpts}</select>
                     <select class="cw-select cw-std" title="Стандарт C++">${stdOpts}</select>
+                    <select class="cw-select cw-arch" title="Архитектура">
+                        <option value="x64">x64</option>
+                        <option value="x86">x86</option>
+                    </select>
+                    <button class="cw-opts-toggle" title="Дополнительные опции">⚙</button>
                     <button class="cw-copy">⎘ Копировать</button>
                     <button class="cw-run" title="Ctrl+Enter">▶ Запустить</button>
                 </div>
+            </div>
+            <div class="cw-opts-panel" hidden>
+                <label class="cw-opts-label">Compiler options
+                    <input class="cw-opts-input cw-compiler-opts" type="text" placeholder="-DDEBUG -Wall" spellcheck="false">
+                </label>
+                <label class="cw-opts-label">Stdin
+                    <textarea class="cw-opts-input cw-stdin" rows="2" placeholder="Данные для std::cin…" spellcheck="false"></textarea>
+                </label>
             </div>
             <div class="cw-cm"><textarea class="cw-ta"></textarea></div>
             <div class="cw-output cw-output--empty">Нажмите ▶ Запустить для выполнения кода</div>`;
 
         this.block.replaceWith(widget);
-        this.widget   = widget;
-        this._out     = widget.querySelector('.cw-output');
-        this._btnRun  = widget.querySelector('.cw-run');
-        this._btnCopy = widget.querySelector('.cw-copy');
-        this._selComp = widget.querySelector('.cw-compiler');
-        this._selStd  = widget.querySelector('.cw-std');
-        const ta      = widget.querySelector('.cw-ta');
-        ta.value      = this.code;
+        this.widget      = widget;
+        this._out        = widget.querySelector('.cw-output');
+        this._btnRun     = widget.querySelector('.cw-run');
+        this._btnCopy    = widget.querySelector('.cw-copy');
+        this._selComp    = widget.querySelector('.cw-compiler');
+        this._selStd     = widget.querySelector('.cw-std');
+        this._selArch    = widget.querySelector('.cw-arch');
+        this._optsToggle = widget.querySelector('.cw-opts-toggle');
+        this._optsPanel  = widget.querySelector('.cw-opts-panel');
+        this._compOpts   = widget.querySelector('.cw-compiler-opts');
+        this._stdin      = widget.querySelector('.cw-stdin');
+        const ta         = widget.querySelector('.cw-ta');
+        ta.value         = this.code;
 
         if (withCM && window.CodeMirror) {
             this._cm = window.CodeMirror.fromTextArea(ta, {
@@ -224,6 +307,12 @@ class CppCompiler {
 
         this._selComp.addEventListener('change', e => { this.compiler = e.target.value; });
         this._selStd.addEventListener('change',  e => { this._onStdChange(e.target.value); });
+        this._selArch.addEventListener('change', e => { this.arch = e.target.value; });
+        this._optsToggle.addEventListener('click', () => {
+            const hidden = this._optsPanel.hidden;
+            this._optsPanel.hidden = !hidden;
+            this._optsToggle.classList.toggle('cw-opts-toggle--active', !hidden === false ? false : true);
+        });
         this._btnRun.addEventListener('click',   () => this._compile());
         this._btnCopy.addEventListener('click',  () => {
             navigator.clipboard.writeText(this._getCode()).then(() => {
@@ -238,7 +327,13 @@ class CppCompiler {
     }
 
     async _compile() {
-        const code = this._getCode();
+        const code        = this._getCode();
+        const extraOpts   = this._compOpts?.value.trim() || '';
+        const stdinData   = this._stdin?.value || '';
+        const archFlag    = this.arch === 'x86' ? '-m32' : '-m64';
+        const userArgs    = [`-std=${this.std}`, '-O2', '-fno-diagnostics-color', archFlag, extraOpts]
+            .filter(Boolean).join(' ');
+
         this._btnRun.disabled    = true;
         this._btnRun.textContent = '⏳…';
         this._out.className      = 'cw-output cw-output--running';
@@ -251,10 +346,11 @@ class CppCompiler {
                 body: JSON.stringify({
                     source: code,
                     options: {
-                        userArguments: `-std=${this.std} -O2 -fno-diagnostics-color`,
+                        userArguments: userArgs,
                         compilerOptions: { executorRequest: true },
                         filters: { execute: true },
-                        tools: [], libraries: []
+                        tools: [], libraries: [],
+                        executeParameters: { stdin: stdinData }
                     },
                     lang: 'c++',
                     allowStoreCodeDebug: true

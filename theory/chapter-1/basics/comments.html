@@ -73,9 +73,9 @@
                     Это самый распространённый вид комментариев в C++.
                 </p>
 
-                <div class="code-block" data-example="chapter-1/basics/comments.cpp">
+                <div class="code-block" data-example="single-line-comment">
                     <div class="code-header">
-                        <span class="code-lang">C++ — виды комментариев</span>
+                        <span class="code-lang">C++ — однострочный комментарий</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
@@ -90,12 +90,33 @@
                     Может занимать несколько строк. Вложенные многострочные комментарии не поддерживаются.
                 </p>
 
+                                <div class="code-block" data-example="multi-line-comment">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — многострочный комментарий</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
+
                 <div class="warning-block">
-                    <div class="warning-block__title">?? Нельзя вкладывать</div>
+                    <div class="warning-block__title">Нельзя вкладывать</div>
                     <p>
                         <code>/* /* вложенный */ */</code> — ошибка компиляции.
                         Первый <code>*/</code> закрывает весь комментарий, а второй <code>*/</code> — лишний.
                     </p>
+                </div>
+
+                
+                                <div class="code-block" data-example="multi-line-comment-error">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — многострочный комментарий</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
                 </div>
 
                 <h2 id="good-comments">Что комментировать</h2>
@@ -170,7 +191,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">?? Содержание</div>
+                <div class="toc-title">Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>

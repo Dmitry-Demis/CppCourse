@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2026-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Битовые маски — Курс C++</title>
+    <meta name="description" content="Битовые маски в C++: проверка, установка, сброс и инверсия битов с помощью побитовых операторов. Пример RGBA.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="index.html" class="active">Глава VI</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава VI</div>
+                <h1>Битовые маски</h1>
+
+                <p>
+                    <span class="key-term">Битовая маска</span> — это заранее определённый набор битов,
+                    который указывает, какие именно биты нужно изменить. Маска блокирует доступ
+                    к ненужным битам и открывает доступ к нужным — как малярная лента при покраске.
+                </p>
+
+                <h2 id="define">Определение масок</h2>
+
+                <p>
+                    Самый читаемый способ — бинарные литералы C++14:
+                </p>
+
+                <div class="code-block" data-example="chapter-6/operators/bitmask-define.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — определение битовых масок</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">#include &lt;cstdint&gt;
+
+// C++14: бинарные литералы
+constexpr std::uint8_t mask0{ 0b0000'0001 }; // бит 0
+constexpr std::uint8_t mask1{ 0b0000'0010 }; // бит 1
+constexpr std::uint8_t mask2{ 0b0000'0100 }; // бит 2
+// ...
+
+// Альтернатива: сдвиг единицы (работает в C++11 и ранее)
+constexpr std::uint8_t bit0{ 1 &lt;&lt; 0 }; // 0000 0001
+constexpr std::uint8_t bit1{ 1 &lt;&lt; 1 }; // 0000 0010
+constexpr std::uint8_t bit2{ 1 &lt;&lt; 2 }; // 0000 0100</code></pre></div>
+                </div>
+
+                <h2 id="test">Проверка бита</h2>
+
+                <p>Используем побитовое И (<code>&amp;</code>) с маской:</p>
+
+                <div class="code-block" data-example="chapter-6/operators/bitmask-test.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — проверка бита</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    constexpr std::uint8_t mask0{ 0b0000'0001 };
+    constexpr std::uint8_t mask1{ 0b0000'0010 };
+
+    std::uint8_t flags{ 0b0000'0101 }; // биты 0 и 2 установлены
+
+    std::cout &lt;&lt; "бит 0: " &lt;&lt; (static_cast&lt;bool&gt;(flags &amp; mask0) ? "вкл\n" : "выкл\n"); // вкл
+    std::cout &lt;&lt; "бит 1: " &lt;&lt; (static_cast&lt;bool&gt;(flags &amp; mask1) ? "вкл\n" : "выкл\n"); // выкл
+
+    return 0;
+}</code></pre></div>
+                </div>
+
+                <h2 id="set-clear-flip">Установка, сброс и инверсия</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">Шпаргалка по операциям с битами</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:0.9em">
+                        <thead><tr style="border-bottom:1px solid var(--border)">
+                            <th style="padding:4px 8px;text-align:left">Операция</th>
+                            <th style="padding:4px 8px;text-align:left">Код</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr><td style="padding:4px 8px">Проверить бит</td><td style="padding:4px 8px"><code>if (flags &amp; mask)</code></td></tr>
+                            <tr><td style="padding:4px 8px">Установить бит</td><td style="padding:4px 8px"><code>flags |= mask</code></td></tr>
+                            <tr><td style="padding:4px 8px">Установить несколько</td><td style="padding:4px 8px"><code>flags |= (mask4 | mask5)</code></td></tr>
+                            <tr><td style="padding:4px 8px">Сбросить бит</td><td style="padding:4px 8px"><code>flags &amp;= ~mask</code></td></tr>
+                            <tr><td style="padding:4px 8px">Сбросить несколько</td><td style="padding:4px 8px"><code>flags &amp;= ~(mask4 | mask5)</code></td></tr>
+                            <tr><td style="padding:4px 8px">Инвертировать бит</td><td style="padding:4px 8px"><code>flags ^= mask</code></td></tr>
+                            <tr><td style="padding:4px 8px">Инвертировать несколько</td><td style="padding:4px 8px"><code>flags ^= (mask4 | mask5)</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block" data-example="chapter-6/operators/bitmask-ops.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — установка, сброс, инверсия</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    constexpr std::uint8_t isHappy    { 1 &lt;&lt; 3 }; // 0000 1000
+    constexpr std::uint8_t isLaughing { 1 &lt;&lt; 4 }; // 0001 0000
+
+    std::uint8_t me{};
+    me |= (isHappy | isLaughing); // установить оба флага
+    me &amp;= ~isLaughing;            // сбросить флаг смеха
+
+    std::cout &lt;&lt; std::boolalpha;
+    std::cout &lt;&lt; "Счастлив: "  &lt;&lt; static_cast&lt;bool&gt;(me &amp; isHappy)    &lt;&lt; '\n'; // true
+    std::cout &lt;&lt; "Смеётся: "   &lt;&lt; static_cast&lt;bool&gt;(me &amp; isLaughing) &lt;&lt; '\n'; // false
+
+    return 0;
+}</code></pre></div>
+                </div>
+
+                <h2 id="rgba">Пример: разбор RGBA-цвета</h2>
+
+                <p>
+                    Цвет пикселя часто хранится как 32-битное число, где каждые 8 бит — один канал (R, G, B, A).
+                    Маски позволяют извлечь каждый канал:
+                </p>
+
+                <div class="code-block" data-example="chapter-6/operators/bitmask-rgba.cpp">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — извлечение RGBA-каналов</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    constexpr std::uint32_t redBits   { 0xFF000000 };
+    constexpr std::uint32_t greenBits { 0x00FF0000 };
+    constexpr std::uint32_t blueBits  { 0x0000FF00 };
+    constexpr std::uint32_t alphaBits { 0x000000FF };
+
+    std::uint32_t pixel { 0xFF7F3300 };
+
+    const std::uint8_t red   { static_cast&lt;std::uint8_t&gt;((pixel &amp; redBits)   &gt;&gt; 24) };
+    const std::uint8_t green { static_cast&lt;std::uint8_t&gt;((pixel &amp; greenBits) &gt;&gt; 16) };
+    const std::uint8_t blue  { static_cast&lt;std::uint8_t&gt;((pixel &amp; blueBits)  &gt;&gt;  8) };
+    const std::uint8_t alpha { static_cast&lt;std::uint8_t&gt;(pixel &amp; alphaBits) };
+
+    std::cout &lt;&lt; std::hex;
+    std::cout &lt;&lt; "R=" &lt;&lt; static_cast&lt;int&gt;(red)
+              &lt;&lt; " G=" &lt;&lt; static_cast&lt;int&gt;(green)
+              &lt;&lt; " B=" &lt;&lt; static_cast&lt;int&gt;(blue)
+              &lt;&lt; " A=" &lt;&lt; static_cast&lt;int&gt;(alpha) &lt;&lt; '\n';
+    // R=ff G=7f B=33 A=0
+
+    return 0;
+}</code></pre></div>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="bit-masks" data-final-desc="битовые маски, установка, сброс, инверсия, RGBA"></div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

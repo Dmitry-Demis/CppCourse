@@ -423,14 +423,16 @@
         .review-badge {
             display: inline-flex; align-items: center; gap: 3px;
             font-size: .68rem; font-weight: 700; padding: 3px 8px; border-radius: 7px; white-space: nowrap;
+            text-decoration: none; cursor: pointer;
         }
+        .review-badge:hover { opacity: .8; text-decoration: none; }
         .review-badge.overdue { background: rgba(248,113,113,.18); color: #f87171;
             animation: pulse-red 1.4s ease-in-out infinite; }
         .review-badge.today   { background: rgba(251,191,36,.15);  color: #fbbf24;
             animation: pulse-yellow 1.4s ease-in-out infinite; }
         .review-badge.soon    { background: rgba(126,184,247,.12); color: #7eb8f7; }
         .review-badge.ok      { background: rgba(110,231,183,.1);  color: #6ee7b7; }
-        .review-badge.unread  { background: rgba(255,255,255,.05); color: var(--text-tertiary); }
+        .review-badge.unread  { background: rgba(255,255,255,.05); color: var(--text-tertiary); cursor: default; }
         @keyframes pulse-red    { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.4)} 50%{box-shadow:0 0 0 4px rgba(248,113,113,0)} }
         @keyframes pulse-yellow { 0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.4)}  50%{box-shadow:0 0 0 4px rgba(251,191,36,0)} }
 
@@ -554,7 +556,111 @@
         .empty-state { text-align: center; padding: var(--space-16); color: var(--text-tertiary); }
         .empty-icon  { font-size: 3rem; margin-bottom: var(--space-3); }
 
-        /* ── Course tabs ── */
+        /* ── Profile tabs ── */
+        .profile-tabs {
+            display: flex; gap: 4px;
+            background: var(--bg-tertiary); border-radius: 14px 14px 0 0; padding: 6px 6px 0;
+            border: 1px solid var(--border-primary); border-bottom: none;
+            flex-wrap: wrap; margin-top: var(--space-5);
+        }
+        .profile-tab {
+            padding: 9px 14px; border-radius: 10px 10px 0 0; border: none;
+            background: none; color: var(--text-tertiary); font-size: .78rem; font-weight: 600;
+            cursor: pointer; transition: all .2s; white-space: nowrap;
+        }
+        .profile-tab.active {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-bottom: 1px solid var(--bg-card);
+            color: var(--text-primary);
+            margin-bottom: -1px;
+        }
+        .profile-tab:not(.active):hover { background: rgba(255,255,255,.05); color: var(--text-secondary); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .tab-panel-inner {
+            background: var(--bg-card); border: 1px solid var(--border-primary);
+            border-radius: 0 0 14px 14px; padding: var(--space-5);
+            min-height: 200px;
+        }
+
+        /* ── Dashboard shared ── */
+        .dash-card-wrap {
+            background: var(--bg-card); border: 1px solid var(--border-primary);
+            border-radius: 16px; padding: var(--space-5); margin-bottom: var(--space-4);
+        }
+        .dash-card-title {
+            font-size: .82rem; font-weight: 700; color: var(--text-secondary);
+            margin-bottom: var(--space-4); display: flex; align-items: center; gap: 8px;
+        }
+        .analytics-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: var(--space-4); }
+        .a-chip { display: flex; flex-direction: column; align-items: center; padding: 10px 16px; border-radius: 12px; min-width: 80px; text-align: center; }
+        .a-chip.green  { background: rgba(110,231,183,.07); border: 1px solid rgba(110,231,183,.2); }
+        .a-chip.blue   { background: rgba(126,184,247,.07); border: 1px solid rgba(126,184,247,.2); }
+        .a-chip.purple { background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.2); }
+        .a-chip.yellow { background: rgba(251,191,36,.07);  border: 1px solid rgba(251,191,36,.2); }
+        .a-chip .ac-val { font-size: 1.2rem; font-weight: 800; line-height: 1; }
+        .a-chip.green  .ac-val { color: #6ee7b7; }
+        .a-chip.blue   .ac-val { color: #7eb8f7; }
+        .a-chip.purple .ac-val { color: #a78bfa; }
+        .a-chip.yellow .ac-val { color: #fbbf24; }
+        .a-chip .ac-lbl { font-size: .62rem; color: var(--text-tertiary); margin-top: 3px; }
+
+        /* ── Heatmap ── */
+        .heatmap-grid { display: flex; flex-wrap: wrap; gap: 3px; }
+        .heatmap-cell { width: 13px; height: 13px; border-radius: 3px; cursor: default; transition: transform .1s; }
+        .heatmap-cell:hover { transform: scale(1.5); }
+        .heatmap-cell.l0 { background: rgba(255,255,255,.06); }
+        .heatmap-cell.l1 { background: rgba(110,231,183,.3); }
+        .heatmap-cell.l2 { background: rgba(110,231,183,.55); }
+        .heatmap-cell.l3 { background: rgba(110,231,183,.8); }
+        .heatmap-cell.l4 { background: #6ee7b7; box-shadow: 0 0 6px rgba(110,231,183,.5); }
+        .heatmap-legend { display: flex; align-items: center; gap: 4px; margin-top: 8px; font-size: .65rem; color: var(--text-tertiary); }
+
+        /* ── Bar chart ── */
+        .bar-chart { display: flex; flex-direction: column; gap: 8px; }
+        .bar-row { display: grid; grid-template-columns: 130px 1fr 52px; gap: 8px; align-items: center; }
+        @media(max-width:600px){ .bar-row { grid-template-columns: 80px 1fr 42px; } }
+        .bar-label { font-size: .72rem; color: var(--text-secondary); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bar-track { height: 10px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 99px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+        .bar-fill.green  { background: linear-gradient(90deg,#6ee7b7,#3b82f6); }
+        .bar-fill.yellow { background: linear-gradient(90deg,#fbbf24,#f97316); }
+        .bar-fill.red    { background: linear-gradient(90deg,#f87171,#ec4899); }
+        .bar-fill.blue   { background: linear-gradient(90deg,#7eb8f7,#a78bfa); }
+        .bar-val { font-size: .72rem; font-weight: 700; color: var(--text-primary); }
+
+        /* ── Score timeline ── */
+        .score-timeline { display: flex; align-items: flex-end; gap: 3px; height: 80px; padding: 4px 0; overflow-x: auto; }
+        .score-bar-t { flex-shrink: 0; width: 10px; border-radius: 3px 3px 0 0; position: relative; cursor: default; }
+        .score-bar-t:hover::after {
+            content: attr(data-tip); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+            background: var(--bg-card); border: 1px solid var(--border-primary);
+            padding: 2px 6px; border-radius: 5px; font-size: .65rem; white-space: nowrap;
+            color: var(--text-primary); z-index: 10; pointer-events: none;
+        }
+
+        /* ── Weekly bars ── */
+        .weekly-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; overflow-x: auto; padding-bottom: 4px; }
+        .weekly-group { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+        .weekly-bars  { display: flex; align-items: flex-end; gap: 2px; }
+        .weekly-bar   { width: 8px; border-radius: 2px 2px 0 0; }
+        .weekly-lbl   { font-size: .55rem; color: var(--text-tertiary); white-space: nowrap; }
+
+        /* ── Improvement ── */
+        .improve-row { display: grid; grid-template-columns: 120px 44px 1fr 44px; gap: 8px; align-items: center; margin-bottom: 7px; }
+        @media(max-width:600px){ .improve-row { grid-template-columns: 70px 36px 1fr 36px; } }
+        .improve-label { font-size: .7rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
+        .improve-score { font-size: .7rem; font-weight: 700; text-align: center; }
+        .improve-track { height: 8px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; position: relative; }
+        .improve-first { height: 100%; border-radius: 99px; background: rgba(248,113,113,.5); position: absolute; top:0; left:0; }
+        .improve-best  { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#6ee7b7,#3b82f6); position: absolute; top:0; left:0; }
+
+        /* ── Pie chart ── */
+        .pie-wrap { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
+        .pie-legend { display: flex; flex-direction: column; gap: 7px; }
+        .pie-legend-item { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--text-secondary); }
+        .pie-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -650,7 +756,9 @@ async function loadProfile() {
             // Update stats cards with real data
             updateStatsFromProgress(progressMap);
             // Re-render chapters progress section
-            loadChaptersProgress(user.isuNumber, chapters, progressMap);
+            await loadChaptersProgress(user.isuNumber, chapters, progressMap);
+            // Load analytics dashboards
+            await loadAnalyticsDashboards(user.isuNumber, chapters, progressMap);
         } catch(e) {
             console.warn('Progress load failed:', e);
             loadChaptersProgress(user.isuNumber, chapters, {});
@@ -713,9 +821,28 @@ function renderProfile(data, chapters, progressMap) {
         </div>
 
         <div class="sec-heading">Прогресс по курсу</div>
-        <div id="course-progress-wrap">
-            <div class="empty-state" style="padding:var(--space-8)"><div class="empty-icon">⏳</div><p>Загрузка прогресса...</p></div>
-        </div>`;
+        <div class="profile-tabs" id="profile-tabs" style="position:sticky;top:64px;z-index:50;margin-bottom:0;border-radius:14px 14px 0 0;border-bottom:none">
+            <button class="profile-tab active" data-tab="table">📋 Таблица</button>
+            <button class="profile-tab" data-tab="heatmap">🔥 Активность</button>
+            <button class="profile-tab" data-tab="mastery">🎯 Усвоение</button>
+            <button class="profile-tab" data-tab="scores">📈 Результаты</button>
+            <button class="profile-tab" data-tab="reading">⏱ Чтение</button>
+            <button class="profile-tab" data-tab="distribution">📊 Распределение</button>
+            <button class="profile-tab" data-tab="weekly">📅 По неделям</button>
+            <button class="profile-tab" data-tab="improvement">🚀 Прогресс</button>
+        </div>
+        <div id="tab-table" class="tab-panel active" style="display:block">
+            <div id="course-progress-wrap">
+                <div class="empty-state" style="padding:var(--space-8)"><div class="empty-icon">⏳</div><p>Загрузка прогресса...</p></div>
+            </div>
+        </div>
+        <div id="tab-heatmap"      class="tab-panel" style="display:none"></div>
+        <div id="tab-mastery"      class="tab-panel" style="display:none"></div>
+        <div id="tab-scores"       class="tab-panel" style="display:none"></div>
+        <div id="tab-reading"      class="tab-panel" style="display:none"></div>
+        <div id="tab-distribution" class="tab-panel" style="display:none"></div>
+        <div id="tab-weekly"       class="tab-panel" style="display:none"></div>
+        <div id="tab-improvement"  class="tab-panel" style="display:none"></div>`;
 
     if (window.gsap) {
         gsap.from('#hero-card',   { opacity:0, y:24, duration:.6, ease:'power2.out' });
@@ -753,67 +880,107 @@ async function loadChaptersProgress(isuNumber, chapters, progressMap) {
 
     const CHAPTER_ICONS = ['🔢','📦','➕','🔀','⚙️','🧩','🔗','📐'];
 
-    // Повторить — только если есть хотя бы один пройденный тест
-    function reviewBadge(srNextDue, hasTestedAtLeastOne) {
+    // Повторить — кликабельная ссылка на страницу теории с якорем #tests
+    function reviewBadge(srNextDue, hasTestedAtLeastOne, testHref) {
         if (!hasTestedAtLeastOne) return `<span class="review-badge unread">—</span>`;
-        if (!srNextDue) return `<span class="review-badge ok">—</span>`;
+        if (!srNextDue) return `<a class="review-badge ok" href="${testHref}">повторить</a>`;
         const diffDays = Math.round((new Date(srNextDue) - new Date()) / 86400000);
-        if (diffDays < 0)   return `<span class="review-badge overdue">⚠ просрочено</span>`;
-        if (diffDays === 0) return `<span class="review-badge today">📌 сегодня</span>`;
-        if (diffDays === 1) return `<span class="review-badge today">📌 завтра</span>`;
-        if (diffDays <= 3)  return `<span class="review-badge soon">через ${diffDays} дн.</span>`;
-        return `<span class="review-badge ok">через ${diffDays} дн.</span>`;
+        if (diffDays < 0)   return `<a class="review-badge overdue" href="${testHref}">⚠ просрочено</a>`;
+        if (diffDays === 0) return `<a class="review-badge today" href="${testHref}">📌 сегодня</a>`;
+        if (diffDays === 1) return `<a class="review-badge today" href="${testHref}">📌 завтра</a>`;
+        if (diffDays <= 3)  return `<a class="review-badge soon" href="${testHref}">через ${diffDays} дн.</a>`;
+        return `<a class="review-badge ok" href="${testHref}">через ${diffDays} дн.</a>`;
     }
 
-    // Медиана из истории попыток (localStorage)
+    // Медиана из данных сервера (averageScore из TestStatsDto)
     function getMedian(quizId) {
-        try {
-            const hist = JSON.parse(localStorage.getItem(`quiz_hist_${quizId}`) || '[]');
-            if (!hist.length) return null;
-            const s = [...hist].sort((a,b) => a-b);
-            const m = Math.floor(s.length / 2);
-            return s.length % 2 === 0 ? Math.round((s[m-1]+s[m])/2) : s[m];
-        } catch { return null; }
+        // Используем averageScore из progressMap если доступен
+        for (const prog of Object.values(progressMap)) {
+            const td = (prog.tests || {})[quizId];
+            if (td && td.attemptsCount > 0) return td.averageScore ?? null;
+        }
+        return null;
     }
 
-    // SVG jug
+    // SVG elixir flask (potion bottle shape)
     function buildJugSvg(pct) {
-        const W=36,H=44,fillH=Math.round((H-14)*Math.min(pct,1)),fillY=H-6-fillH;
-        const color=pct>=0.8?'#6ee7b7':pct>=0.4?'#7eb8f7':'#a78bfa';
-        const glow=pct>=0.8?'rgba(110,231,183,.35)':pct>=0.4?'rgba(126,184,247,.3)':'rgba(167,139,250,.25)';
-        const uid='j'+Math.random().toString(36).slice(2,7);
-        const jugPath=`M10,4 Q10,2 13,2 L23,2 Q26,2 26,4 L28,10 Q32,12 32,16 L32,38 Q32,42 28,42 L8,42 Q4,42 4,38 L4,16 Q4,12 8,10 Z`;
-        const liq=fillH>0?`<rect x="5" y="${fillY}" width="26" height="${fillH+6}" rx="2" fill="${color}" opacity="0.85"/>`:'';
-        return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" class="ch-jug" style="filter:drop-shadow(0 0 6px ${glow})">
-            <defs><clipPath id="${uid}"><path d="${jugPath}"/></clipPath></defs>
-            <path d="${jugPath}" fill="rgba(255,255,255,.04)" stroke="rgba(167,139,250,.35)" stroke-width="1.2"/>
-            <path d="M26,8 Q34,6 35,10 Q34,14 28,12" fill="rgba(167,139,250,.3)" stroke="rgba(167,139,250,.4)" stroke-width="0.8"/>
-            <path d="M4,18 Q0,22 0,28 Q0,34 4,36" fill="none" stroke="rgba(167,139,250,.4)" stroke-width="1.5" stroke-linecap="round"/>
-            <g clip-path="url(#${uid})">${liq}</g>
-            <path d="M13,6 Q12,14 13,22" stroke="rgba(255,255,255,.25)" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <text x="18" y="${H-14}" text-anchor="middle" font-size="7" font-weight="700" fill="${color}">${Math.round(pct*100)}%</text>
+        const clampedPct = Math.min(Math.max(pct, 0), 1);
+        const color = clampedPct >= 0.8 ? '#6ee7b7' : clampedPct >= 0.4 ? '#7eb8f7' : '#c084fc';
+        const colorDark = clampedPct >= 0.8 ? '#059669' : clampedPct >= 0.4 ? '#3b82f6' : '#9333ea';
+        const glow = clampedPct >= 0.8 ? 'rgba(110,231,183,.5)' : clampedPct >= 0.4 ? 'rgba(126,184,247,.45)' : 'rgba(192,132,252,.45)';
+        const uid = 'p' + Math.random().toString(36).slice(2, 7);
+
+        // Flask shape: narrow neck, wide body
+        // Neck: x 13-23, y 2-14 | Body: x 4-32, y 14-42 (rounded bottom)
+        const flaskPath = `M14,2 L22,2 L22,4 Q26,6 28,10 L32,14 Q36,16 36,20 L36,36 Q36,42 30,44 L6,44 Q0,42 0,36 L0,20 Q0,16 4,14 L8,10 Q10,6 14,4 Z`;
+        const neckPath  = `M14,2 L22,2 L22,4 Q26,6 28,10 L8,10 Q10,6 14,4 Z`;
+
+        // Liquid fill height inside body (body starts at y=14, ends at y=44 → 30px tall)
+        const bodyTop = 14, bodyBot = 44, bodyH = bodyBot - bodyTop;
+        const fillH = Math.round(bodyH * clampedPct);
+        const fillY = bodyBot - fillH;
+
+        // Bubbles (only when pct > 0)
+        const bubbles = clampedPct > 0.05 ? [
+            { cx: 10, cy: fillY + fillH * 0.6, r: 2.2 },
+            { cx: 26, cy: fillY + fillH * 0.35, r: 1.5 },
+            { cx: 18, cy: fillY + fillH * 0.75, r: 1.8 },
+        ].filter(b => b.cy > fillY && b.cy < bodyBot - 3)
+         .map(b => `<circle cx="${b.cx}" cy="${b.cy}" r="${b.r}" fill="rgba(255,255,255,.35)" />`)
+         .join('') : '';
+
+        // Shine streak on neck
+        const shine = `<path d="M16,3 Q15,7 16,11" stroke="rgba(255,255,255,.4)" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+
+        return `<svg width="36" height="46" viewBox="0 0 36 46" class="ch-jug" style="filter:drop-shadow(0 0 8px ${glow})">
+            <defs>
+                <clipPath id="${uid}-clip"><path d="${flaskPath}"/></clipPath>
+                <linearGradient id="${uid}-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${color}" stop-opacity="0.95"/>
+                    <stop offset="100%" stop-color="${colorDark}" stop-opacity="1"/>
+                </linearGradient>
+            </defs>
+            <!-- Flask outline -->
+            <path d="${flaskPath}" fill="rgba(255,255,255,.04)" stroke="rgba(167,139,250,.4)" stroke-width="1.2"/>
+            <!-- Neck fill (always slightly tinted) -->
+            <path d="${neckPath}" fill="rgba(255,255,255,.06)"/>
+            <!-- Liquid -->
+            <g clip-path="url(#${uid}-clip)">
+                ${fillH > 0 ? `<rect x="0" y="${fillY}" width="36" height="${fillH + 2}" fill="url(#${uid}-grad)" opacity="0.9"/>` : ''}
+                ${bubbles}
+            </g>
+            <!-- Shine -->
+            ${shine}
+            <!-- Stopper -->
+            <rect x="13" y="0" width="10" height="3" rx="1.5" fill="rgba(167,139,250,.6)" stroke="rgba(167,139,250,.8)" stroke-width=".6"/>
+            <!-- Percent label -->
+            <text x="18" y="34" text-anchor="middle" font-size="7.5" font-weight="800" fill="${clampedPct > 0.15 ? 'rgba(255,255,255,.9)' : color}">${Math.round(clampedPct * 100)}%</text>
         </svg>`;
     }
 
     let theoryHtml = '';
 
-    // Fetch global avg reading times for rating column
+    // Fetch page ratings from feedback API
     const allParaIds = chapters.flatMap(ch => (ch.paragraphs || []).map(p => p.id));
-    let globalAvgMap = {};
+    let ratingMap = {};
     try {
-        const r = await fetch('/api/stats/avg-reading/bulk', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(allParaIds)
+        const ratingResults = await Promise.allSettled(
+            allParaIds.map(pid =>
+                fetch(`/api/feedback/${pid}`).then(r => r.ok ? r.json() : null)
+            )
+        );
+        allParaIds.forEach((pid, i) => {
+            const res = ratingResults[i];
+            if (res.status === 'fulfilled' && res.value?.average) {
+                ratingMap[pid] = res.value.average;
+            }
         });
-        if (r.ok) globalAvgMap = await r.json();
     } catch {}
-    // Rating = avg reading time from DB (real data only, no random)
+
     function calcRating(paragraphId) {
-        const avg = globalAvgMap[paragraphId];
-        if (!avg || avg <= 0) return null; // no data → dash
-        const allVals = Object.values(globalAvgMap).filter(v => v > 0);
-        const maxAvg = allVals.length ? Math.max(...allVals) : 1;
-        return Math.round(avg / maxAvg * 100) / 10;
+        const avg = ratingMap[paragraphId];
+        if (!avg || avg <= 0) return null;
+        return avg; // already 1–10 scale
     }
 
     chapters.forEach((ch, idx) => {
@@ -883,8 +1050,9 @@ async function loadChaptersProgress(isuNumber, chapters, progressMap) {
                     const median = getMedian(t.quizId);
                     const mCls2 = median === null ? 'none' : median >= 70 ? 'pass' : 'fail';
                     const lastDate = done ? fmtDate(td.lastAttemptAt) : '—';
-                    const repeatBadge = reviewBadge(srNextDue, done);
                     const testHref = `theory/${ch.id}/${ch.groupId}/${p.id}.html#tests`;
+                    // srNextDue приходит с сервера — используем его напрямую
+                    const repeatBadge = reviewBadge(srNextDue, done, testHref);
                     return `<a class="pt-test-row${done ? '' : ' pt-not-started'}" href="${testHref}">
                         <div class="pt-test-name">${td?.testTitle || t.title || t.quizId}</div>
                         <div class="pt-cell">${done ? td.attemptsCount : '—'}</div>
@@ -912,6 +1080,8 @@ async function loadChaptersProgress(isuNumber, chapters, progressMap) {
 
             const detailId = qids.length > 0 ? `tests-${ch.id}-${p.id}` : null;
 
+            const paraTestHref = `theory/${ch.id}/${ch.groupId}/${p.id}.html#tests`;
+
             return `<div class="para-row-wrap">
                 <div class="para-row-grid${sessions > 0 || hasTest ? '' : ' unread'}">
                     <div class="pr-star">${star}</div>
@@ -932,7 +1102,7 @@ async function loadChaptersProgress(isuNumber, chapters, progressMap) {
                                </div>`
                             : '<span style="color:var(--text-tertiary);font-size:.7rem">—</span>'}
                     </div>
-                    <div class="pr-cell">${reviewBadge(srNextDue, hasTest)}</div>
+                    <div class="pr-cell">${reviewBadge(srNextDue, hasTest, paraTestHref)}</div>
                     <div class="pr-cell pr-rating"><span class="ph-rating-val ${ratingCls}">${rating !== null ? rating.toFixed(1) : '—'}</span></div>
                 </div>
                 ${testsDetail}
@@ -1003,6 +1173,401 @@ function counter(id, target) {
 }
 
 loadProfile();
+
+// ── Tab switching (delegated, works with dynamically created tabs) ────────────
+document.addEventListener('click', e => {
+    const tab = e.target.closest('.profile-tab');
+    if (!tab) return;
+    const tabId = tab.dataset.tab;
+    document.querySelectorAll('.profile-tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.tab-panel').forEach(p => {
+        const isActive = p.id === 'tab-' + tabId;
+        p.classList.toggle('active', isActive);
+        p.style.display = isActive ? 'block' : 'none';
+    });
+});
+
+// ── Analytics dashboards ──────────────────────────────────────────────────────
+async function loadAnalyticsDashboards(isuNumber, chapters, progressMap) {
+    // Show loading state in all dashboard tabs immediately
+    ['heatmap','mastery','scores','reading','distribution','weekly','improvement'].forEach(id => {
+        const el = document.getElementById('tab-' + id);
+        if (el && !el.innerHTML.trim()) {
+            el.innerHTML = '<div class="empty-state" style="padding:2rem"><div class="empty-icon">⏳</div><p>Загрузка...</p></div>';
+        }
+    });
+
+    let analytics = null;
+    try {
+        const r = await fetch(`/api/analytics/${isuNumber}`);
+        if (r.ok) {
+            analytics = await r.json();
+            console.log('[Analytics] loaded:', analytics);
+        } else {
+            console.warn('[Analytics] API returned', r.status, await r.text().catch(() => ''));
+        }
+    } catch(e) {
+        console.error('[Analytics] fetch failed:', e);
+    }
+    if (!analytics) {
+        // Show error state in all dashboard tabs
+        ['heatmap','mastery','scores','reading','distribution','weekly','improvement'].forEach(id => {
+            const el = document.getElementById('tab-' + id);
+            if (el) el.innerHTML = '<div class="empty-state" style="padding:2rem"><div class="empty-icon">📭</div><p>Нет данных аналитики</p><p style="font-size:.75rem;color:var(--text-tertiary);margin-top:8px">Пройдите тесты и почитайте теорию, чтобы здесь появилась статистика</p></div>';
+        });
+        return;
+    }
+
+    // Build paragraphId → title map from course structure
+    const paraTitle = {};
+    (chapters || []).forEach(ch => {
+        (ch.paragraphs || []).forEach(p => { paraTitle[p.id] = p.title || p.id; });
+    });
+
+    const PIE_COLORS = ['#a78bfa','#7eb8f7','#6ee7b7','#fbbf24','#f87171','#fb923c','#34d399'];
+
+    function fmtSecs(s) {
+        if (!s) return '0м';
+        const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+        return h > 0 ? `${h}ч ${m}м` : `${m}м`;
+    }
+
+    // Safe render wrapper — catches errors and shows them in the tab
+    function safeRender(tabId, fn) {
+        try { fn(); }
+        catch(e) {
+            console.error(`[Analytics] render error in tab-${tabId}:`, e);
+            const el = document.getElementById('tab-' + tabId);
+            if (el) el.innerHTML = `<div class="empty-state" style="padding:2rem"><div class="empty-icon">⚠️</div><p>Ошибка рендера</p><pre style="font-size:.65rem;color:var(--text-tertiary);margin-top:8px;white-space:pre-wrap">${e.message}</pre></div>`;
+        }
+    }
+
+    // ── 1. HEATMAP — активность за 90 дней ───────────────────────────────────
+    safeRender('heatmap', function() {
+        const el = document.getElementById('tab-heatmap');
+        if (!el) return;
+        const data = analytics.heatmap || [];
+        const map = {};
+        data.forEach(d => { map[d.date] = d; });
+        const maxXp = Math.max(...data.map(d => d.xp), 1);
+
+        // Fill 90 days
+        const cells = [];
+        for (let i = 89; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const key = d.toISOString().slice(0,10);
+            const entry = map[key];
+            const xp = entry?.xp || 0;
+            const level = xp === 0 ? 0 : xp < maxXp * 0.25 ? 1 : xp < maxXp * 0.5 ? 2 : xp < maxXp * 0.75 ? 3 : 4;
+            const tip = entry ? `${key}: ${xp} XP, ${entry.actions} действий` : key;
+            cells.push(`<div class="heatmap-cell l${level}" title="${tip}"></div>`);
+        }
+
+        const totalDays = data.length;
+        const totalXp   = data.reduce((s,d) => s + d.xp, 0);
+        const streak    = (() => {
+            let s = 0;
+            for (let i = 0; i < 90; i++) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                if (map[d.toISOString().slice(0,10)]) s++; else break;
+            }
+            return s;
+        })();
+
+        el.innerHTML = `
+            <div class="dash-card-wrap">
+                <div class="dash-card-title">🔥 Активность за 90 дней</div>
+                <div class="analytics-chips">
+                    <div class="a-chip green"><div class="ac-val">${totalDays}</div><div class="ac-lbl">активных дней</div></div>
+                    <div class="a-chip yellow"><div class="ac-val">${totalXp}</div><div class="ac-lbl">XP заработано</div></div>
+                    <div class="a-chip blue"><div class="ac-val">${streak}</div><div class="ac-lbl">текущий стрик</div></div>
+                </div>
+                <div class="heatmap-grid">${cells.join('')}</div>
+                <div class="heatmap-legend">
+                    Меньше
+                    <div class="heatmap-cell l0" style="width:11px;height:11px;border-radius:2px"></div>
+                    <div class="heatmap-cell l1" style="width:11px;height:11px;border-radius:2px"></div>
+                    <div class="heatmap-cell l2" style="width:11px;height:11px;border-radius:2px"></div>
+                    <div class="heatmap-cell l3" style="width:11px;height:11px;border-radius:2px"></div>
+                    <div class="heatmap-cell l4" style="width:11px;height:11px;border-radius:2px"></div>
+                    Больше
+                </div>
+            </div>`;
+    });
+
+    // ── 2. MASTERY — усвоение по параграфам (горизонтальные бары) ────────────
+    safeRender('mastery', function() {
+        const el = document.getElementById('tab-mastery');
+        if (!el) return;
+        const data = analytics.masteryByParagraph || [];
+        if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Нет данных</p></div>'; return; }
+
+        const avgMastery = data.length ? Math.round(data.reduce((s,d) => s + d.mastery, 0) / data.length) : 0;
+        const perfect    = data.filter(d => d.mastery === 100).length;
+        const weak       = data.filter(d => d.mastery < 70).length;
+
+        const rows = data.slice(0, 20).map(d => {
+            const cls = d.mastery >= 70 ? 'green' : d.mastery >= 40 ? 'yellow' : 'red';
+            const title = paraTitle[d.paragraphId] || d.paragraphId;
+            return `<div class="bar-row">
+                <div class="bar-label" title="${title}">${title}</div>
+                <div class="bar-track"><div class="bar-fill ${cls}" style="width:${d.mastery}%"></div></div>
+                <div class="bar-val" style="color:${d.mastery>=70?'#6ee7b7':d.mastery>=40?'#fbbf24':'#f87171'}">${d.mastery}%</div>
+            </div>`;
+        }).join('');
+
+        el.innerHTML = `
+            <div class="dash-card-wrap">
+                <div class="dash-card-title">🎯 Усвоение по параграфам</div>
+                <div class="analytics-chips">
+                    <div class="a-chip blue"><div class="ac-val">${avgMastery}%</div><div class="ac-lbl">среднее</div></div>
+                    <div class="a-chip green"><div class="ac-val">${perfect}</div><div class="ac-lbl">на 100%</div></div>
+                    <div class="a-chip yellow"><div class="ac-val">${weak}</div><div class="ac-lbl">слабых</div></div>
+                </div>
+                <div class="bar-chart">${rows}</div>
+            </div>`;
+    });
+
+    // ── 3. SCORES — результаты тестов во времени (timeline) ──────────────────
+    safeRender('scores', function() {
+        const el = document.getElementById('tab-scores');
+        if (!el) return;
+        const data = analytics.testTimeline || [];
+        if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Нет данных</p></div>'; return; }
+
+        const avg  = Math.round(data.reduce((s,d) => s + d.score, 0) / data.length);
+        const best = Math.max(...data.map(d => d.score));
+        const pass = data.filter(d => d.score >= 70).length;
+
+        const bars = data.map(d => {
+            const h = Math.max(4, Math.round(d.score * 0.76)); // max 76px
+            const col = d.score >= 70 ? '#6ee7b7' : d.score >= 40 ? '#fbbf24' : '#f87171';
+            const title = paraTitle[d.paragraphId] || d.paragraphId;
+            return `<div class="score-bar-t" style="height:${h}px;background:${col};opacity:.85"
+                data-tip="${d.date} · ${title} · ${d.score}%"></div>`;
+        }).join('');
+
+        el.innerHTML = `
+            <div class="dash-card-wrap">
+                <div class="dash-card-title">📈 Последние ${data.length} попыток</div>
+                <div class="analytics-chips">
+                    <div class="a-chip blue"><div class="ac-val">${avg}%</div><div class="ac-lbl">среднее</div></div>
+                    <div class="a-chip green"><div class="ac-val">${best}%</div><div class="ac-lbl">лучший</div></div>
+                    <div class="a-chip purple"><div class="ac-val">${pass}/${data.length}</div><div class="ac-lbl">зачтено</div></div>
+                </div>
+                <div style="font-size:.65rem;color:var(--text-tertiary);margin-bottom:6px">Наведите на столбец для деталей</div>
+                <div class="score-timeline">${bars}</div>
+                <div style="display:flex;justify-content:space-between;font-size:.62rem;color:var(--text-tertiary);margin-top:4px">
+                    <span>← старые</span><span>новые →</span>
+                </div>
+            </div>`;
+    });
+
+    // ── 4. READING — время чтения по главам (stacked bar) ────────────────────
+    safeRender('reading', function() {
+        const el = document.getElementById('tab-reading');
+        if (!el) return;
+        const readData = analytics.readingStats || [];
+        if (!readData.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Нет данных</p></div>'; return; }
+
+        // Group by chapter
+        const byChapter = {};
+        readData.forEach(r => {
+            // Find chapter for this paragraph
+            const ch = (chapters || []).find(c => (c.paragraphs||[]).some(p => p.id === r.paragraphId));
+            const key = ch ? `Глава ${ch.number}` : 'Другое';
+            if (!byChapter[key]) byChapter[key] = { secs: 0, sessions: 0, codeRuns: 0 };
+            byChapter[key].secs     += r.totalReadingSeconds;
+            byChapter[key].sessions += r.readingSessionsCount;
+            byChapter[key].codeRuns += r.codeRunsCount;
+        });
+
+        const maxSecs = Math.max(...Object.values(byChapter).map(v => v.secs), 1);
+        const totalSecs = Object.values(byChapter).reduce((s,v) => s + v.secs, 0);
+        const totalSessions = Object.values(byChapter).reduce((s,v) => s + v.sessions, 0);
+        const totalCode = Object.values(byChapter).reduce((s,v) => s + v.codeRuns, 0);
+
+        const rows = Object.entries(byChapter).map(([key, v]) => `
+            <div class="bar-row">
+                <div class="bar-label">${key}</div>
+                <div class="bar-track"><div class="bar-fill blue" style="width:${Math.round(v.secs/maxSecs*100)}%"></div></div>
+                <div class="bar-val">${fmtSecs(v.secs)}</div>
+            </div>`).join('');
+
+        el.innerHTML = `
+            <div class="dash-card-wrap">
+                <div class="dash-card-title">⏱ Время чтения по главам</div>
+                <div class="analytics-chips">
+                    <div class="a-chip blue"><div class="ac-val">${fmtSecs(totalSecs)}</div><div class="ac-lbl">всего</div></div>
+                    <div class="a-chip purple"><div class="ac-val">${totalSessions}</div><div class="ac-lbl">сессий</div></div>
+                    <div class="a-chip green"><div class="ac-val">${totalCode}</div><div class="ac-lbl">запусков кода</div></div>
+                </div>
+                <div class="bar-chart">${rows}</div>
+            </div>`;
+    });
+
+    // ── 5. DISTRIBUTION — гистограмма результатов ────────────────────────────
+    safeRender('distribution', function() {
+        const el = document.getElementById('tab-distribution');
+        if (!el) return;
+        const dist = analytics.scoreDistribution || [];
+        const total = dist.reduce((s,d) => s + d.count, 0);
+        if (!total) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Нет данных</p></div>'; return; }
+
+        const maxCount = Math.max(...dist.map(d => d.count), 1);
+
+        // SVG bar chart
+        const W = 400, H = 120, pad = { l: 30, r: 10, t: 10, b: 30 };
+        const bw = (W - pad.l - pad.r) / dist.length;
+        const bars = dist.map((d, i) => {
+            const bh = d.count > 0 ? Math.max(4, Math.round((d.count / maxCount) * (H - pad.t - pad.b))) : 0;
+            const x = pad.l + i * bw + 2;
+            const y = H - pad.b - bh;
+            const col = i >= 7 ? '#6ee7b7' : i >= 4 ? '#fbbf24' : '#f87171';
+            return `<rect x="${x}" y="${y}" width="${bw-4}" height="${bh}" rx="3" fill="${col}" opacity=".85">
+                <title>${d.label}%: ${d.count} попыток</title>
+            </rect>
+            ${d.count > 0 ? `<text x="${x + (bw-4)/2}" y="${y-3}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)">${d.count}</text>` : ''}
+            <text x="${x + (bw-4)/2}" y="${H-pad.b+12}" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.4)">${d.label.split('-')[0]}</text>`;
+        }).join('');
+
+        // Pie chart for pass/fail
+        const passed = dist.slice(7).reduce((s,d) => s + d.count, 0);
+        const failed = total - passed;
+        const passAngle = passed / total * 360;
+        function polarToXY(cx, cy, r, deg) {
+            const rad = (deg - 90) * Math.PI / 180;
+            return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+        }
+        const cx = 50, cy = 50, r = 40;
+        const [x1,y1] = polarToXY(cx,cy,r,0);
+        const [x2,y2] = polarToXY(cx,cy,r,passAngle);
+        const large = passAngle > 180 ? 1 : 0;
+        const pieSvg = `<svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+            ${passed > 0 ? `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z" fill="#6ee7b7" opacity=".85"/>` : ''}
+            ${failed > 0 ? `<path d="M${cx},${cy} L${x2},${y2} A${r},${r} 0 ${1-large},1 ${x1},${y1} Z" fill="#f87171" opacity=".75"/>` : ''}
+            <text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="10" font-weight="700" fill="white">${analytics.passRate}%</text>
+        </svg>`;
+
+        el.innerHTML = `
+            <div class="dash-card-wrap">
+                <div class="dash-card-title">📊 Распределение результатов</div>
+                <div class="analytics-chips">
+                    <div class="a-chip purple"><div class="ac-val">${total}</div><div class="ac-lbl">попыток</div></div>
+                    <div class="a-chip blue"><div class="ac-val">${analytics.avgScore}%</div><div class="ac-lbl">среднее</div></div>
+                    <div class="a-chip green"><div class="ac-val">${analytics.passRate}%</div><div class="ac-lbl">зачтено</div></div>
+                </div>
+                <div style="display:flex;gap:var(--space-6);flex-wrap:wrap;align-items:flex-start">
+                    <div>
+                        <div style="font-size:.65rem;color:var(--text-tertiary);margin-bottom:6px">Гистограмма по диапазонам</div>
+                        <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%">${bars}</svg>
+                    </div>
+                    <div>
+                        <div style="font-size:.65rem;color:var(--text-tertiary);margin-bottom:6px">Зачёт / Незачёт</div>
+                        <div class="pie-wrap">
+                            ${pieSvg}
+                            <div class="pie-legend">
+                                <div class="pie-legend-item"><div class="pie-dot" style="background:#6ee7b7"></div>Зачтено: ${passed}</div>
+                                <div class="pie-legend-item"><div class="pie-dot" style="background:#f87171"></div>Не зачтено: ${failed}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    });
+
+    // ── 6. WEEKLY — активность по неделям (сгруппированные бары) ─────────────
+    safeRender('weekly', function() {
+        const el = document.getElementById('tab-weekly');
+        if (!el) return;
+        const data = analytics.weeklyActivity || [];
+        if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Нет данных</p></div>'; return; }
+
+        const maxTests = Math.max(...data.map(d => d.tests), 1);
+        const maxReads = Math.max(...data.map(d => d.reads), 1);
+        const maxCode  = Math.max(...data.map(d => d.codeRuns), 1);
+        const maxAll   = Math.max(maxTests, maxReads, maxCode);
+        const H = 90;
+
+        const groups = data.map(d => {
+            const th = Math.max(2, Math.round(d.tests / maxAll * H));
+            const rh = Math.max(2, Math.round(d.reads / maxAll * H));
+            const ch = Math.max(2, Math.round(d.codeRuns / maxAll * H));
+            const lbl = d.weekStart.slice(5); // MM-DD
+            return `<div class="weekly-group" title="${d.weekStart}: ${d.tests} тестов, ${d.reads} чтений, ${d.codeRuns} кода">
+                <div class="weekly-bars">
+                    <div class="weekly-bar" style="height:${th}px;background:#a78bfa" title="Тесты: ${d.tests}"></div>
+                    <div class="weekly-bar" style="height:${rh}px;background:#7eb8f7" title="Чтение: ${d.reads}"></div>
+                    <div class="weekly-bar" style="height:${ch}px;background:#6ee7b7" title="Код: ${d.codeRuns}"></div>
+                </div>
+                <div class="weekly-lbl">${lbl}</div>
+            </div>`;
+        }).join('');
+
+        const totalTests = data.reduce((s,d) => s + d.tests, 0);
+        const totalReads = data.reduce((s,d) => s + d.reads, 0);
+        const totalCode  = data.reduce((s,d) => s + d.codeRuns, 0);
+
+        el.innerHTML = `
+            <div class="dash-card-wrap">
+                <div class="dash-card-title">📅 Активность по неделям (последние 12)</div>
+                <div class="analytics-chips">
+                    <div class="a-chip purple"><div class="ac-val">${totalTests}</div><div class="ac-lbl">тестов</div></div>
+                    <div class="a-chip blue"><div class="ac-val">${totalReads}</div><div class="ac-lbl">чтений</div></div>
+                    <div class="a-chip green"><div class="ac-val">${totalCode}</div><div class="ac-lbl">запусков кода</div></div>
+                </div>
+                <div class="weekly-chart">${groups}</div>
+                <div style="display:flex;gap:12px;margin-top:8px;font-size:.65rem;color:var(--text-tertiary)">
+                    <span><span style="display:inline-block;width:8px;height:8px;background:#a78bfa;border-radius:2px;margin-right:4px"></span>Тесты</span>
+                    <span><span style="display:inline-block;width:8px;height:8px;background:#7eb8f7;border-radius:2px;margin-right:4px"></span>Чтение</span>
+                    <span><span style="display:inline-block;width:8px;height:8px;background:#6ee7b7;border-radius:2px;margin-right:4px"></span>Код</span>
+                </div>
+            </div>`;
+    });
+
+    // ── 7. IMPROVEMENT — прогресс (первая vs лучшая попытка) ─────────────────
+    safeRender('improvement', function() {
+        const el = document.getElementById('tab-improvement');
+        if (!el) return;
+        const data = analytics.improvementData || [];
+        if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Нет данных — пройдите тесты несколько раз</p></div>'; return; }
+
+        const avgImprove = Math.round(data.reduce((s,d) => s + d.improvement, 0) / data.length);
+        const maxImprove = Math.max(...data.map(d => d.improvement));
+
+        const rows = data.map(d => {
+            const title = paraTitle[d.paragraphId] || d.paragraphId;
+            const firstW = d.firstScore;
+            const bestW  = d.bestScore;
+            const impCol = d.improvement >= 20 ? '#6ee7b7' : d.improvement >= 10 ? '#fbbf24' : '#7eb8f7';
+            return `<div class="improve-row">
+                <div class="improve-label" title="${title}">${title}</div>
+                <div class="improve-score" style="color:#f87171">${d.firstScore}%</div>
+                <div class="improve-track">
+                    <div class="improve-first" style="width:${firstW}%"></div>
+                    <div class="improve-best"  style="width:${bestW}%"></div>
+                </div>
+                <div class="improve-score" style="color:${impCol}">+${d.improvement}%</div>
+            </div>`;
+        }).join('');
+
+        el.innerHTML = `
+            <div class="dash-card-wrap">
+                <div class="dash-card-title">🚀 Прогресс: первая → лучшая попытка</div>
+                <div class="analytics-chips">
+                    <div class="a-chip green"><div class="ac-val">+${avgImprove}%</div><div class="ac-lbl">среднее улучшение</div></div>
+                    <div class="a-chip yellow"><div class="ac-val">+${maxImprove}%</div><div class="ac-lbl">максимум</div></div>
+                    <div class="a-chip blue"><div class="ac-val">${data.length}</div><div class="ac-lbl">тестов улучшено</div></div>
+                </div>
+                <div style="font-size:.65rem;color:var(--text-tertiary);margin-bottom:8px">
+                    <span style="display:inline-block;width:10px;height:6px;background:rgba(248,113,113,.5);border-radius:2px;margin-right:4px"></span>Первая попытка
+                    <span style="display:inline-block;width:10px;height:6px;background:linear-gradient(90deg,#6ee7b7,#3b82f6);border-radius:2px;margin:0 4px 0 12px"></span>Лучший результат
+                </div>
+                ${rows}
+            </div>`;
+    });
+}
 </script>
     <script src="js/theme.js"></script>
 </body>

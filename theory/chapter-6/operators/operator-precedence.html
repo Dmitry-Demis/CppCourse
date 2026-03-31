@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="created" content="2026-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приоритет и ассоциативность операторов — Курс C++</title>
+    <meta name="description" content="Приоритет и ассоциативность операторов C++: таблица уровней, порядок вычисления операндов, скобки.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="index.html" class="active">Глава VI</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+
+                <div class="section-badge">Глава VI</div>
+                <h1>Приоритет и ассоциативность операторов</h1>
+
+                <p>
+                    Когда в выражении несколько операторов, компилятор должен решить,
+                    в каком порядке их применять. Для этого существуют два правила:
+                    <span class="key-term">приоритет</span> и <span class="key-term">ассоциативность</span>.
+                </p>
+
+                <h2 id="precedence">Приоритет</h2>
+
+                <p>
+                    Каждому оператору назначен уровень приоритета. Операторы с более высоким
+                    уровнем группируются с операндами раньше. Например, <code>*</code> имеет
+                    приоритет выше, чем <code>+</code>, поэтому <code>4 + 2 * 3</code>
+                    вычисляется как <code>4 + (2 * 3) = 10</code>, а не <code>(4 + 2) * 3 = 18</code>.
+                </p>
+
+                <h2 id="associativity">Ассоциативность</h2>
+
+                <p>
+                    Если два оператора имеют одинаковый приоритет, ассоциативность определяет
+                    порядок группировки: слева направо (L→R) или справа налево (R→L).
+                    Например, <code>7 - 4 - 1</code> при ассоциативности L→R даёт
+                    <code>(7 - 4) - 1 = 2</code>.
+                </p>
+
+                <h2 id="table">Таблица приоритетов операторов</h2>
+
+                <p>Уровень 1 — наивысший приоритет, уровень 17 — наименьший.</p>
+
+                <div class="info-card">
+                    <div class="info-card__title">Полная таблица приоритетов C++</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:0.85em">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border)">
+                                <th style="text-align:left;padding:6px 8px;white-space:nowrap">Уровень</th>
+                                <th style="text-align:left;padding:6px 8px">Оператор</th>
+                                <th style="text-align:left;padding:6px 8px">Описание</th>
+                                <th style="text-align:left;padding:6px 8px;white-space:nowrap">Ассоц.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Level 1 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="2">1</td>
+                                <td style="padding:4px 8px"><code>::</code></td>
+                                <td style="padding:4px 8px">Глобальная область видимости (унарный)</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="2">L→R</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:4px 8px"><code>::</code></td>
+                                <td style="padding:4px 8px">Область видимости пространства имён (бинарный)</td>
+                            </tr>
+                            <!-- Level 2 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="10">2</td>
+                                <td style="padding:4px 8px"><code>()</code></td>
+                                <td style="padding:4px 8px">Скобки / вызов функции</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="10">L→R</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>type() / type{}</code></td><td style="padding:4px 8px">Функциональное приведение типа / инициализация</td></tr>
+                            <tr><td style="padding:4px 8px"><code>[]</code></td><td style="padding:4px 8px">Индексация массива</td></tr>
+                            <tr><td style="padding:4px 8px"><code>.</code></td><td style="padding:4px 8px">Доступ к члену объекта</td></tr>
+                            <tr><td style="padding:4px 8px"><code>-&gt;</code></td><td style="padding:4px 8px">Доступ к члену через указатель</td></tr>
+                            <tr><td style="padding:4px 8px"><code>x++</code></td><td style="padding:4px 8px">Постфиксный инкремент</td></tr>
+                            <tr><td style="padding:4px 8px"><code>x--</code></td><td style="padding:4px 8px">Постфиксный декремент</td></tr>
+                            <tr><td style="padding:4px 8px"><code>typeid</code></td><td style="padding:4px 8px">Информация о типе во время выполнения</td></tr>
+                            <tr><td style="padding:4px 8px"><code>const_cast / dynamic_cast / reinterpret_cast / static_cast</code></td><td style="padding:4px 8px">Приведения типов</td></tr>
+                            <tr><td style="padding:4px 8px"><code>noexcept / alignof / sizeof…</code></td><td style="padding:4px 8px">Проверка исключений, выравнивание, размер пакета</td></tr>
+                            <!-- Level 3 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="12">3</td>
+                                <td style="padding:4px 8px"><code>+x</code></td>
+                                <td style="padding:4px 8px">Унарный плюс</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="12">R→L</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>-x</code></td><td style="padding:4px 8px">Унарный минус</td></tr>
+                            <tr><td style="padding:4px 8px"><code>++x</code></td><td style="padding:4px 8px">Префиксный инкремент</td></tr>
+                            <tr><td style="padding:4px 8px"><code>--x</code></td><td style="padding:4px 8px">Префиксный декремент</td></tr>
+                            <tr><td style="padding:4px 8px"><code>! / not</code></td><td style="padding:4px 8px">Логическое НЕ</td></tr>
+                            <tr><td style="padding:4px 8px"><code>~</code></td><td style="padding:4px 8px">Побитовое НЕ</td></tr>
+                            <tr><td style="padding:4px 8px"><code>(type)</code></td><td style="padding:4px 8px">Приведение типа в стиле C</td></tr>
+                            <tr><td style="padding:4px 8px"><code>sizeof</code></td><td style="padding:4px 8px">Размер в байтах</td></tr>
+                            <tr><td style="padding:4px 8px"><code>co_await</code></td><td style="padding:4px 8px">Ожидание асинхронного вызова (C++20)</td></tr>
+                            <tr><td style="padding:4px 8px"><code>&amp;x</code></td><td style="padding:4px 8px">Адрес объекта</td></tr>
+                            <tr><td style="padding:4px 8px"><code>*x</code></td><td style="padding:4px 8px">Разыменование указателя</td></tr>
+                            <tr><td style="padding:4px 8px"><code>new / new[] / delete / delete[]</code></td><td style="padding:4px 8px">Динамическое выделение и освобождение памяти</td></tr>
+                            <!-- Level 4 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="2">4</td>
+                                <td style="padding:4px 8px"><code>-&gt;*</code></td>
+                                <td style="padding:4px 8px">Выбор члена через указатель на член (через указатель)</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="2">L→R</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>.*</code></td><td style="padding:4px 8px">Выбор члена через указатель на член (через объект)</td></tr>
+                            <!-- Level 5 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="3">5</td>
+                                <td style="padding:4px 8px"><code>*</code></td>
+                                <td style="padding:4px 8px">Умножение</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="3">L→R</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>/</code></td><td style="padding:4px 8px">Деление</td></tr>
+                            <tr><td style="padding:4px 8px"><code>%</code></td><td style="padding:4px 8px">Остаток от деления</td></tr>
+                            <!-- Level 6 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="2">6</td>
+                                <td style="padding:4px 8px"><code>+</code></td>
+                                <td style="padding:4px 8px">Сложение</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="2">L→R</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>-</code></td><td style="padding:4px 8px">Вычитание</td></tr>
+                            <!-- Level 7 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="2">7</td>
+                                <td style="padding:4px 8px"><code>&lt;&lt;</code></td>
+                                <td style="padding:4px 8px">Побитовый сдвиг влево / вставка в поток</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="2">L→R</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>&gt;&gt;</code></td><td style="padding:4px 8px">Побитовый сдвиг вправо / извлечение из потока</td></tr>
+                            <!-- Level 8 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px">8</td>
+                                <td style="padding:4px 8px"><code>&lt;=&gt;</code></td>
+                                <td style="padding:4px 8px">Трёхстороннее сравнение (C++20)</td>
+                                <td style="padding:4px 8px;white-space:nowrap">L→R</td>
+                            </tr>
+                            <!-- Level 9 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="4">9</td>
+                                <td style="padding:4px 8px"><code>&lt;</code></td>
+                                <td style="padding:4px 8px">Меньше</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="4">L→R</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>&lt;=</code></td><td style="padding:4px 8px">Меньше или равно</td></tr>
+                            <tr><td style="padding:4px 8px"><code>&gt;</code></td><td style="padding:4px 8px">Больше</td></tr>
+                            <tr><td style="padding:4px 8px"><code>&gt;=</code></td><td style="padding:4px 8px">Больше или равно</td></tr>
+                            <!-- Level 10 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="2">10</td>
+                                <td style="padding:4px 8px"><code>==</code></td>
+                                <td style="padding:4px 8px">Равенство</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="2">L→R</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>!=</code></td><td style="padding:4px 8px">Неравенство</td></tr>
+                            <!-- Level 11 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px">11</td>
+                                <td style="padding:4px 8px"><code>&amp;</code></td>
+                                <td style="padding:4px 8px">Побитовое И</td>
+                                <td style="padding:4px 8px;white-space:nowrap">L→R</td>
+                            </tr>
+                            <!-- Level 12 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px">12</td>
+                                <td style="padding:4px 8px"><code>^</code></td>
+                                <td style="padding:4px 8px">Побитовое XOR</td>
+                                <td style="padding:4px 8px;white-space:nowrap">L→R</td>
+                            </tr>
+                            <!-- Level 13 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px">13</td>
+                                <td style="padding:4px 8px"><code>|</code></td>
+                                <td style="padding:4px 8px">Побитовое ИЛИ</td>
+                                <td style="padding:4px 8px;white-space:nowrap">L→R</td>
+                            </tr>
+                            <!-- Level 14 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px">14</td>
+                                <td style="padding:4px 8px"><code>&amp;&amp; / and</code></td>
+                                <td style="padding:4px 8px">Логическое И</td>
+                                <td style="padding:4px 8px;white-space:nowrap">L→R</td>
+                            </tr>
+                            <!-- Level 15 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px">15</td>
+                                <td style="padding:4px 8px"><code>|| / or</code></td>
+                                <td style="padding:4px 8px">Логическое ИЛИ</td>
+                                <td style="padding:4px 8px;white-space:nowrap">L→R</td>
+                            </tr>
+                            <!-- Level 16 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px;vertical-align:top" rowspan="14">16</td>
+                                <td style="padding:4px 8px"><code>throw</code></td>
+                                <td style="padding:4px 8px">Выброс исключения</td>
+                                <td style="padding:4px 8px;white-space:nowrap" rowspan="14">R→L</td>
+                            </tr>
+                            <tr><td style="padding:4px 8px"><code>co_yield</code></td><td style="padding:4px 8px">Выражение yield (C++20)</td></tr>
+                            <tr><td style="padding:4px 8px"><code>?:</code></td><td style="padding:4px 8px">Условный (тернарный) оператор</td></tr>
+                            <tr><td style="padding:4px 8px"><code>=</code></td><td style="padding:4px 8px">Присваивание</td></tr>
+                            <tr><td style="padding:4px 8px"><code>*=</code></td><td style="padding:4px 8px">Умножение с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>/=</code></td><td style="padding:4px 8px">Деление с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>%=</code></td><td style="padding:4px 8px">Остаток с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>+=</code></td><td style="padding:4px 8px">Сложение с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>-=</code></td><td style="padding:4px 8px">Вычитание с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>&lt;&lt;=</code></td><td style="padding:4px 8px">Сдвиг влево с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>&gt;&gt;=</code></td><td style="padding:4px 8px">Сдвиг вправо с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>&amp;=</code></td><td style="padding:4px 8px">Побитовое И с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>|=</code></td><td style="padding:4px 8px">Побитовое ИЛИ с присваиванием</td></tr>
+                            <tr><td style="padding:4px 8px"><code>^=</code></td><td style="padding:4px 8px">Побитовое XOR с присваиванием</td></tr>
+                            <!-- Level 17 -->
+                            <tr style="border-top:1px solid var(--border)">
+                                <td style="padding:4px 8px">17</td>
+                                <td style="padding:4px 8px"><code>,</code></td>
+                                <td style="padding:4px 8px">Оператор запятая</td>
+                                <td style="padding:4px 8px;white-space:nowrap">L→R</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="parentheses">Скобки</h2>
+
+                <p>
+                    Скобки имеют один из наивысших приоритетов и позволяют явно задать
+                    порядок вычислений. Используйте их для нетривиальных выражений —
+                    это делает код понятнее и предотвращает ошибки.
+                </p>
+
+                <div class="callout callout--tip">
+                    <div class="callout__title">Лучшая практика</div>
+                    <div class="callout__body">
+                        <p>
+                            Расставляйте скобки в составных выражениях, чтобы явно показать
+                            намерение. Исключение: простые арифметические выражения
+                            (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>)
+                            и одиночное присваивание.
+                        </p>
+                    </div>
+                </div>
+
+                <h2 id="eval-order">Порядок вычисления операндов</h2>
+
+                <p>
+                    Приоритет и ассоциативность определяют только <em>группировку</em> операторов,
+                    но не порядок вычисления операндов. В большинстве случаев компилятор
+                    вправе вычислять операнды в любом порядке.
+                </p>
+
+                <div class="callout callout--warning">
+                    <div class="callout__title">Предупреждение</div>
+                    <div class="callout__body">
+                        <p>
+                            Не пишите выражения, результат которых зависит от порядка
+                            вычисления операндов или аргументов функции.
+                            Это приводит к неопределённому поведению.
+                        </p>
+                    </div>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="operator-precedence" data-final-desc="приоритет, ассоциативность, скобки"></div>
+
+                <!-- FEEDBACK SECTION -->
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done">
+                        <span class="feedback-done__icon">✓</span>
+                        <span>Спасибо за отзыв!</span>
+                    </div>
+                </section>
+
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>Интерактивный курс по языку программирования C++</p>
+    </footer>
+
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    function copyCode(btn) {
+        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+            btn.textContent = 'Скопировано!';
+            setTimeout(() => btn.textContent = 'Копировать', 2000);
+        });
+    }
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

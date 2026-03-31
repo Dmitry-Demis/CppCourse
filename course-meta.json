@@ -73,11 +73,74 @@
       "number": 5,
       "groupId": "control-flow",
       "title": "Управление потоком",
-      "description": "Условные операторы, ветвление, типичные ошибки с if",
+      "description": "Условные операторы, ветвление, типичные ошибки с `if`, switch, циклы, goto, break/continue, завершение программы",
       "paragraphs": [
         "introduction-to-control-flow",
         "if-statements",
-        "if-common-problems"
+        "if-common-problems",
+        "switch-basics",
+        "switch-fallthrough",
+        "goto-statements",
+        "while-loops",
+        "do-while-loops",
+        "for-loops",
+        "break-and-continue",
+        "halts"
+      ]
+    },
+    {
+      "id": "chapter-6",
+      "number": 6,
+      "groupId": "operators",
+      "title": "Операторы",
+      "description": "Приоритет и ассоциативность, арифметика, остаток, степень, инкремент, побочные эффекты, запятая, тернарный оператор, сравнение, логические и побитовые операторы",
+      "paragraphs": [
+        "operator-precedence",
+        "arithmetic-operators",
+        "remainder-and-exponentiation",
+        "increment-decrement",
+        "comma-operator",
+        "conditional-operator",
+        "relational-operators",
+        "logical-operators",
+        "bitwise-operators",
+        "bit-flags",
+        "bit-masks"
+      ]
+    },
+    {
+      "id": "chapter-7",
+      "number": 7,
+      "groupId": "scope-linkage",
+      "title": "Область видимости, время жизни и компоновка",
+      "description": "Блоки, локальные и глобальные переменные, перекрытие имён, внутренняя и внешняя компоновка, inline, константы, статические переменные, пространства имён",
+      "paragraphs": [
+        "blocks",
+        "namespaces-user-defined",
+        "local-variables",
+        "global-variables",
+        "variable-shadowing",
+        "linkage-internal",
+        "linkage-external",
+        "global-variables-evil",
+        "inline-functions-variables",
+        "global-constants",
+        "static-local-variables",
+        "scope-summary",
+        "using-statements",
+        "namespaces-advanced"
+      ]
+    },
+    {
+      "id": "chapter-8",
+      "number": 8,
+      "groupId": "random",
+      "title": "Случайные числа",
+      "description": "Псевдослучайные генераторы, Mersenne Twister, инициализация, распределения и готовый заголовочный файл Random.h",
+      "paragraphs": [
+        "random-intro",
+        "random-mersenne-twister",
+        "random-global"
       ]
     }
   ]

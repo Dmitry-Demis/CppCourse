@@ -58,7 +58,14 @@
         // Итоговый блок
         if (finalId) {
             const meta = await fetchMeta(finalId);
-            if (meta) el.appendChild(buildFinal(meta, el.dataset.finalDesc || ''));
+            if (meta) {
+                el.appendChild(buildFinal(meta, el.dataset.finalDesc || ''));
+            } else {
+                const msg = document.createElement('div');
+                msg.className = 'qw-unavailable';
+                msg.textContent = 'Данных нет';
+                el.appendChild(msg);
+            }
         }
     }
 

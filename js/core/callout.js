@@ -71,7 +71,6 @@
         if (el.dataset.calloutUpgraded) return;
         el.dataset.calloutUpgraded = '1';
 
-        // Добавляем классы новой системы
         el.classList.add('callout', `callout--${type}`);
 
         // Иконка
@@ -92,8 +91,17 @@
         });
 
         el.innerHTML = '';
-        el.appendChild(iconEl);
-        if (titleEl) el.appendChild(titleEl);
+
+        // Заголовочная строка: иконка + заголовок рядом
+        if (titleEl) {
+            const header = document.createElement('div');
+            header.className = 'callout__header';
+            header.appendChild(iconEl);
+            header.appendChild(titleEl);
+            el.appendChild(header);
+        } else {
+            el.appendChild(iconEl);
+        }
         el.appendChild(bodyWrapper);
     }
 
@@ -102,17 +110,28 @@
         if (el.dataset.calloutUpgraded) return;
         el.dataset.calloutUpgraded = '1';
 
-        // Определяем тип
         const type = [...el.classList]
             .find(c => c.startsWith('callout--') && c !== 'callout--visible')
             ?.replace('callout--', '') || 'info';
 
-        // Вставляем иконку если её нет
-        if (!el.querySelector('.callout__icon')) {
+        const titleEl = el.querySelector('.callout__title');
+        const bodyEl  = el.querySelector('.callout__body');
+
+        // Вставляем иконку и оборачиваем заголовок в header
+        if (!el.querySelector('.callout__header')) {
             const iconEl = document.createElement('span');
             iconEl.className = 'callout__icon';
             iconEl.innerHTML = ICONS[type] || ICONS.info;
-            el.prepend(iconEl);
+
+            if (titleEl) {
+                const header = document.createElement('div');
+                header.className = 'callout__header';
+                header.appendChild(iconEl);
+                titleEl.parentNode.insertBefore(header, titleEl);
+                header.appendChild(titleEl);
+            } else {
+                el.prepend(iconEl);
+            }
         }
     }
 

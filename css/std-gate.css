@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /* ── std-gate ───────────────────────────────────────────────────────────────── */
 
 .std-gate { --sg-color: #a78bfa; --sg-border: rgba(167,139,250,0.35); --sg-stripe: rgba(167,139,250,0.045); }
@@ -227,4 +225,3 @@
 .std-gate__reveal--visible { opacity: 1; transform: translateY(0) scale(1); }
 .std-gate__reveal > *:first-child { margin-top: 0; }
 .std-gate__reveal > *:last-child  { margin-bottom: 0; }
->>>>>>> 1b00388 (New)

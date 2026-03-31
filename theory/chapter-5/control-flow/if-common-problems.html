@@ -76,7 +76,7 @@
                 </p>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">?? Dangling else</div>
+                    <div class="warning-block__title">Dangling else</div>
                     <pre style="margin:0"><code class="language-cpp">if (x >= 0)
     if (x &lt;= 20)
         std::cout &lt;&lt; "от 0 до 20\n";
@@ -109,7 +109,7 @@
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">?? Правило</div>
+                    <div class="info-card__title">Правило</div>
                     <p>
                         Чем меньше уровней вложенности — тем меньше вероятность ошибки.
                         Если видите три и более уровня <code>if</code> подряд — это сигнал к рефакторингу.
@@ -125,7 +125,7 @@
                 </p>
 
                 <div class="warning-block">
-                    <div class="warning-block__title">?? Лишняя точка с запятой</div>
+                    <div class="warning-block__title">Лишняя точка с запятой</div>
                     <pre style="margin:0"><code class="language-cpp">if (isAdmin());          // &lt;-- точка с запятой! if выполняет пустой оператор
     deleteDatabase();    // выполняется ВСЕГДА, не условно</code></pre>
                 </div>
@@ -147,7 +147,7 @@
                 </div>
 
                 <div class="info-card">
-                    <div class="info-card__title">?? Yoda conditions</div>
+                    <div class="info-card__title">Yoda conditions</div>
                     <p>
                         Некоторые разработчики пишут константу слева: <code>if (0 == x)</code>.
                         Тогда случайное <code>if (0 = x)</code> — ошибка компиляции, а не тихий баг.
@@ -206,7 +206,7 @@
 
         <aside class="right-sidebar">
             <div class="toc-container">
-                <div class="toc-title">?? Содержание</div>
+                <div class="toc-title">Содержание</div>
                 <nav class="toc-nav"></nav>
             </div>
         </aside>
