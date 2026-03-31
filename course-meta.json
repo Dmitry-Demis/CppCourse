@@ -23,7 +23,7 @@
       "groupId": "constants",
       "level": "BEGINNER",
       "title": "Константы и constexpr",
-      "description": "const, constexpr, литералы, суффиксы, магические числа, константные выражения, системы счисления, static_assert",
+      "description": "const, constexpr, литералы, суффиксы, магические числа, системы счисления, константные выражения, static_assert",
       "paragraphs": [
         "constants",
         "literals",
@@ -283,14 +283,15 @@
       "groupId": "strings",
       "level": "JUNIOR+",
       "title": "Строки",
-      "description": "std::string: создание, ввод/вывод, поиск, изменение, сравнение, операции с символами, подстроки, преобразования, string_view",
+      "description": "std::string: создание, ввод/вывод, поиск, изменение, сравнение, операции с символами, подстроки, преобразования, string_view, практика",
       "paragraphs": [
         "string-intro",
         "string-search-modify",
         "string-compare-chars",
         "string-substr",
         "string-conversions",
-        "string-view"
+        "string-view",
+        "string-wordcount"
       ]
     },
     {
@@ -342,12 +343,13 @@
       "groupId": "pointers",
       "level": "MIDDLE+",
       "title": "Указатели",
-      "description": "Адреса памяти, указатели, nullptr, const и указатели, передача по адресу, арифметика указателей, std::optional",
+      "description": "Адреса памяти, указатели, nullptr, const и указатели, арифметика указателей и индексация, std::optional",
       "paragraphs": [
         "pointers-intro",
         "null-pointers",
         "pointers-const",
         "pointer-arithmetic",
+        "pointer-subscripting",
         "std-optional"
       ]
     },
