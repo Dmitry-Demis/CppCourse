@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Range-based for loop (for-each) — Курс C++</title>
+    <meta name="description" content="Цикл for-each в C++: синтаксис, auto, ссылки, обратный обход, когда использовать.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Массивы и std::vector</div>
+                <h1>Range-based for loop (for-each)</h1>
+
+                <p>
+                    Обычный цикл <code>for</code> с индексом — источник ошибок: off-by-one, проблемы знаковости.
+                    <span class="key-term">Range-based for loop</span> (цикл по диапазону, или for-each) решает это:
+                    он обходит все элементы контейнера без явного индекса.
+                </p>
+
+                <h2 id="syntax">Синтаксис</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — range-based for loop</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector fibonacci { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 };
+
+    // Обычный for с индексом:
+    for (std::size_t i { 0 }; i &lt; fibonacci.size(); ++i)
+        std::cout &lt;&lt; fibonacci[i] &lt;&lt; ' ';
+
+    // Range-based for — проще и безопаснее:
+    for (int num : fibonacci)       // num получает копию каждого элемента
+        std::cout &lt;&lt; num &lt;&lt; ' ';
+
+    // С auto — компилятор выводит тип:
+    for (auto num : fibonacci)
+        std::cout &lt;&lt; num &lt;&lt; ' ';
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="references">Ссылки: избегаем копирования</h2>
+
+                <p>
+                    По умолчанию каждый элемент <em>копируется</em> в переменную цикла.
+                    Для дорогих типов (строки, объекты) используйте ссылку:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — auto, auto&amp;, const auto&amp;</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector&lt;std::string&gt; words { "hello", "world", "cpp" };
+
+    // auto — копирует (дорого для std::string!)
+    for (auto word : words)
+        std::cout &lt;&lt; word &lt;&lt; ' ';
+
+    // const auto& — ссылка без копирования, нельзя изменить
+    for (const auto&amp; word : words)
+        std::cout &lt;&lt; word &lt;&lt; ' ';
+
+    // auto& — ссылка, можно изменить элементы
+    for (auto&amp; word : words)
+        word += "!"; // изменяем оригинальные элементы
+
+    for (const auto&amp; word : words)
+        std::cout &lt;&lt; word &lt;&lt; ' '; // hello! world! cpp!
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">📋 Когда что использовать</div>
+                    <table style="width:100%; border-collapse:collapse; font-size:0.9em">
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <th style="padding:6px; text-align:left">Объявление</th>
+                            <th style="padding:6px; text-align:left">Когда</th>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:6px"><code>auto</code></td>
+                            <td style="padding:6px">Нужна копия для изменения</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border)">
+                            <td style="padding:6px"><code>auto&amp;</code></td>
+                            <td style="padding:6px">Нужно изменить оригинальные элементы</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:6px"><code>const auto&amp;</code></td>
+                            <td style="padding:6px">Только чтение (рекомендуется по умолчанию)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h2 id="reverse">Обратный обход (C++20)</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++20 — обратный обход через std::views::reverse</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;ranges&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector nums { 1, 2, 3, 4, 5 };
+
+    for (const auto&amp; n : std::views::reverse(nums))
+        std::cout &lt;&lt; n &lt;&lt; ' '; // 5 4 3 2 1
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="real-use">Живое применение: поиск в массиве</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — поиск имени в списке</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector&lt;std::string&gt; names { "Alice", "Bob", "Charlie", "Dave" };
+
+    std::string search;
+    std::cout &lt;&lt; "Введите имя: ";
+    std::cin &gt;&gt; search;
+
+    bool found { false };
+    for (const auto&amp; name : names)
+    {
+        if (name == search)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    std::cout &lt;&lt; (found ? "Найдено!" : "Не найдено.") &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Лучшая практика</div>
+                    <p>Предпочитайте range-based for loop обычному for с индексом при обходе контейнеров. Используйте <code>const auto&amp;</code> по умолчанию.</p>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="vector-range-for" data-final-desc="Range-based for loop"></div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

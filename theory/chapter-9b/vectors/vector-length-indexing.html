@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Длина вектора и проблема знаковости индексов — Курс C++</title>
+    <meta name="description" content="size(), ssize(), size_type, проблема знаковых и беззнаковых индексов в std::vector C++.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Массивы и std::vector</div>
+                <h1>Длина вектора и проблема знаковости индексов</h1>
+
+                <p>
+                    Получить длину вектора просто. Но есть нюанс: стандартная библиотека использует
+                    <em>беззнаковые</em> типы для длины и индексов, что создаёт неожиданные проблемы.
+                </p>
+
+                <h2 id="size">Получение длины</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — три способа получить длину</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector primes { 2, 3, 5, 7, 11 };
+
+    // 1. Метод size() — возвращает std::size_t (беззнаковый)
+    std::cout &lt;&lt; primes.size() &lt;&lt; '\n'; // 5
+
+    // 2. std::size() — то же самое (C++17)
+    std::cout &lt;&lt; std::size(primes) &lt;&lt; '\n'; // 5
+
+    // 3. std::ssize() — возвращает знаковый тип (C++20, рекомендуется)
+    std::cout &lt;&lt; std::ssize(primes) &lt;&lt; '\n'; // 5
+
+    // Сохранить в переменную:
+    int len { static_cast&lt;int&gt;(primes.size()) }; // явное приведение
+    auto len2 { std::ssize(primes) };             // C++20: auto выводит знаковый тип
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="sign-problem">Проблема знаковости: историческая ошибка</h2>
+
+                <p>
+                    Дизайнеры стандартной библиотеки C++ в 1997 году выбрали беззнаковые типы для индексов.
+                    Сегодня это считается ошибкой. Вот почему это создаёт проблемы:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — ловушка с беззнаковым индексом</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector arr { 4, 6, 7, 3, 8 };
+
+    // Обход в обратном порядке — ОПАСНО с беззнаковым индексом!
+    for (std::size_t i { arr.size() - 1 }; i &gt;= 0; --i) // бесконечный цикл!
+    {
+        std::cout &lt;&lt; arr[i] &lt;&lt; ' ';
+        // Когда i == 0 и мы делаем --i, беззнаковый 0 оборачивается в огромное число!
+    }
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 480 100" width="480" height="100" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <rect x="10" y="10" width="220" height="80" rx="8" fill="rgba(243,139,168,.08)" stroke="#f38ba8" stroke-width="1.5"/>
+                    <text x="120" y="35" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold" font-family="sans-serif">❌ Беззнаковый (std::size_t)</text>
+                    <text x="120" y="55" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">0 - 1 = 4294967295</text>
+                    <text x="120" y="75" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">оборачивается в огромное число!</text>
+                    <rect x="250" y="10" width="220" height="80" rx="8" fill="rgba(126,231,135,.08)" stroke="var(--accent-green)" stroke-width="1.5"/>
+                    <text x="360" y="35" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-weight="bold" font-family="sans-serif">✅ Знаковый (int)</text>
+                    <text x="360" y="55" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-family="monospace">0 - 1 = -1</text>
+                    <text x="360" y="75" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="sans-serif">условие i &gt;= 0 → false, цикл завершается</text>
+                </svg>
+                </div>
+
+                <h2 id="solutions">Решения</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — безопасный обратный обход</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector arr { 4, 6, 7, 3, 8 };
+
+    // Вариант 1: знаковый индекс + static_cast (до C++20)
+    for (int i { static_cast&lt;int&gt;(arr.size()) - 1 }; i &gt;= 0; --i)
+        std::cout &lt;&lt; arr[static_cast&lt;std::size_t&gt;(i)] &lt;&lt; ' ';
+    std::cout &lt;&lt; '\n';
+
+    // Вариант 2: std::ssize() (C++20, чище)
+    for (auto i { std::ssize(arr) - 1 }; i &gt;= 0; --i)
+        std::cout &lt;&lt; arr.data()[i] &lt;&lt; ' '; // data() принимает знаковый индекс
+    std::cout &lt;&lt; '\n';
+
+    // Вариант 3 (лучший): range-for в обратном порядке (C++20)
+    // — рассмотрим в следующем параграфе
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">💡 Практический совет</div>
+                    <p>Если используете индексы — предпочитайте <code>std::ssize()</code> (C++20) или <code>static_cast&lt;int&gt;(v.size())</code>. Лучше всего — избегать индексов вообще и использовать range-for.</p>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="vector-length-indexing" data-final-desc="Длина вектора и проблема знаковости"></div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

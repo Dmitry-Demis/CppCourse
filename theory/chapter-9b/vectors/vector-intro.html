@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Введение в std::vector — Курс C++</title>
+    <meta name="description" content="std::vector в C++: создание, инициализация, индексация, контейнеры в памяти, CTAD.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Массивы и std::vector</div>
+                <h1>Введение в <code>std::vector</code></h1>
+
+                <p>
+                    До сих пор для хранения нескольких значений мы объявляли отдельные переменные.
+                    Это не масштабируется: 5 оценок — 5 переменных, 500 оценок — 500 переменных.
+                    <span class="key-term">Контейнер</span> решает эту проблему: он хранит коллекцию значений под одним именем.
+                </p>
+
+                <p>
+                    <span class="key-term"><code>std::vector</code></span> — самый используемый контейнер в C++.
+                    Это динамический массив: он хранит элементы одного типа последовательно в памяти
+                    и умеет менять размер во время выполнения программы.
+                </p>
+
+                <h2 id="why-array">Зачем нужны массивы</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — без массива vs с массивом</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// Без массива: 5 переменных, не масштабируется
+int score1 { 84 }, score2 { 92 }, score3 { 76 }, score4 { 81 }, score5 { 56 };
+int avg = (score1 + score2 + score3 + score4 + score5) / 5;
+
+// С массивом: одна переменная, легко масштабировать
+#include &lt;vector&gt;
+std::vector scores { 84, 92, 76, 81, 56 }; // 5 элементов</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="creating">Создание std::vector</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — способы создания</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;vector&gt;
+
+// Пустой вектор
+std::vector&lt;int&gt; empty {};
+
+// Инициализация списком (предпочтительно)
+std::vector&lt;int&gt; primes { 2, 3, 5, 7, 11 };
+
+// CTAD (C++17): компилятор выводит тип элемента
+std::vector vowels { 'a', 'e', 'i', 'o', 'u' }; // std::vector&lt;char&gt;
+
+// Вектор заданной длины (все элементы = 0)
+std::vector&lt;int&gt; data(10); // 10 элементов, инициализированы нулём
+
+// const вектор
+const std::vector&lt;int&gt; fixed { 1, 2, 3 }; // нельзя изменить</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">⚠️ { } vs ( ) при создании вектора</div>
+                    <p><code>std::vector&lt;int&gt; v { 10 }</code> — вектор из одного элемента со значением 10.</p>
+                    <p><code>std::vector&lt;int&gt; v ( 10 )</code> — вектор из 10 элементов, каждый равен 0.</p>
+                    <p>Фигурные скобки вызывают list-конструктор, круглые — конструктор с длиной.</p>
+                </div>
+
+                <h2 id="memory">Элементы в памяти: непрерывно</h2>
+
+                <p>
+                    Ключевое свойство массивов: элементы хранятся <em>непрерывно</em> в памяти, без пробелов.
+                    Это позволяет быстро вычислить адрес любого элемента и обеспечивает
+                    <em>произвольный доступ</em> — обращение к любому элементу за O(1).
+                </p>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 500 90" width="500" height="90" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <text x="10" y="20" fill="var(--text-secondary)" font-size="11" font-family="sans-serif">primes:</text>
+                    <!-- cells -->
+                    <rect x="10" y="28" width="70" height="40" rx="4" fill="var(--accent-violet-dim)" stroke="var(--accent-violet)" stroke-width="1.5"/>
+                    <text x="45" y="53" text-anchor="middle" fill="var(--accent-violet)" font-size="16" font-weight="bold" font-family="monospace">2</text>
+                    <text x="45" y="78" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="monospace">[0]</text>
+
+                    <rect x="90" y="28" width="70" height="40" rx="4" fill="var(--accent-violet-dim)" stroke="var(--accent-violet)" stroke-width="1.5"/>
+                    <text x="125" y="53" text-anchor="middle" fill="var(--accent-violet)" font-size="16" font-weight="bold" font-family="monospace">3</text>
+                    <text x="125" y="78" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="monospace">[1]</text>
+
+                    <rect x="170" y="28" width="70" height="40" rx="4" fill="var(--accent-violet-dim)" stroke="var(--accent-violet)" stroke-width="1.5"/>
+                    <text x="205" y="53" text-anchor="middle" fill="var(--accent-violet)" font-size="16" font-weight="bold" font-family="monospace">5</text>
+                    <text x="205" y="78" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="monospace">[2]</text>
+
+                    <rect x="250" y="28" width="70" height="40" rx="4" fill="var(--accent-violet-dim)" stroke="var(--accent-violet)" stroke-width="1.5"/>
+                    <text x="285" y="53" text-anchor="middle" fill="var(--accent-violet)" font-size="16" font-weight="bold" font-family="monospace">7</text>
+                    <text x="285" y="78" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="monospace">[3]</text>
+
+                    <rect x="330" y="28" width="70" height="40" rx="4" fill="var(--accent-violet-dim)" stroke="var(--accent-violet)" stroke-width="1.5"/>
+                    <text x="365" y="53" text-anchor="middle" fill="var(--accent-violet)" font-size="16" font-weight="bold" font-family="monospace">11</text>
+                    <text x="365" y="78" text-anchor="middle" fill="var(--text-tertiary)" font-size="10" font-family="monospace">[4]</text>
+
+                    <text x="420" y="53" fill="var(--text-tertiary)" font-size="11" font-family="sans-serif">← непрерывно</text>
+                    <text x="420" y="68" fill="var(--text-tertiary)" font-size="11" font-family="sans-serif">в памяти</text>
+                </svg>
+                </div>
+
+                <h2 id="indexing">Доступ к элементам: оператор []</h2>
+
+                <p>
+                    Индексация начинается с <strong>0</strong>. Первый элемент — <code>[0]</code>, последний — <code>[N-1]</code>.
+                    Оператор <code>[]</code> не проверяет границы — выход за пределы даёт неопределённое поведение.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — доступ к элементам</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector primes { 2, 3, 5, 7, 11 };
+
+    std::cout &lt;&lt; primes[0] &lt;&lt; '\n'; // 2 (первый)
+    std::cout &lt;&lt; primes[4] &lt;&lt; '\n'; // 11 (последний)
+
+    primes[2] = 99; // изменяем элемент с индексом 2
+    std::cout &lt;&lt; primes[2] &lt;&lt; '\n'; // 99
+
+    // Безопасный доступ с проверкой границ:
+    std::cout &lt;&lt; primes.at(1) &lt;&lt; '\n'; // 3 (бросает исключение при выходе за границы)
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Нет элемента с индексом N!</div>
+                    <p>Для вектора из 5 элементов допустимые индексы: 0, 1, 2, 3, 4. Индекс 5 — выход за границы и неопределённое поведение.</p>
+                </div>
+
+                <h2 id="real-use">Живое применение</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — хранение оценок студентов</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::vector&lt;double&gt; grades { 4.5, 3.8, 5.0, 4.2, 3.5 };
+
+    // Сумма всех оценок
+    double sum { 0.0 };
+    sum += grades[0]; sum += grades[1]; sum += grades[2];
+    sum += grades[3]; sum += grades[4];
+
+    std::cout &lt;&lt; "Средняя оценка: " &lt;&lt; sum / 5 &lt;&lt; '\n'; // 4.2
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="vector-intro" data-final-desc="Введение в std::vector"></div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>
