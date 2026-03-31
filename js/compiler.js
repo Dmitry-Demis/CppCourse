@@ -2,6 +2,13 @@
 // CppCompiler v5 — CodeMirror 6 (UMD via jsDelivr) + Godbolt
 // ============================================
 
+// Compute site root from script URL (same approach as navigation.js)
+const _compilerSiteRoot = (() => {
+    const src = (document.currentScript || {}).src || '';
+    const m = src.match(/^(.*\/)js\/compiler\.js/);
+    return m ? m[1] : './';
+})();
+
 const CW_COMPILERS = [
     { id: 'g152',      label: 'GCC 15.2'   },
     { id: 'clang2210', label: 'Clang 22.1' },
@@ -109,9 +116,15 @@ class CppCompiler {
 
     async _fetchCode(example, std) {
         for (const candidate of this._candidatePathsForStd(example, std)) {
+            // 1. Try server API first
             try {
                 const r = await fetch(`/api/examples/${candidate}`);
                 if (r.ok) return (await r.json()).code || '';
+            } catch {}
+            // 2. Fallback: try client-side static examples folder
+            try {
+                const r = await fetch(`${_compilerSiteRoot}examples/${candidate}`);
+                if (r.ok) return await r.text();
             } catch {}
         }
         return null;

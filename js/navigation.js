@@ -87,7 +87,7 @@ function buildCourseNav(structure) {
     const titleEl = document.querySelector('.sidebar-title');
     if (titleEl) titleEl.textContent = 'Содержание курса';
 
-    structure.chapters.forEach(chapter => {
+    structure.chapters.forEach((chapter, ci) => {
         const chapterEl = document.createElement('li');
         chapterEl.className = 'sidebar-chapter';
 
@@ -102,7 +102,7 @@ function buildCourseNav(structure) {
         // Click on label → go to chapter index.html
         const labelEl = document.createElement('span');
         labelEl.className = 'sidebar-chapter-label';
-        labelEl.textContent = `Глава ${chapter.number}. ${chapter.title}`;
+        labelEl.innerHTML = `Глава ${ci + 1}. ${renderInlineCode(chapter.title)}`;
         labelEl.style.cursor = 'pointer';
         labelEl.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -179,7 +179,7 @@ function buildCourseNav(structure) {
             const sli = document.createElement('li');
             sli.className = 'sidebar-section-item';
             sli.innerHTML = `<a class="sidebar-section-link${isActive ? ' active' : ''}" href="${href}">
-                <span class="sidebar-section-number">§${chapter.number}.${idx + 1}</span>
+                <span class="sidebar-section-number">§${ci + 1}.${idx + 1}</span>
                 <span class="sidebar-section-title">${para.title}</span>
                 ${badges ? `<span class="sb-badges">${badges}</span>` : ''}
             </a>`;
@@ -205,12 +205,12 @@ function buildParagraphNav(structure) {
     const currentPath = normalizePath(window.location.pathname);
 
     // Flat list of all paragraphs across all chapters
-    const allParas = structure.chapters.flatMap(ch =>
+    const allParas = structure.chapters.flatMap((ch, chIdx) =>
         ch.paragraphs.map(p => ({
             ...p,
             chapterId: ch.id,
             groupId: ch.groupId,
-            chapterNum: ch.number,
+            chapterNum: chIdx + 1,
             href: `theory/${ch.id}/${ch.groupId}/${p.id}.html`
         }))
     );

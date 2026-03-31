@@ -307,7 +307,7 @@
                     return list.map((p, i) => {
                         const { mastery } = paraProgress(p);
                         const href = `theory/${chapter.id}/${chapter.groupId}/${p.id}.html`;
-                        const paraNum = `§${chapter.number}.${startIndex + i + 1}`;
+                        const paraNum = `§${ci + 1}.${startIndex + i + 1}`;
                         return `<div class="para-item" data-para-id="${p.id}">
                             <a class="chapter-section-link" href="${href}" onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:6px;">
                                 <span class="para-num" style="flex-shrink:0;font-family:var(--font-mono);font-size:.65rem;color:var(--card-color,var(--accent-violet));font-weight:700;min-width:2.8em">${paraNum}</span>
@@ -330,7 +330,7 @@
                 card.innerHTML = `
                     <div class="card-header">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-                            <span class="card-number">Глава ${chapter.number} <span style="font-size:.7rem;font-weight:500;opacity:.6">(${paragraphs.length} §§)</span>${chapter.level ? `<span class="card-level card-level--${chapter.level.replace('+','-plus')}">${chapter.level}</span>` : ''}</span>
+                            <span class="card-number">Глава ${ci + 1} <span style="font-size:.7rem;font-weight:500;opacity:.6">(${paragraphs.length} §§)</span>${chapter.level ? `<span class="card-level card-level--${chapter.level.replace('+','-plus')}">${chapter.level}</span>` : ''}</span>
                             <span class="ch-mastery-badge" style="font-size:.72rem;font-weight:800;color:${masteryColor};background:rgba(255,255,255,.06);padding:2px 8px;border-radius:99px;border:1px solid ${masteryColor}33" data-target="${chapterMastery}">0%</span>
                         </div>
                         <h3>${chapter.title}</h3>

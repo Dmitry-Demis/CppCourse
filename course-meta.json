@@ -2,7 +2,6 @@
   "chapters": [
     {
       "id": "chapter-1",
-      "number": 1,
       "groupId": "basics",
       "level": "BEGINNER",
       "title": "Основы C++",
@@ -19,11 +18,10 @@
     },
     {
       "id": "chapter-1b",
-      "number": 2,
       "groupId": "constants",
       "level": "BEGINNER",
-      "title": "Константы и constexpr",
-      "description": "const, constexpr, литералы, суффиксы, магические числа, системы счисления, константные выражения, static_assert",
+      "title": "Константы и `constexpr`",
+      "description": "`const`, `constexpr`, литералы, суффиксы, магические числа, системы счисления, константные выражения, `static_assert`",
       "paragraphs": [
         "constants",
         "literals",
@@ -33,11 +31,10 @@
     },
     {
       "id": "chapter-2",
-      "number": 3,
       "groupId": "fundamental-types",
       "level": "BEGINNER",
       "title": "Целочисленные типы",
-      "description": "Целые числа, знаковость, переполнение, типы фиксированной ширины, введение в типы данных",
+      "description": "Целые числа, знаковость, переполнение, типы фиксированной ширины (`int8_t`, `uint32_t`…)",
       "paragraphs": [
         "introduction-to-fundamental-data-types",
         "integer-types",
@@ -48,11 +45,10 @@
     },
     {
       "id": "chapter-2b",
-      "number": 4,
       "groupId": "numeric-types",
       "level": "BEGINNER",
       "title": "Вещественные, логические и символьные типы",
-      "description": "Числа с плавающей точкой, bool, char, преобразования типов, sizeof и void",
+      "description": "`float`/`double`, `bool`, `char`, `sizeof` и `void`",
       "paragraphs": [
         "floating-point",
         "boolean",
@@ -64,7 +60,6 @@
     },
     {
       "id": "chapter-3",
-      "number": 5,
       "groupId": "functions",
       "level": "JUNIOR",
       "title": "Функции",
@@ -81,11 +76,10 @@
     },
     {
       "id": "chapter-3b",
-      "number": 6,
       "groupId": "type-conversion",
       "level": "JUNIOR",
       "title": "Преобразования типов",
-      "description": "Неявные преобразования, числовые повышения, числовые преобразования, сужающие преобразования, арифметические преобразования, static_cast",
+      "description": "Неявные преобразования, числовые повышения, сужающие преобразования, `static_cast`",
       "paragraphs": [
         "implicit-conversion",
         "numeric-promotion",
@@ -97,11 +91,10 @@
     },
     {
       "id": "chapter-3c",
-      "number": 7,
       "groupId": "type-aliases",
       "level": "JUNIOR",
       "title": "Псевдонимы типов и вывод типов",
-      "description": "using и typedef, вывод типа через auto для переменных и функций, trailing return type",
+      "description": "`using` и `typedef`, вывод типа через `auto` для переменных и функций, trailing return type",
       "paragraphs": [
         "type-aliases",
         "type-deduction-auto",
@@ -110,7 +103,6 @@
     },
     {
       "id": "chapter-4",
-      "number": 8,
       "groupId": "code-organization",
       "level": "JUNIOR",
       "title": "Организация кода",
@@ -125,11 +117,10 @@
     },
     {
       "id": "chapter-5b",
-      "number": 9,
       "groupId": "branching",
       "level": "JUNIOR",
       "title": "Ветвление",
-      "description": "Введение в управление потоком, if/else, типичные ошибки, switch, goto и завершение программы",
+      "description": "Управление потоком, `if`/`else`, `switch`, `goto` и завершение программы",
       "paragraphs": [
         "introduction-to-control-flow",
         "if-statements",
@@ -142,11 +133,10 @@
     },
     {
       "id": "chapter-5",
-      "number": 10,
       "groupId": "control-flow",
       "level": "JUNIOR",
       "title": "Циклы",
-      "description": "while, do-while, for, break и continue",
+      "description": "`while`, `do-while`, `for`, `break` и `continue`",
       "paragraphs": [
         "while-loops",
         "do-while-loops",
@@ -156,11 +146,10 @@
     },
     {
       "id": "chapter-9b",
-      "number": 11,
       "groupId": "vectors",
       "level": "JUNIOR",
-      "title": "Массивы и std::vector",
-      "description": "std::vector: создание, индексация, длина, циклы, range-for, изменение размера, стек-поведение, enum-индексы, vector<bool>",
+      "title": "std::vector",
+      "description": "`std::vector`: создание, индексация, длина, циклы, range-for, изменение размера, стек-поведение, enum-индексы, `vector<bool>`",
       "paragraphs": [
         "vector-intro",
         "vector-length-indexing",
@@ -172,12 +161,41 @@
       ]
     },
     {
+      "id": "chapter-9c",
+      "groupId": "cstyle-arrays",
+      "level": "JUNIOR",
+      "title": "C-style массивы",
+      "description": "Сырые массивы `int[]`, деградация массива, многомерные массивы",
+      "paragraphs": [
+        "cstyle-arrays",
+        "array-decay",
+        "multidimensional-arrays"
+      ]
+    },
+    {
+      "id": "chapter-15",
+      "groupId": "strings",
+      "level": "JUNIOR+",
+      "title": "Строки",
+      "description": "`std::string`: создание, ввод/вывод, поиск, изменение, сравнение, подстроки, преобразования, `string_view`, C-строки, практика",
+      "paragraphs": [
+        "string-intro",
+        "string-search-modify",
+        "string-compare-chars",
+        "string-substr",
+        "string-conversions",
+        "string-view",
+        "cstyle-strings",
+        "char-arrays",
+        "string-wordcount"
+      ]
+    },
+    {
       "id": "chapter-9d",
-      "number": 12,
       "groupId": "std-array",
       "level": "JUNIOR+",
       "title": "std::array",
-      "description": "Фиксированный массив: объявление, constexpr, CTAD, длина и индексация, передача в функции, массивы структур, brace elision, многомерные массивы",
+      "description": "Фиксированный массив: объявление, `constexpr`, CTAD, передача в функции, массивы структур, brace elision, многомерные массивы",
       "paragraphs": [
         "array-intro",
         "array-passing",
@@ -186,23 +204,7 @@
       ]
     },
     {
-      "id": "chapter-9c",
-      "number": 13,
-      "groupId": "cstyle-arrays",
-      "level": "JUNIOR",
-      "title": "C-style массивы",
-      "description": "Сырые массивы int[], деградация массива, многомерные массивы, C-строки, символьные массивы",
-      "paragraphs": [
-        "cstyle-arrays",
-        "array-decay",
-        "multidimensional-arrays",
-        "cstyle-strings",
-        "char-arrays"
-      ]
-    },
-    {
       "id": "chapter-6b",
-      "number": 14,
       "groupId": "operators-extra",
       "level": "JUNIOR+",
       "title": "Операторы: синтаксис и арифметика",
@@ -222,11 +224,10 @@
     },
     {
       "id": "chapter-6",
-      "number": 15,
       "groupId": "operators",
       "level": "JUNIOR+",
       "title": "Побитовые операторы",
-      "description": "Побитовые операции, битовые флаги и маски",
+      "description": "Побитовые операции, битовые флаги и маски, `std::bitset`",
       "paragraphs": [
         "bitwise-operators",
         "bit-flags",
@@ -235,7 +236,6 @@
     },
     {
       "id": "chapter-7",
-      "number": 16,
       "groupId": "scope-linkage",
       "level": "JUNIOR+",
       "title": "Область видимости",
@@ -250,11 +250,10 @@
     },
     {
       "id": "chapter-8",
-      "number": 17,
       "groupId": "scope-linkage",
       "level": "MIDDLE",
       "title": "Время жизни и компоновка",
-      "description": "Статические переменные, внутренняя и внешняя компоновка, inline, глобальные константы, опасность глобальных переменных",
+      "description": "Статические переменные, внутренняя и внешняя компоновка, `inline`, глобальные константы, опасность глобальных переменных",
       "paragraphs": [
         "static-local-variables",
         "linkage-internal",
@@ -267,36 +266,17 @@
     },
     {
       "id": "chapter-9",
-      "number": 18,
       "groupId": "namespaces",
       "level": "MIDDLE",
       "title": "Пространства имён: продвинутые темы",
-      "description": "using-объявления и директивы, безымянные и inline-пространства имён",
+      "description": "`using`-объявления и директивы, безымянные и `inline`-пространства имён",
       "paragraphs": [
         "using-statements",
         "namespaces-advanced"
       ]
     },
     {
-      "id": "chapter-15",
-      "number": 19,
-      "groupId": "strings",
-      "level": "JUNIOR+",
-      "title": "Строки",
-      "description": "std::string: создание, ввод/вывод, поиск, изменение, сравнение, операции с символами, подстроки, преобразования, string_view, практика",
-      "paragraphs": [
-        "string-intro",
-        "string-search-modify",
-        "string-compare-chars",
-        "string-substr",
-        "string-conversions",
-        "string-view",
-        "string-wordcount"
-      ]
-    },
-    {
       "id": "chapter-11",
-      "number": 20,
       "groupId": "overloading",
       "level": "MIDDLE",
       "title": "Перегрузка функций",
@@ -309,8 +289,33 @@
       ]
     },
     {
+      "id": "chapter-13",
+      "groupId": "references",
+      "level": "MIDDLE",
+      "title": "Ссылки",
+      "description": "lvalue и rvalue, ссылки, `const`-ссылки, передача по ссылке, возврат по ссылке, `std::reference_wrapper`",
+      "paragraphs": [
+        "lvalue-rvalue",
+        "lvalue-references",
+        "pass-by-reference",
+        "return-by-reference",
+        "reference-wrapper"
+      ]
+    },
+    {
+      "id": "chapter-10",
+      "groupId": "random",
+      "level": "MIDDLE",
+      "title": "Случайные числа",
+      "description": "Псевдослучайные генераторы, Mersenne Twister, инициализация, распределения и `Random.h`",
+      "paragraphs": [
+        "random-intro",
+        "random-mersenne-twister",
+        "random-global"
+      ]
+    },
+    {
       "id": "chapter-12",
-      "number": 21,
       "groupId": "templates",
       "level": "MIDDLE+",
       "title": "Шаблоны функций",
@@ -323,27 +328,11 @@
       ]
     },
     {
-      "id": "chapter-13",
-      "number": 22,
-      "groupId": "references",
-      "level": "MIDDLE",
-      "title": "Ссылки",
-      "description": "lvalue и rvalue, ссылки, const-ссылки, передача по ссылке, возврат по ссылке, std::reference_wrapper",
-      "paragraphs": [
-        "lvalue-rvalue",
-        "lvalue-references",
-        "pass-by-reference",
-        "return-by-reference",
-        "reference-wrapper"
-      ]
-    },
-    {
       "id": "chapter-14",
-      "number": 23,
       "groupId": "pointers",
       "level": "MIDDLE+",
       "title": "Указатели",
-      "description": "Адреса памяти, указатели, nullptr, const и указатели, арифметика указателей и индексация, std::optional",
+      "description": "Адреса памяти, указатели, `nullptr`, `const` и указатели, арифметика указателей и индексация, `std::optional`",
       "paragraphs": [
         "pointers-intro",
         "null-pointers",
@@ -351,19 +340,6 @@
         "pointer-arithmetic",
         "pointer-subscripting",
         "std-optional"
-      ]
-    },
-    {
-      "id": "chapter-10",
-      "number": 24,
-      "groupId": "random",
-      "level": "MIDDLE",
-      "title": "Случайные числа",
-      "description": "Псевдослучайные генераторы, Mersenne Twister, инициализация, распределения и готовый заголовочный файл Random.h",
-      "paragraphs": [
-        "random-intro",
-        "random-mersenne-twister",
-        "random-global"
       ]
     }
   ]

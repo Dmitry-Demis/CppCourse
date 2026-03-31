@@ -46,7 +46,8 @@ async function loadCourseStructure(base = '') {
                 if (!r.ok) { p.title = p.id; return; }
                 const text = await r.text();
                 const m = text.match(/<title>(.*?)<\/title>/i);
-                p.title = m ? renderInlineCode(m[1].replace(/\s*[—–-].*$/, '').trim()) : p.id;
+                // Only strip em-dash and en-dash separators, NOT regular hyphens (they're part of names like C-style)
+                p.title = m ? renderInlineCode(m[1].replace(/\s*[—–].*$/, '').trim()) : p.id;
             } catch {
                 p.title = p.id;
             }
