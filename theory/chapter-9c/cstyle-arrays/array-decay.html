@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Деградация массива (array decay) — Курс C++</title>
+    <meta name="description" content="Деградация C-style массива в указатель: потеря информации о длине, передача в функции, опасности.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚠️</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">C-style массивы</div>
+                <h1>Деградация массива (array decay)</h1>
+
+                <p>
+                    Одна из самых коварных особенностей C-style массивов — <span class="key-term">деградация</span> (decay).
+                    В большинстве контекстов массив автоматически преобразуется в указатель на свой первый элемент,
+                    теряя при этом информацию о длине.
+                </p>
+
+                <h2 id="what-is-decay">Что такое деградация</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — деградация в действии</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main()
+{
+    int arr[5] { 9, 7, 5, 3, 1 };
+
+    // arr имеет тип int[5]
+    // При использовании в выражении — деградирует в int*
+    auto ptr { arr }; // ptr имеет тип int*, не int[5]!
+
+    std::cout &lt;&lt; (ptr == &amp;arr[0]) &lt;&lt; '\n'; // true: ptr указывает на первый элемент
+
+    // sizeof показывает разницу:
+    std::cout &lt;&lt; sizeof(arr) &lt;&lt; '\n';  // 20 (5 * 4 байта)
+    std::cout &lt;&lt; sizeof(ptr) &lt;&lt; '\n';  // 8 (размер указателя)
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 480 120" width="480" height="120" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <!-- array -->
+                    <text x="10" y="18" fill="var(--text-secondary)" font-size="11" font-family="sans-serif">arr: int[5] — знает длину</text>
+                    <rect x="10" y="22" width="55" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="37" y="44" text-anchor="middle" fill="var(--accent-blue)" font-size="14" font-family="monospace">9</text>
+                    <text x="37" y="58" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="monospace">[0]</text>
+                    <rect x="70" y="22" width="55" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="97" y="44" text-anchor="middle" fill="var(--accent-blue)" font-size="14" font-family="monospace">7</text>
+                    <rect x="130" y="22" width="55" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="157" y="44" text-anchor="middle" fill="var(--accent-blue)" font-size="14" font-family="monospace">5</text>
+                    <rect x="190" y="22" width="55" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="217" y="44" text-anchor="middle" fill="var(--accent-blue)" font-size="14" font-family="monospace">3</text>
+                    <rect x="250" y="22" width="55" height="35" rx="3" fill="var(--accent-blue-dim)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+                    <text x="277" y="44" text-anchor="middle" fill="var(--accent-blue)" font-size="14" font-family="monospace">1</text>
+                    <!-- decay arrow -->
+                    <text x="330" y="35" fill="var(--text-muted)" font-size="20" font-family="sans-serif">→</text>
+                    <!-- pointer -->
+                    <text x="360" y="18" fill="var(--text-secondary)" font-size="11" font-family="sans-serif">ptr: int* — длина потеряна!</text>
+                    <rect x="360" y="22" width="100" height="35" rx="3" fill="var(--surface-3)" stroke="var(--accent-orange)" stroke-width="1.5"/>
+                    <text x="410" y="44" text-anchor="middle" fill="var(--accent-orange)" font-size="11" font-family="monospace">0x7fff...10</text>
+                    <text x="410" y="58" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="sans-serif">адрес arr[0]</text>
+                    <!-- warning -->
+                    <text x="10" y="100" fill="var(--accent-orange)" font-size="10" font-family="sans-serif">⚠ sizeof(arr)=20, sizeof(ptr)=8 — разные результаты!</text>
+                </svg>
+                </div>
+
+                <h2 id="passing">Передача в функцию: массив деградирует</h2>
+
+                <p>
+                    Когда C-style массив передаётся в функцию, он деградирует в указатель.
+                    Функция не знает длину массива — это главная опасность.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — передача массива</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;iterator&gt; // std::size
+
+void printArray(const int arr[], int length) // arr — это int*, не int[]!
+{
+    // std::size(arr) здесь НЕ работает — arr уже деградировал
+    for (int i { 0 }; i &lt; length; ++i)
+        std::cout &lt;&lt; arr[i] &lt;&lt; ' ';
+    std::cout &lt;&lt; '\n';
+}
+
+int main()
+{
+    const int primes[] { 2, 3, 5, 7, 11 };
+
+    // Нужно явно передавать длину:
+    printArray(primes, static_cast&lt;int&gt;(std::size(primes)));
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="dangers">Опасности деградации</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — типичные ошибки</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+void badSizeof(int arr[])
+{
+    // ОШИБКА: sizeof(arr) = размер указателя, не массива!
+    std::cout &lt;&lt; sizeof(arr) / sizeof(arr[0]) &lt;&lt; '\n'; // неверный результат
+}
+
+int main()
+{
+    int arr[] { 1, 2, 3, 4, 5 };
+
+    // В main: sizeof работает правильно
+    std::cout &lt;&lt; sizeof(arr) / sizeof(arr[0]) &lt;&lt; '\n'; // 5 — верно
+
+    // В функции: sizeof работает неправильно
+    badSizeof(arr); // выведет 2 или 1 (размер указателя / 4)
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Почему C-style массивы устарели</div>
+                    <p>Деградация — главная причина, по которой C-style массивы считаются опасными в современном C++. Используй <code>std::array</code> или <code>std::vector</code> вместо них. Они не деградируют и всегда знают свою длину.</p>
+                </div>
+
+                <h2 id="when-no-decay">Когда деградации нет</h2>
+
+                <p>Массив <em>не</em> деградирует в нескольких случаях:</p>
+                <ul>
+                    <li>При использовании в <code>sizeof()</code> или <code>typeid()</code></li>
+                    <li>При взятии адреса через <code>&amp;arr</code></li>
+                    <li>При передаче по ссылке: <code>const int (&amp;arr)[5]</code></li>
+                </ul>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — передача по ссылке (без деградации)</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;iterator&gt;
+
+// Принимает массив по ссылке — деградации нет, но только для int[5]
+void printArray(const int (&amp;arr)[5])
+{
+    std::cout &lt;&lt; std::size(arr) &lt;&lt; '\n'; // 5 — работает!
+    for (int x : arr)
+        std::cout &lt;&lt; x &lt;&lt; ' ';
+    std::cout &lt;&lt; '\n';
+}
+
+// Шаблонная версия — для любой длины
+template &lt;std::size_t N&gt;
+void printAny(const int (&amp;arr)[N])
+{
+    std::cout &lt;&lt; N &lt;&lt; '\n'; // N — длина массива
+}
+
+int main()
+{
+    int arr[] { 1, 2, 3, 4, 5 };
+    printArray(arr);
+    printAny(arr);
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

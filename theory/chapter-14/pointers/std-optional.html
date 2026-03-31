@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>std::optional — Курс C++</title>
+    <meta name="description" content="std::optional в C++: возврат значения или отсутствия, nullopt, has_value, value_or.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❓</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Указатели</div>
+                <h1><code>std::optional</code></h1>
+
+                <p>
+                    Иногда функция не может вернуть осмысленное значение — например, деление на ноль
+                    или поиск элемента, которого нет. Как сообщить об этом вызывающему коду?
+                    C++17 предлагает элегантное решение: <span class="key-term"><code>std::optional&lt;T&gt;</code></span>.
+                </p>
+
+                <h2 id="problem">Проблема: что возвращать при ошибке</h2>
+
+                <p>
+                    Классические подходы имеют недостатки:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — старые подходы (проблемы)</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// Подход 1: магическое значение-сигнал
+// Проблема: -1 может быть валидным результатом
+int findIndex(int val) {
+    // ...
+    return -1; // "не найдено" — но что если -1 — нормальный индекс?
+}
+
+// Подход 2: out-параметр
+// Проблема: неудобный синтаксис, легко забыть проверить
+bool divide(int x, int y, int&amp; result) {
+    if (y == 0) return false;
+    result = x / y;
+    return true;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="optional">std::optional: чистое решение</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — std::optional</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;optional&gt; // C++17
+
+std::optional&lt;int&gt; divide(int x, int y)
+{
+    if (y == 0)
+        return {};           // нет значения (std::nullopt)
+    return x / y;            // есть значение
+}
+
+int main()
+{
+    auto r1 { divide(10, 2) };
+    if (r1)                          // проверка наличия значения
+        std::cout &lt;&lt; *r1 &lt;&lt; '\n';   // 5 — разыменование
+
+    auto r2 { divide(10, 0) };
+    if (!r2)
+        std::cout &lt;&lt; "Деление на ноль!\n";
+
+    // value_or: значение или запасное
+    std::cout &lt;&lt; r2.value_or(-1) &lt;&lt; '\n'; // -1
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 460 110" width="460" height="110" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <!-- has value -->
+                    <rect x="10" y="10" width="200" height="90" rx="8" fill="var(--surface-2)" stroke="var(--accent-green)" stroke-width="1.5"/>
+                    <text x="110" y="35" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-weight="bold" font-family="monospace">optional&lt;int&gt; = 5</text>
+                    <rect x="60" y="45" width="100" height="35" rx="4" fill="var(--accent-green-dim)" stroke="var(--accent-green)" stroke-width="1"/>
+                    <text x="110" y="68" text-anchor="middle" fill="var(--accent-green)" font-size="18" font-weight="bold" font-family="monospace">5</text>
+                    <text x="110" y="95" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="sans-serif">has_value() = true</text>
+                    <!-- no value -->
+                    <rect x="250" y="10" width="200" height="90" rx="8" fill="var(--surface-2)" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="5,3"/>
+                    <text x="350" y="35" text-anchor="middle" fill="var(--text-muted)" font-size="12" font-weight="bold" font-family="monospace">optional&lt;int&gt; = {}</text>
+                    <rect x="300" y="45" width="100" height="35" rx="4" fill="var(--surface-3)" stroke="var(--border)" stroke-width="1"/>
+                    <text x="350" y="68" text-anchor="middle" fill="var(--text-muted)" font-size="14" font-family="monospace">nullopt</text>
+                    <text x="350" y="95" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="sans-serif">has_value() = false</text>
+                </svg>
+                </div>
+
+                <h2 id="api">API std::optional</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — все способы работы</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;optional&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    std::optional&lt;int&gt; a { 42 };       // со значением
+    std::optional&lt;int&gt; b {};           // без значения
+    std::optional&lt;int&gt; c { std::nullopt }; // явно без значения
+
+    // Проверка наличия значения
+    if (a.has_value()) std::cout &lt;&lt; "a есть\n";
+    if (!b)            std::cout &lt;&lt; "b нет\n";
+
+    // Получение значения
+    std::cout &lt;&lt; *a &lt;&lt; '\n';           // 42 (UB если нет значения!)
+    std::cout &lt;&lt; a.value() &lt;&lt; '\n';    // 42 (бросает исключение если нет)
+    std::cout &lt;&lt; b.value_or(0) &lt;&lt; '\n'; // 0 (запасное значение)
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="vs-pointer">std::optional vs указатель</h2>
+
+                <p>
+                    Синтаксис <code>std::optional</code> похож на указатель, но семантика другая:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — сравнение</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// Указатель: ссылочная семантика, может быть dangling
+int* ptr { nullptr };
+if (ptr) std::cout &lt;&lt; *ptr;
+
+// optional: семантика значения, всегда безопасно
+std::optional&lt;int&gt; opt {};
+if (opt) std::cout &lt;&lt; *opt;
+
+// Ключевое отличие: optional ВЛАДЕЕТ значением
+// Возврат из функции — безопасно (копирует значение)
+std::optional&lt;int&gt; getVal() {
+    int local { 42 };
+    return local; // OK! optional копирует значение
+}
+// int* getPtr() { int local{42}; return &amp;local; } // ОПАСНО!</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">Когда использовать std::optional</div>
+                    <p>Используй <code>std::optional&lt;T&gt;</code> как возвращаемый тип функции, которая может не вернуть результат. Это лучше, чем магические значения-сигналы или out-параметры.</p>
+                    <p>Не используй для параметров функций с дорогостоящим копированием — лучше <code>const T*</code> или перегрузка функций.</p>
+                    <p><a href="https://en.cppreference.com/w/cpp/utility/optional" target="_blank" rel="noopener">cppreference — std::optional</a></p>
+                </div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

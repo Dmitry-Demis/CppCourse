@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Системы счисления — Курс C++</title>
+    <meta name="description" content="Двоичная, восьмеричная, шестнадцатеричная системы счисления в C++. Литералы 0b, 0x, 0. std::bitset.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔢</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Константы и constexpr</div>
+                <h1>Системы счисления</h1>
+
+                <p>
+                    В повседневной жизни мы используем десятичную систему (основание 10).
+                    В программировании часто встречаются ещё три: двоичная, восьмеричная и шестнадцатеричная.
+                    C++ поддерживает литералы для всех четырёх.
+                </p>
+
+                <h2 id="table">Таблица систем счисления</h2>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 520 160" width="520" height="160" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <!-- header -->
+                    <rect x="10" y="10" width="500" height="28" rx="4" fill="var(--surface-3)"/>
+                    <text x="65" y="29" text-anchor="middle" fill="var(--text-secondary)" font-size="11" font-weight="bold" font-family="sans-serif">Десятичная</text>
+                    <text x="185" y="29" text-anchor="middle" fill="var(--accent-blue)" font-size="11" font-weight="bold" font-family="sans-serif">Двоичная</text>
+                    <text x="305" y="29" text-anchor="middle" fill="var(--accent-violet)" font-size="11" font-weight="bold" font-family="sans-serif">Восьмеричная</text>
+                    <text x="430" y="29" text-anchor="middle" fill="var(--accent-green)" font-size="11" font-weight="bold" font-family="sans-serif">Шестнадцатеричная</text>
+                    <!-- rows -->
+                    <text x="65" y="55" text-anchor="middle" fill="var(--text-primary)" font-size="12" font-family="monospace">0</text>
+                    <text x="185" y="55" text-anchor="middle" fill="var(--accent-blue)" font-size="12" font-family="monospace">0</text>
+                    <text x="305" y="55" text-anchor="middle" fill="var(--accent-violet)" font-size="12" font-family="monospace">0</text>
+                    <text x="430" y="55" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-family="monospace">0</text>
+
+                    <text x="65" y="75" text-anchor="middle" fill="var(--text-primary)" font-size="12" font-family="monospace">8</text>
+                    <text x="185" y="75" text-anchor="middle" fill="var(--accent-blue)" font-size="12" font-family="monospace">1000</text>
+                    <text x="305" y="75" text-anchor="middle" fill="var(--accent-violet)" font-size="12" font-family="monospace">10</text>
+                    <text x="430" y="75" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-family="monospace">8</text>
+
+                    <text x="65" y="95" text-anchor="middle" fill="var(--text-primary)" font-size="12" font-family="monospace">10</text>
+                    <text x="185" y="95" text-anchor="middle" fill="var(--accent-blue)" font-size="12" font-family="monospace">1010</text>
+                    <text x="305" y="95" text-anchor="middle" fill="var(--accent-violet)" font-size="12" font-family="monospace">12</text>
+                    <text x="430" y="95" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-family="monospace">A</text>
+
+                    <text x="65" y="115" text-anchor="middle" fill="var(--text-primary)" font-size="12" font-family="monospace">15</text>
+                    <text x="185" y="115" text-anchor="middle" fill="var(--accent-blue)" font-size="12" font-family="monospace">1111</text>
+                    <text x="305" y="115" text-anchor="middle" fill="var(--accent-violet)" font-size="12" font-family="monospace">17</text>
+                    <text x="430" y="115" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-family="monospace">F</text>
+
+                    <text x="65" y="135" text-anchor="middle" fill="var(--text-primary)" font-size="12" font-family="monospace">255</text>
+                    <text x="185" y="135" text-anchor="middle" fill="var(--accent-blue)" font-size="12" font-family="monospace">1111 1111</text>
+                    <text x="305" y="135" text-anchor="middle" fill="var(--accent-violet)" font-size="12" font-family="monospace">377</text>
+                    <text x="430" y="135" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-family="monospace">FF</text>
+
+                    <text x="65" y="155" text-anchor="middle" fill="var(--text-primary)" font-size="12" font-family="monospace">65535</text>
+                    <text x="185" y="155" text-anchor="middle" fill="var(--accent-blue)" font-size="12" font-family="monospace">1111...1111</text>
+                    <text x="305" y="155" text-anchor="middle" fill="var(--accent-violet)" font-size="12" font-family="monospace">177777</text>
+                    <text x="430" y="155" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-family="monospace">FFFF</text>
+                </svg>
+                </div>
+
+                <h2 id="literals">Литералы в C++</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — литералы разных систем</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main()
+{
+    int dec { 255 };      // десятичный (по умолчанию)
+    int hex { 0xFF };     // шестнадцатеричный: префикс 0x
+    int oct { 0377 };     // восьмеричный: префикс 0 (ноль!)
+    int bin { 0b11111111 }; // двоичный: префикс 0b (C++14)
+
+    // Все четыре — одно и то же число 255
+    std::cout &lt;&lt; dec &lt;&lt; ' ' &lt;&lt; hex &lt;&lt; ' ' &lt;&lt; oct &lt;&lt; ' ' &lt;&lt; bin &lt;&lt; '\n';
+    // 255 255 255 255
+
+    // Разделитель цифр ' (C++14) — только для читаемости
+    int big { 1'000'000 };
+    int bits { 0b1011'0010 };
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Ловушка: ведущий ноль</div>
+                    <p><code>int x { 012 }</code> — это <strong>восьмеричное</strong> число 12, равное десятичному 10, а не 12! Никогда не пиши ведущий ноль перед числом, если не хочешь восьмеричный литерал.</p>
+                </div>
+
+                <h2 id="output">Вывод в разных системах</h2>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — вывод</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;bitset&gt;
+#include &lt;iostream&gt;
+
+int main()
+{
+    int x { 255 };
+
+    std::cout &lt;&lt; x &lt;&lt; '\n';              // 255 (десятичный, по умолчанию)
+    std::cout &lt;&lt; std::hex &lt;&lt; x &lt;&lt; '\n'; // ff (шестнадцатеричный)
+    std::cout &lt;&lt; std::oct &lt;&lt; x &lt;&lt; '\n'; // 377 (восьмеричный)
+    std::cout &lt;&lt; std::dec &lt;&lt; x &lt;&lt; '\n'; // 255 (вернуть десятичный)
+
+    // Двоичный вывод через std::bitset
+    std::cout &lt;&lt; std::bitset&lt;8&gt;{ 255 } &lt;&lt; '\n'; // 11111111
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="hex-binary">Hex как компактная запись двоичного</h2>
+
+                <p>
+                    Каждая шестнадцатеричная цифра точно соответствует 4 битам.
+                    Это делает hex удобным для работы с битовыми масками и адресами памяти.
+                </p>
+
+                <div style="display:flex; justify-content:center; margin: var(--space-6) 0">
+                <svg viewBox="0 0 420 70" width="420" height="70" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+                    <!-- hex digits -->
+                    <rect x="10" y="10" width="50" height="30" rx="4" fill="var(--accent-green-dim)" stroke="var(--accent-green)" stroke-width="1.5"/>
+                    <text x="35" y="30" text-anchor="middle" fill="var(--accent-green)" font-size="16" font-weight="bold" font-family="monospace">3</text>
+                    <rect x="65" y="10" width="50" height="30" rx="4" fill="var(--accent-green-dim)" stroke="var(--accent-green)" stroke-width="1.5"/>
+                    <text x="90" y="30" text-anchor="middle" fill="var(--accent-green)" font-size="16" font-weight="bold" font-family="monospace">A</text>
+                    <rect x="120" y="10" width="50" height="30" rx="4" fill="var(--accent-green-dim)" stroke="var(--accent-green)" stroke-width="1.5"/>
+                    <text x="145" y="30" text-anchor="middle" fill="var(--accent-green)" font-size="16" font-weight="bold" font-family="monospace">7</text>
+                    <rect x="175" y="10" width="50" height="30" rx="4" fill="var(--accent-green-dim)" stroke="var(--accent-green)" stroke-width="1.5"/>
+                    <text x="200" y="30" text-anchor="middle" fill="var(--accent-green)" font-size="16" font-weight="bold" font-family="monospace">F</text>
+                    <!-- binary -->
+                    <text x="35" y="58" text-anchor="middle" fill="var(--accent-blue)" font-size="11" font-family="monospace">0011</text>
+                    <text x="90" y="58" text-anchor="middle" fill="var(--accent-blue)" font-size="11" font-family="monospace">1010</text>
+                    <text x="145" y="58" text-anchor="middle" fill="var(--accent-blue)" font-size="11" font-family="monospace">0111</text>
+                    <text x="200" y="58" text-anchor="middle" fill="var(--accent-blue)" font-size="11" font-family="monospace">1111</text>
+                    <!-- label -->
+                    <text x="270" y="25" fill="var(--text-secondary)" font-size="11" font-family="sans-serif">0x3A7F</text>
+                    <text x="270" y="45" fill="var(--text-muted)" font-size="10" font-family="sans-serif">= 0011 1010 0111 1111</text>
+                    <text x="270" y="60" fill="var(--text-muted)" font-size="10" font-family="sans-serif">= 14975 (десятичное)</text>
+                </svg>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">Ссылка на cppreference</div>
+                    <p><a href="https://en.cppreference.com/w/cpp/language/integer_literal" target="_blank" rel="noopener">cppreference — Integer literals</a></p>
+                </div>
+
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row">
+                        <div class="feedback-stars">
+                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                        </div>
+                        <span class="feedback-rating-value">—</span>
+                    </div>
+                    <div class="feedback-form">
+                        <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                        <div class="feedback-form__row">
+                            <span class="feedback-form__char">0 / 1024</span>
+                            <button class="feedback-form__submit">Отправить</button>
+                        </div>
+                    </div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../js/compiler.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>
