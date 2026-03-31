@@ -32,7 +32,7 @@
     },
     {
       "id": "chapter-2",
-      "number": 4,
+      "number": 3,
       "groupId": "fundamental-types",
       "level": "BEGINNER",
       "title": "Целочисленные типы",
@@ -317,8 +317,23 @@
       ]
     },
     {
-      "id": "chapter-10",
+      "id": "chapter-15",
       "number": 22,
+      "groupId": "strings",
+      "level": "JUNIOR+",
+      "title": "Строки",
+      "description": "std::string: создание, ввод/вывод, поиск, изменение, сравнение, операции с символами, преобразования, string_view",
+      "paragraphs": [
+        "string-intro",
+        "string-search-modify",
+        "string-compare-chars",
+        "string-conversions",
+        "string-view"
+      ]
+    },
+    {
+      "id": "chapter-10",
+      "number": 23,
       "groupId": "random",
       "level": "MIDDLE",
       "title": "Случайные числа",
