@@ -227,6 +227,25 @@
     color: var(--text-secondary);
 }
 
+/* Chapter level badges */
+.card-level {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    padding: 1px 6px;
+    border-radius: 4px;
+    vertical-align: middle;
+    text-transform: uppercase;
+}
+.card-level--BEGINNER    { background: rgba(126,231,135,.15); color: #7ee787; border: 1px solid rgba(126,231,135,.3); }
+.card-level--JUNIOR      { background: rgba(88,166,255,.15);  color: #58a6ff; border: 1px solid rgba(88,166,255,.3); }
+.card-level--JUNIOR-plus { background: rgba(100,200,255,.15); color: #64c8ff; border: 1px solid rgba(100,200,255,.3); }
+.card-level--MIDDLE      { background: rgba(210,168,255,.15); color: #d2a8ff; border: 1px solid rgba(210,168,255,.3); }
+.card-level--MIDDLE-plus { background: rgba(255,166,87,.15);  color: #ffa657; border: 1px solid rgba(255,166,87,.3); }
+.card-level--ADVANCED    { background: rgba(243,139,168,.15); color: #f38ba8; border: 1px solid rgba(243,139,168,.3); }
+
 .chapter-card .card-arrow {
     display: flex;
     align-items: center;

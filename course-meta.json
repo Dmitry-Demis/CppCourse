@@ -4,6 +4,7 @@
       "id": "chapter-1",
       "number": 1,
       "groupId": "basics",
+      "level": "BEGINNER",
       "title": "Основы C++",
       "description": "Структура программы, переменные, типы, ввод/вывод, инициализация, неинициализированные переменные",
       "paragraphs": [
@@ -20,6 +21,7 @@
       "id": "chapter-2",
       "number": 2,
       "groupId": "fundamental-types",
+      "level": "BEGINNER",
       "title": "Целочисленные типы",
       "description": "Целые числа, знаковость, переполнение, типы фиксированной ширины, введение в типы данных",
       "paragraphs": [
@@ -34,6 +36,7 @@
       "id": "chapter-2b",
       "number": 3,
       "groupId": "numeric-types",
+      "level": "BEGINNER",
       "title": "Вещественные, логические и символьные типы",
       "description": "Числа с плавающей точкой, bool, char, преобразования типов, sizeof и void",
       "paragraphs": [
@@ -49,6 +52,7 @@
       "id": "chapter-3",
       "number": 4,
       "groupId": "functions",
+      "level": "JUNIOR",
       "title": "Функции",
       "description": "Объявление функций, параметры, возвращаемые значения, предварительные объявления, локальная область видимости",
       "paragraphs": [
@@ -65,6 +69,7 @@
       "id": "chapter-3b",
       "number": 5,
       "groupId": "type-conversion",
+      "level": "JUNIOR",
       "title": "Преобразования типов",
       "description": "Неявные преобразования, числовые повышения, числовые преобразования, сужающие преобразования, арифметические преобразования, static_cast",
       "paragraphs": [
@@ -80,6 +85,7 @@
       "id": "chapter-3c",
       "number": 6,
       "groupId": "type-aliases",
+      "level": "JUNIOR",
       "title": "Псевдонимы типов и вывод типов",
       "description": "using и typedef, вывод типа через auto для переменных и функций, trailing return type",
       "paragraphs": [
@@ -92,6 +98,7 @@
       "id": "chapter-4",
       "number": 7,
       "groupId": "code-organization",
+      "level": "JUNIOR",
       "title": "Организация кода",
       "description": "Разбивка на файлы, пространства имён, препроцессор, заголовочные файлы и header guards",
       "paragraphs": [
@@ -106,6 +113,7 @@
       "id": "chapter-5b",
       "number": 8,
       "groupId": "branching",
+      "level": "JUNIOR",
       "title": "Ветвление",
       "description": "Введение в управление потоком, if/else, типичные ошибки, switch, goto и завершение программы",
       "paragraphs": [
@@ -122,6 +130,7 @@
       "id": "chapter-5",
       "number": 9,
       "groupId": "control-flow",
+      "level": "JUNIOR",
       "title": "Циклы",
       "description": "while, do-while, for, break и continue",
       "paragraphs": [
@@ -135,20 +144,37 @@
       "id": "chapter-9b",
       "number": 10,
       "groupId": "vectors",
+      "level": "JUNIOR",
       "title": "Массивы и std::vector",
-      "description": "std::vector: создание, индексация, длина, циклы, range-for, изменение размера, стек-поведение",
+      "description": "std::vector: создание, индексация, длина, циклы, range-for, изменение размера, стек-поведение, enum-индексы, vector<bool>",
       "paragraphs": [
         "vector-intro",
         "vector-length-indexing",
         "vector-loops",
         "vector-range-for",
-        "vector-resize-stack"
+        "vector-resize-stack",
+        "vector-enum-indexing",
+        "vector-bool"
+      ]
+    },
+    {
+      "id": "chapter-9c",
+      "number": 11,
+      "groupId": "cstyle-arrays",
+      "level": "JUNIOR",
+      "title": "C-style массивы",
+      "description": "Сырые массивы int[], многомерные массивы, символьные массивы и C-строки",
+      "paragraphs": [
+        "cstyle-arrays",
+        "multidimensional-arrays",
+        "char-arrays"
       ]
     },
     {
       "id": "chapter-6b",
-      "number": 11,
+      "number": 12,
       "groupId": "operators-extra",
+      "level": "JUNIOR+",
       "title": "Операторы: синтаксис и арифметика",
       "description": "Именование, литералы, выражения, приоритет, арифметика, остаток, инкремент, запятая, тернарный оператор, сравнение, логические операторы",
       "paragraphs": [
@@ -166,8 +192,9 @@
     },
     {
       "id": "chapter-6",
-      "number": 12,
+      "number": 13,
       "groupId": "operators",
+      "level": "JUNIOR+",
       "title": "Побитовые операторы",
       "description": "Побитовые операции, битовые флаги и маски",
       "paragraphs": [
@@ -178,8 +205,9 @@
     },
     {
       "id": "chapter-7",
-      "number": 13,
+      "number": 14,
       "groupId": "scope-linkage",
+      "level": "JUNIOR+",
       "title": "Область видимости",
       "description": "Блоки, локальные и глобальные переменные, перекрытие имён, пользовательские пространства имён",
       "paragraphs": [
@@ -192,8 +220,9 @@
     },
     {
       "id": "chapter-8",
-      "number": 14,
+      "number": 15,
       "groupId": "scope-linkage",
+      "level": "MIDDLE",
       "title": "Время жизни и компоновка",
       "description": "Статические переменные, внутренняя и внешняя компоновка, inline, глобальные константы, опасность глобальных переменных",
       "paragraphs": [
@@ -208,8 +237,9 @@
     },
     {
       "id": "chapter-9",
-      "number": 15,
+      "number": 16,
       "groupId": "namespaces",
+      "level": "MIDDLE",
       "title": "Пространства имён: продвинутые темы",
       "description": "using-объявления и директивы, безымянные и inline-пространства имён",
       "paragraphs": [
@@ -218,9 +248,38 @@
       ]
     },
     {
+      "id": "chapter-11",
+      "number": 17,
+      "groupId": "overloading",
+      "level": "MIDDLE",
+      "title": "Перегрузка функций",
+      "description": "Перегрузка, дифференциация, разрешение перегрузки, аргументы по умолчанию, удаление перегрузок",
+      "paragraphs": [
+        "overload-intro",
+        "overload-resolution",
+        "default-arguments",
+        "delete-functions"
+      ]
+    },
+    {
+      "id": "chapter-12",
+      "number": 18,
+      "groupId": "templates",
+      "level": "MIDDLE+",
+      "title": "Шаблоны функций",
+      "description": "Шаблоны функций, инстанциация, несколько параметров типа, нетиповые параметры, шаблоны в заголовочных файлах",
+      "paragraphs": [
+        "template-intro",
+        "template-multiple-types",
+        "non-type-template-params",
+        "templates-in-headers"
+      ]
+    },
+    {
       "id": "chapter-10",
-      "number": 16,
+      "number": 19,
       "groupId": "random",
+      "level": "MIDDLE",
       "title": "Случайные числа",
       "description": "Псевдослучайные генераторы, Mersenne Twister, инициализация, распределения и готовый заголовочный файл Random.h",
       "paragraphs": [

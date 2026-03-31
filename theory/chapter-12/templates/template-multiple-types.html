@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-03-31">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шаблоны с несколькими типами — Курс C++</title>
+    <meta name="description" content="Шаблоны функций с несколькими параметрами типа T и U, auto-возврат, abbreviated function templates C++20.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    <div class="page-wrapper">
+        <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Шаблоны функций</div>
+                <h1>Шаблоны с несколькими параметрами типа</h1>
+
+                <p>
+                    Шаблон с одним параметром <code>T</code> требует, чтобы оба аргумента были одного типа.
+                    Если нужно принимать аргументы разных типов — используют несколько параметров типа.
+                </p>
+
+                <h2 id="problem">Проблема одного T</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — один T не работает с разными типами</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">template &lt;typename T&gt;
+T max(T x, T y) { return (x &lt; y) ? y : x; }
+
+int main()
+{
+    max(2, 3.5);   // compile error: T = int или double? Неоднозначно!
+    max(2, 3);     // OK: T = int
+    max(2.0, 3.5); // OK: T = double
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="two-types">Два параметра типа: T и U</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — шаблон с T и U</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+template &lt;typename T, typename U&gt;
+auto max(T x, U y) // auto: компилятор выводит тип возврата
+{
+    return (x &lt; y) ? y : x;
+}
+
+int main()
+{
+    std::cout &lt;&lt; max(2, 3.5)   &lt;&lt; '\n'; // T=int, U=double → 3.5
+    std::cout &lt;&lt; max(5L, 3)    &lt;&lt; '\n'; // T=long, U=int → 5
+    std::cout &lt;&lt; max(1.5f, 2)  &lt;&lt; '\n'; // T=float, U=int → 2
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="abbreviated">Сокращённый синтаксис C++20: auto-параметры</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++20 — abbreviated function template</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">// C++20: auto-параметры — каждый auto становится независимым T
+auto max(auto x, auto y)
+{
+    return (x &lt; y) ? y : x;
+}
+
+// Эквивалентно:
+// template &lt;typename T, typename U&gt;
+// auto max(T x, U y) { return (x &lt; y) ? y : x; }
+
+// Но если нужно, чтобы оба параметра были ОДНОГО типа — используйте явный T:
+template &lt;typename T&gt;
+T sum(T x, T y) { return x + y; } // sum(1, 2.5) — ошибка, что и нужно</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="overload-templates">Перегрузка шаблонов</h2>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — перегрузка шаблонов функций</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+// Два одинаковых типа
+template &lt;typename T&gt;
+auto add(T x, T y) { return x + y; }
+
+// Два разных типа
+template &lt;typename T, typename U&gt;
+auto add(T x, U y) { return x + y; }
+
+// Три параметра
+template &lt;typename T, typename U, typename V&gt;
+auto add(T x, U y, V z) { return x + y + z; }
+
+int main()
+{
+    std::cout &lt;&lt; add(1.2, 3.4)    &lt;&lt; '\n'; // add&lt;double&gt; (одинаковые)
+    std::cout &lt;&lt; add(5.6, 7)      &lt;&lt; '\n'; // add&lt;double,int&gt; (разные)
+    std::cout &lt;&lt; add(8, 9, 10)    &lt;&lt; '\n'; // add&lt;int,int,int&gt; (три)
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="template-multiple-types" data-final-desc="Шаблоны с несколькими типами"></div>
+                <section class="feedback-section">
+                    <div class="feedback-section__title">Оцените этот параграф</div>
+                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                    <div class="feedback-stars-row"><div class="feedback-stars">
+                    <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+                    </div><span class="feedback-rating-value">—</span></div>
+                    <div class="feedback-form"><textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea><div class="feedback-form__row"><span class="feedback-form__char">0 / 1024</span><button class="feedback-form__submit">Отправить</button></div></div>
+                    <div class="feedback-done"><span class="feedback-done__icon">✓</span><span>Спасибо за отзыв!</span></div>
+                </section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar"><div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div></aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../js/quiz.js"></script><script src="../../../components/quiz-widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script><script src="../../../js/feedback.js"></script>
+</body>
+</html>
