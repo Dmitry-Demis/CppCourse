@@ -276,8 +276,36 @@
       ]
     },
     {
-      "id": "chapter-10",
+      "id": "chapter-13",
       "number": 19,
+      "groupId": "references",
+      "level": "MIDDLE",
+      "title": "Ссылки",
+      "description": "lvalue и rvalue, ссылки, const-ссылки, передача по ссылке, возврат по ссылке, in/out параметры",
+      "paragraphs": [
+        "lvalue-rvalue",
+        "lvalue-references",
+        "pass-by-reference",
+        "return-by-reference"
+      ]
+    },
+    {
+      "id": "chapter-14",
+      "number": 20,
+      "groupId": "pointers",
+      "level": "MIDDLE+",
+      "title": "Указатели",
+      "description": "Адреса памяти, указатели, nullptr, const и указатели, передача по адресу, арифметика указателей, указатели и массивы",
+      "paragraphs": [
+        "pointers-intro",
+        "null-pointers",
+        "pointers-const",
+        "pointer-arithmetic"
+      ]
+    },
+    {
+      "id": "chapter-10",
+      "number": 21,
       "groupId": "random",
       "level": "MIDDLE",
       "title": "Случайные числа",
