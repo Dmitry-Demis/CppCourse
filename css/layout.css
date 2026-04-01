@@ -690,3 +690,35 @@
         text-align: left;
     }
 }
+
+/* ── Paragraph lock styles ─────────────────────────────────────────────── */
+.sidebar-section-link.para-locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+.sidebar-section-link.para-locked::after {
+    content: '🔒';
+    font-size: 0.7rem;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.lock-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent-orange, #fab387);
+    color: var(--text-primary);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+}
+.lock-toast.show {
+    transform: translateX(-50%) translateY(0);
+}

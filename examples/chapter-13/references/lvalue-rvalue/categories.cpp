@@ -1,8 +1,7 @@
-#include <iostream>
+﻿#include <iostream>
 
 int main()
-{
-    int x { 5 };
+{int x {5};
 
     // lvalue — имеет адрес, можно взять &
     x = 10;          // x — lvalue (слева от =)
@@ -12,8 +11,8 @@ int main()
     // &42;          // ОШИБКА: нельзя взять адрес rvalue
     // int* q = &(x + 1); // ОШИБКА
 
-    int y { x + 1 }; // x+1 — rvalue, используется как инициализатор
+    int y {x + 1}; // x+1 — rvalue, используется как инициализатор
 
     std::cout << x << ' ' << y << '\n';
-    return 0;
-}
+    return 0;}
+

@@ -514,17 +514,24 @@ class QuizSystem {
         
         // Save progress to server if user is logged in
         const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
-        if (user) {
-            const points = Math.round(percentage / 10) * 10;
-            // Use absolute path to avoid issues when page is in subdirectory
-            fetch('/api/progress', {
+        if (user && user.isuNumber) {
+            const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+            const lastPart = parts[parts.length - 1] || '';
+            const paragraphId = lastPart.replace(/\.html$/, '') || 'unknown';
+
+            fetch('/api/test/complete', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber },
                 body: JSON.stringify({
-                    isuNumber: user.isuNumber,
-                    chapterId: 'chapter-1',
-                    chapterTitle: 'Глава I: Фундаментальные типы данных',
-                    points: points
+                    paragraphId,
+                    testId:          this.currentTest,
+                    testTitle:       testData.title,
+                    score:           percentage,
+                    correctAnswers:  this.score,
+                    totalQuestions:  testData.questions.length,
+                    wrongQuestionIds: [],
+                    correctQuestionIds: [],
+                    timeSpent:       0
                 })
             })
             .then(r => r.json())

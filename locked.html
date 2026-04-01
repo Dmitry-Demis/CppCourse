@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Параграф закрыт — Курс C++</title>
+    <link rel="stylesheet" href="css/variables.css?v=3">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .locked-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .locked-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+        .locked-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .locked-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary); }
+        .locked-desc { color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; }
+        .locked-prev { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+        .locked-prev strong { color: var(--accent-blue); }
+        .locked-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+    <div class="locked-page">
+        <div class="locked-card">
+            <div class="locked-icon">🔒</div>
+            <div class="locked-title" id="locked-title">Параграф закрыт</div>
+            <div class="locked-desc" id="locked-desc">
+                Чтобы открыть этот параграф, пройдите все тесты предыдущего параграфа на <strong>70% и выше</strong>.
+            </div>
+            <div class="locked-prev" id="locked-prev"></div>
+            <div class="locked-actions">
+                <a href="#" id="btn-go-prev" class="btn btn--primary">Перейти к предыдущему</a>
+                <a href="index.html" class="btn btn--secondary">На главную</a>
+            </div>
+        </div>
+    </div>
+    <script src="js/course.js"></script>
+    <script>
+        (async function () {
+            const params = new URLSearchParams(location.search);
+            const prevId = params.get('prev') || '';
+
+            // Если не залогинен — показываем другое сообщение
+            const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+            if (!user?.isuNumber) {
+                document.getElementById('locked-title').textContent = 'Требуется вход';
+                document.getElementById('locked-desc').innerHTML =
+                    'Войдите в аккаунт, чтобы открывать параграфы курса.';
+                document.getElementById('btn-go-prev').textContent = 'Войти';
+                document.getElementById('btn-go-prev').href = '/login.html';
+                if (prevId) {
+                    document.getElementById('locked-prev').innerHTML =
+                        `Параграф: <strong>${prevId}</strong>`;
+                }
+                return;
+            }
+
+            if (!prevId) return;
+
+            // Находим href предыдущего параграфа
+            try {
+                const structure = await loadCourseStructure('');
+                for (const ch of structure.chapters) {
+                    const para = (ch.paragraphs || []).find(p => p.id === prevId);
+                    if (para) {
+                        const href = `theory/${ch.id}/${ch.groupId}/${para.id}.html`;
+                        document.getElementById('btn-go-prev').href = href;
+                        document.getElementById('locked-prev').innerHTML =
+                            `Предыдущий параграф: <strong>${para.title || prevId}</strong>`;
+                        break;
+                    }
+                }
+            } catch {}
+        })();
+    </script>
+    <script src="js/theme.js"></script>
+</body>
+</html>

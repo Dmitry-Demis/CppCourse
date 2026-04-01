@@ -1,12 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
     <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
     <meta charset="UTF-8">
-    <meta name="created" content="2025-03-17">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Глава III — Функции — Курс C++</title>
-
+    <title>Функции — Курс C++</title>
     <link rel="stylesheet" href="../../../css/variables.css?v=3">
     <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
@@ -15,26 +13,12 @@
     <link rel="stylesheet" href="../../../css/theory.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/quiz.css">
-
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
-    <style>
-        .section-card { position: relative; }
-        .section-card__quiz-btn {
-            position: absolute; top: 50%; right: 2.5rem; transform: translateY(-50%);
-            background: rgba(167,139,250,.15); border: 1px solid rgba(167,139,250,.3);
-            color: #a78bfa; font-size: .72rem; font-weight: 700;
-            padding: 3px 10px; border-radius: 99px; cursor: pointer;
-            white-space: nowrap; transition: background .15s; z-index: 2;
-        }
-        .section-card__quiz-btn:hover { background: rgba(167,139,250,.3); }
-    </style>
     <link rel="stylesheet" href="../../../css/feedback.css">
     <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
 </head>
 <body>
-
     <div class="reading-progress-bar" id="reading-progress"></div>
-
     <header class="site-header">
         <div class="header-inner">
             <a href="../../../index.html" class="header-logo">
@@ -47,11 +31,15 @@
             </a>
             <nav class="header-nav">
                 <a href="../../../index.html">Главная</a>
-                <a href="#" class="active">Глава III</a>
+                <a href="#" class="active">Глава V</a>
             </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
         </div>
     </header>
-
     <div class="page-wrapper">
         <aside class="sidebar">
             <div class="sidebar-section">
@@ -59,71 +47,18 @@
                 <ul class="sidebar-nav" id="course-nav"></ul>
             </div>
         </aside>
-
         <main class="main-content">
             <div class="chapter-content">
-
-                <div class="section-badge">Глава III</div>
+                <div class="section-badge">Глава V</div>
                 <h1>Функции</h1>
-
-                <p>
-                    Функции — основной инструмент структурирования кода в C++.
-                    В этой главе разберём всё: от базового синтаксиса до передачи параметров,
-                    перегрузки и современных возможностей C++11–C++23.
-                </p>
-
-                <div id="avg-reading-time" style="display:none;margin-bottom:1rem;font-size:.85rem;color:var(--text-tertiary)"></div>
+                <p>Объявление функций, параметры, возвращаемые значения, предварительные объявления, локальная область видимости</p>
                 <div class="chapter-sections" id="sections-grid">
                     <div class="chapter-sections-loading">Загрузка...</div>
                 </div>
-
-                <!-- Навигация -->
-
-                
-                <!-- FEEDBACK SECTION -->
-                <section class="feedback-section">
-                    <div class="feedback-section__title">Оцените этот параграф</div>
-                    <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
-
-                    <div class="feedback-stars-row">
-                        <div class="feedback-stars">
-                        <span class="feedback-star" aria-label="Оценка 1"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 2"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 3"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 4"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 5"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 6"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 7"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 8"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 9"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        <span class="feedback-star" aria-label="Оценка 10"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
-                        </div>
-                        <span class="feedback-rating-value">—</span>
-                    </div>
-
-                    <div class="feedback-form">
-                        <textarea
-                            class="feedback-form__textarea"
-                            maxlength="1024"
-                            placeholder="Комментарий (необязательно)…"
-                        ></textarea>
-                        <div class="feedback-form__row">
-                            <span class="feedback-form__char">0 / 1024</span>
-                            <button class="feedback-form__submit">Отправить</button>
-                        </div>
-                    </div>
-
-                    <div class="feedback-done">
-                        <span class="feedback-done__icon">✓</span>
-                        <span>Спасибо за отзыв!</span>
-                    </div>
-                </section>
-
+                <section class="feedback-section"></section>
                 <div class="paragraph-nav"></div>
-
             </div>
         </main>
-
         <aside class="right-sidebar">
             <div class="toc-container">
                 <div class="toc-title">Содержание</div>
@@ -131,17 +66,23 @@
             </div>
         </aside>
     </div>
-
-    <footer class="site-footer">
-        <p>Интерактивный курс по языку программирования C++</p>
-    </footer>
-
-    <script src="../../../js/course.js"></script>    <script src="../../../js/core/callout.js"></script>
-<script src="../../../js/navigation.js"></script>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/paragraph-lock.js"></script>
     <script src="../../../js/toc.js"></script>
     <script src="../../../js/quiz.js"></script>
     <script src="../../../js/gamification.js"></script>
     <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
     async function buildSectionsGrid() {
         const grid = document.getElementById('sections-grid');
         if (!grid) return;
@@ -151,35 +92,24 @@
             if (!chapter) { grid.innerHTML = '<p style="color:var(--text-secondary)">Глава не найдена.</p>'; return; }
             const paragraphs = chapter.paragraphs || [];
             if (!paragraphs.length) { grid.innerHTML = '<p style="color:var(--text-secondary)">Параграфы не найдены.</p>'; return; }
-
+            const chapterIndex = data.chapters.findIndex(c => c.id === chapter.id);
+            const chapterNum = chapterIndex >= 0 ? chapterIndex + 1 : 1;
             grid.innerHTML = paragraphs.map((p, i) => {
-                const href = `${p.id}.html`;
+                const href = p.id + '.html';
                 const testCount = (p.tests || []).length;
                 const testBadge = testCount > 0
                     ? `<span style="position:absolute;top:50%;right:2.5rem;transform:translateY(-50%);background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px;">${testCount > 1 ? testCount + ' теста' : 'Тест'}</span>`
                     : '';
-                return `<a href="${href}" class="section-card">
-                    <div class="section-card__number">§3.${i + 1}</div>
-                    <div class="section-card__body"><div class="section-card__title">${p.title}</div></div>
-                    ${testBadge}
-                    <span class="section-card__arrow">&rsaquo;</span>
-                </a>`;
+                return `<a href="${href}" class="section-card"><div class="section-card__number">§${chapterNum}.${i+1}</div><div class="section-card__body"><div class="section-card__title">${p.title}</div></div>${testBadge}<span class="section-card__arrow">&rsaquo;</span></a>`;
             }).join('');
+            if (window.ParagraphLock) await window.ParagraphLock.applyLocksToChapterIndex(data);
         } catch (e) {
-            document.getElementById('sections-grid').innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции: ' + e.message + '</p>';
+            grid.innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции: ' + e.message + '</p>';
         }
     }
     buildSectionsGrid();
     </script>
-
     <script src="../../../js/theme.js"></script>
     <script src="../../../js/feedback.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-

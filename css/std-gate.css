@@ -117,20 +117,56 @@
 
 /* ── Анимации открытия ──────────────────────────────────────────────────────── */
 
+/* ── Дверь — открывается как две половинки с перспективой ─────────────────── */
 .sg-door-overlay {
     position: fixed; inset: 0;
     z-index: 9998;
     display: flex;
     pointer-events: none;
+    perspective: 1200px;
 }
 .sg-door-left, .sg-door-right {
     flex: 1;
-    background: #07071a;
-    transition: transform 0.55s cubic-bezier(0.7, 0, 0.3, 1);
+    background: linear-gradient(180deg, #0a0a1e 0%, #07071a 50%, #0a0a1e 100%);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.7s cubic-bezier(0.6, 0, 0.2, 1);
+    transform-origin: left center;
 }
-.sg-door--open .sg-door-left  { transform: translateX(-100%); }
-.sg-door--open .sg-door-right { transform: translateX(100%); }
+.sg-door-right {
+    transform-origin: right center;
+}
+/* Декоративные линии на двери */
+.sg-door-left::before, .sg-door-right::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 60px,
+        rgba(255,255,255,0.02) 60px,
+        rgba(255,255,255,0.02) 61px
+    );
+}
+.sg-door-left::after {
+    content: '';
+    position: absolute; top: 0; right: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, transparent, var(--el-color, #a78bfa) 50%, transparent);
+    opacity: 0.6;
+    box-shadow: 0 0 12px var(--el-color, #a78bfa);
+}
+.sg-door-right::after {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, transparent, var(--el-color, #a78bfa) 50%, transparent);
+    opacity: 0.6;
+    box-shadow: 0 0 12px var(--el-color, #a78bfa);
+}
+/* Открытие — поворот по оси Y как настоящая дверь */
+.sg-door--open .sg-door-left  { transform: perspective(1200px) rotateY(-110deg); }
+.sg-door--open .sg-door-right { transform: perspective(1200px) rotateY(110deg); }
 
+/* ── Замочная скважина ────────────────────────────────────────────────────── */
 .sg-keyhole {
     position: fixed;
     top: 50%; left: 50%;
@@ -138,12 +174,12 @@
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
-    animation: keyholeAppear 0.4s 0.1s ease forwards;
+    animation: keyholeAppear 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     filter: drop-shadow(0 0 12px var(--el-color, #a78bfa));
 }
 @keyframes keyholeAppear {
-    from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-20deg); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
 }
 .sg-keyhole--glowing {
     filter:
@@ -151,9 +187,33 @@
         drop-shadow(0 0 50px var(--el-color, #a78bfa))
         drop-shadow(0 0 90px var(--el-color, #a78bfa));
     transition: filter 0.3s ease;
+    animation: keyholeShake 0.15s 3 ease-in-out;
+}
+@keyframes keyholeShake {
+    0%,100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    25%     { transform: translate(-50%, -50%) scale(1) rotate(-8deg); }
+    75%     { transform: translate(-50%, -50%) scale(1) rotate(8deg); }
 }
 
-/* 3D ключ рендерится через Three.js canvas — CSS-ключ не нужен */
+/* ── Молния из центра ─────────────────────────────────────────────────────── */
+.sg-center-bolt {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10002;
+    pointer-events: none;
+    opacity: 0;
+    animation: boltAppear 0.8s ease forwards;
+}
+@keyframes boltAppear {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.2); filter: brightness(3); }
+    15%  { opacity: 1; transform: translate(-50%, -50%) scale(1.4); filter: brightness(4); }
+    40%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); filter: brightness(2); }
+    70%  { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+}
+
+/* 3D ключ рендерится через Three.js canvas */
 
 #sg-element-canvas {
     position: fixed; inset: 0;

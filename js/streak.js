@@ -190,30 +190,28 @@
     }
 
     // ── Header mini profile ───────────────────────────────────────────────
-    function renderHeaderProfile(user) {
+    function renderHeaderProfile(profile) {
         // Remove old
         document.querySelectorAll('.header-profile-mini').forEach(el => el.remove());
         // Also hide the plain text link added by navigation.js
         document.querySelectorAll('.header-profile-link').forEach(el => el.remove());
 
         const LEVEL_ICONS = ['','🌱','📘','⚙️','💻','🔬','👑'];
-        const level = (() => { try { return JSON.parse(localStorage.getItem('gs_level') || '1'); } catch { return 1; } })();
-        const xp    = (() => { try { return JSON.parse(localStorage.getItem('gs_xp')    || '0'); } catch { return 0; } })();
-        const coins = (() => { try { return JSON.parse(localStorage.getItem('gs_coins') || '0'); } catch { return 0; } })();
-        const streak = user.currentStreak ?? 0;
+        const level  = profile.level  ?? 1;
+        const xp     = profile.xp     ?? 0;
+        const streak = profile.currentStreak ?? 0;
         const needed = level * 120;
         const xpPct  = Math.min(Math.round(xp / needed * 100), 100);
-
-        const icon = LEVEL_ICONS[Math.min(level, LEVEL_ICONS.length - 1)] || '⭐';
+        const icon   = LEVEL_ICONS[Math.min(level, LEVEL_ICONS.length - 1)] || '⭐';
 
         const mini = document.createElement('a');
         mini.href = (typeof _siteRoot !== 'undefined' ? _siteRoot : '') + 'profile.html';
         mini.className = 'header-profile-mini';
-        mini.title = `${user.firstName} ${user.lastName} · Ур. ${level} · ${xp} XP · 🪙${coins}`;
+        mini.title = `${profile.firstName} ${profile.lastName} · Ур. ${level} · ${xp} XP`;
         mini.innerHTML = `
             <div class="hpm-avatar">${icon}</div>
             <div class="hpm-info">
-                <div class="hpm-name">${user.firstName} ${user.lastName}</div>
+                <div class="hpm-name">${profile.firstName} ${profile.lastName}</div>
                 <div class="hpm-sub">Ур. ${level} · ${xpPct}% XP${streak > 0 ? ` · <span class="hpm-streak">🔥${streak}</span>` : ''}</div>
             </div>`;
 
@@ -322,8 +320,22 @@
 
         injectStyle();
 
-        // Render header profile immediately (no server needed)
-        renderHeaderProfile(user);
+        // Validate session against server — no localStorage fallback
+        let profile;
+        try {
+            const profileRes = await fetch(`/api/profile/${user.isuNumber}`, {
+                headers: { 'X-Isu-Number': user.isuNumber }
+            });
+            if (!profileRes.ok) {
+                localStorage.removeItem('cpp_user');
+                return;
+            }
+            profile = await profileRes.json();
+        } catch {
+            return; // offline — show nothing
+        }
+
+        renderHeaderProfile(profile);
 
         // Check streak once per calendar day
         const sessionKey = `streak_checked_${new Date().toDateString()}`;
@@ -331,7 +343,7 @@
         sessionStorage.setItem(sessionKey, '1');
 
         try {
-            const res = await fetch(`/api/streak/${user.isuNumber}`);
+            const res = await fetch(`/api/streak/${profile.isuNumber}`);
             if (!res.ok) return;
             const data = await res.json();
 
@@ -339,7 +351,7 @@
             const hasReward = (data.coinsReward ?? 0) > 0 || (data.xpReward ?? 0) > 0;
             const hasEvent  = data.usedFreeze || data.streakBroken;
             if (data.currentStreak > 0 && (hasReward || hasEvent)) {
-                renderModal(data, user);
+                renderModal(data, profile);
             }
         } catch { /* offline */ }
     }

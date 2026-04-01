@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблица лидеров — Курс C++</title>
+    <link rel="stylesheet" href="css/variables.css?v=3">
+    <link rel="stylesheet" href="css/theme-picker.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+    <style>
+        .lb-page { max-width: 860px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+        .lb-title { font-size: 2rem; font-weight: 800; margin-bottom: 0.4rem; }
+        .lb-subtitle { color: var(--text-secondary); margin-bottom: 2rem; font-size: .88rem; }
+
+        .lb-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .lb-tab {
+            padding: 6px 14px; border-radius: 99px; font-size: .8rem; font-weight: 700;
+            border: 1px solid var(--border-primary); background: var(--bg-secondary);
+            color: var(--text-secondary); cursor: pointer; transition: all .15s;
+        }
+        .lb-tab:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .lb-tab.active { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+
+        .lb-table-wrap { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 12px; overflow: hidden; }
+        .lb-table { width: 100%; border-collapse: collapse; }
+        .lb-table th { padding: 10px 16px; text-align: left; font-size: .72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border-primary); }
+        .lb-table td { padding: 10px 16px; font-size: .88rem; border-bottom: 1px solid var(--border-primary); }
+        .lb-table tr:last-child td { border-bottom: none; }
+        .lb-table tr:hover td { background: var(--bg-tertiary); }
+
+        .lb-rank { font-family: var(--font-mono); font-weight: 700; color: var(--text-muted); }
+        .lb-rank-1 { color: #fde68a; }
+        .lb-rank-2 { color: #d1d5db; }
+        .lb-rank-3 { color: #cd7f32; }
+
+        .lb-guid { font-family: var(--font-mono); font-size: .78rem; color: var(--text-secondary); }
+        .lb-guid-you { color: var(--accent-blue); }
+        .lb-guid-you::after { content: ' ← вы'; font-size: .7rem; opacity: .7; }
+
+        .lb-val { font-family: var(--font-mono); font-weight: 700; color: var(--accent-violet); }
+        .lb-sub { font-size: .75rem; color: var(--text-muted); }
+
+        .lb-loading { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .lb-empty   { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .lb-my-row td { background: rgba(88,166,255,.07) !important; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="index.html">Главная</a>
+                <a href="achievements.html">🏆 Достижения</a>
+                <a href="leaderboard.html" class="active">🥇 Лидеры</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrapper" style="display:block">
+        <main class="lb-page">
+            <div class="lb-title">🏆 Таблица лидеров</div>
+            <div class="lb-subtitle">Участники идентифицируются по GUID — имена не раскрываются.</div>
+
+            <div class="lb-tabs" id="lb-tabs">
+                <button class="lb-tab active" data-tab="xp">⭐ Уровень</button>
+                <button class="lb-tab" data-tab="coins">🪙 Монеты</button>
+                <button class="lb-tab" data-tab="reading">📖 Прочитано</button>
+                <button class="lb-tab" data-tab="streak">🔥 Серия дней</button>
+                <button class="lb-tab" data-tab="tests">📝 Тесты</button>
+                <button class="lb-tab" data-tab="mastery">🎯 Усвоение</button>
+                <button class="lb-tab" data-tab="scroll">📜 Прокрутка</button>
+            </div>
+
+            <div class="lb-table-wrap">
+                <div class="lb-loading" id="lb-loading">⏳ Загрузка...</div>
+                <table class="lb-table" id="lb-table" style="display:none">
+                    <thead id="lb-thead"></thead>
+                    <tbody id="lb-tbody"></tbody>
+                </table>
+                <div class="lb-empty" id="lb-empty" style="display:none">Нет данных</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/theme.js"></script>
+    <script>
+    const TABS = {
+        xp: {
+            heads: ['#', 'GUID', 'Уровень', 'Опыт (XP)'],
+            row: (r, me) => [
+                rankCell(r.rank),
+                guidCell(r.publicId, me),
+                `<td><span class="lb-val">${r.level}</span></td>`,
+                `<td><span class="lb-val">${r.xp.toLocaleString('ru')}</span></td>`
+            ]
+        },
+        coins: {
+            heads: ['#', 'GUID', 'Монет заработано'],
+            row: (r, me) => [
+                rankCell(r.rank),
+                guidCell(r.publicId, me),
+                `<td><span class="lb-val">🪙 ${r.totalCoins.toLocaleString('ru')}</span></td>`
+            ]
+        },
+        reading: {
+            heads: ['#', 'GUID', 'Параграфов', 'Время'],
+            row: (r, me) => [
+                rankCell(r.rank),
+                guidCell(r.publicId, me),
+                `<td><span class="lb-val">${r.paragraphs}</span></td>`,
+                `<td><span class="lb-val" style="font-size:.82rem">${r.timeFormatted}</span></td>`
+            ]
+        },
+        streak: {
+            heads: ['#', 'GUID', 'Макс. серия', 'Текущая'],
+            row: (r, me) => [
+                rankCell(r.rank),
+                guidCell(r.publicId, me),
+                `<td><span class="lb-val">🔥 ${r.maxStreak}</span> <span class="lb-sub">дн.</span></td>`,
+                `<td><span class="lb-val">${r.currentStreak}</span></td>`
+            ]
+        },
+        tests: {
+            heads: ['#', 'GUID', 'Попыток', 'Средний балл'],
+            row: (r, me) => [
+                rankCell(r.rank),
+                guidCell(r.publicId, me),
+                `<td><span class="lb-val">${r.testAttempts.toLocaleString('ru')}</span></td>`,
+                `<td><span class="lb-val">${r.avgScore}%</span></td>`
+            ]
+        },
+        mastery: {
+            heads: ['#', 'GUID', 'Пройдено тестов', 'Охват курса'],
+            row: (r, me) => [
+                rankCell(r.rank),
+                guidCell(r.publicId, me),
+                `<td><span class="lb-val">${r.passedTests}</span> <span class="lb-sub">/ ${r.totalTests}</span></td>`,
+                `<td><span class="lb-val">${r.coveragePct}%</span></td>`
+            ]
+        },
+        scroll: {
+            heads: ['#', 'GUID', 'Прокручено'],
+            row: (r, me) => [
+                rankCell(r.rank),
+                guidCell(r.publicId, me),
+                `<td><span class="lb-val">${r.display}</span></td>`
+            ]
+        }
+    };
+
+    function rankCell(rank) {
+        const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+        const cls = rank <= 3 ? ` lb-rank-${rank}` : '';
+        const icon = medals[rank] ? `${medals[rank]} ` : '';
+        return `<td class="lb-rank${cls}">${icon}${rank}</td>`;
+    }
+
+    function guidCell(publicId, myGuid) {
+        const id = String(publicId || '');
+        const isMe = myGuid && id.toLowerCase() === myGuid.toLowerCase();
+        const cls = isMe ? ' lb-guid-you' : '';
+        return `<td class="lb-guid${cls}" title="${id}">${id.slice(0, 8)}…</td>`;
+    }
+
+    let currentTab = 'xp';
+    const cache = {};
+
+    async function loadTab(tab) {
+        document.getElementById('lb-loading').style.display = 'block';
+        document.getElementById('lb-table').style.display = 'none';
+        document.getElementById('lb-empty').style.display = 'none';
+
+        let rows;
+        if (cache[tab]) {
+            rows = cache[tab];
+        } else {
+            try {
+                const res = await fetch(`/api/leaderboard/${tab}`);
+                rows = res.ok ? await res.json() : [];
+                cache[tab] = rows;
+            } catch { rows = []; }
+        }
+
+        document.getElementById('lb-loading').style.display = 'none';
+
+        if (!rows.length) {
+            document.getElementById('lb-empty').style.display = 'block';
+            return;
+        }
+
+        const myGuid = (() => {
+            try { return JSON.parse(localStorage.getItem('cpp_user') || 'null')?.publicId || null; }
+            catch { return null; }
+        })();
+
+        const cfg = TABS[tab];
+        document.getElementById('lb-thead').innerHTML =
+            '<tr>' + cfg.heads.map(h => `<th>${h}</th>`).join('') + '</tr>';
+
+        document.getElementById('lb-tbody').innerHTML = rows.map(r => {
+            const isMe = myGuid && String(r.publicId || '').toLowerCase() === myGuid.toLowerCase();
+            return `<tr${isMe ? ' class="lb-my-row"' : ''}>${cfg.row(r, myGuid).join('')}</tr>`;
+        }).join('');
+
+        document.getElementById('lb-table').style.display = 'table';
+    }
+
+    document.getElementById('lb-tabs').addEventListener('click', e => {
+        const btn = e.target.closest('.lb-tab');
+        if (!btn) return;
+        document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
+        loadTab(currentTab);
+    });
+
+    // Sync publicId from server if missing in localStorage
+    (async () => {
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        if (user?.isuNumber && !user.publicId) {
+            try {
+                const res = await fetch(`/api/profile/${user.isuNumber}`, {
+                    headers: { 'X-Isu-Number': user.isuNumber }
+                });
+                if (res.ok) {
+                    const p = await res.json();
+                    if (p.publicId) {
+                        user.publicId = p.publicId;
+                        localStorage.setItem('cpp_user', JSON.stringify(user));
+                    }
+                }
+            } catch {}
+        }
+        loadTab(currentTab);
+    })();
+    </script>
+</body>
+</html>

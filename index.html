@@ -42,6 +42,7 @@
                 <a href="theory/chapter-1/basics/index.html">Глава I</a>
                 <a href="achievements.html">🏆 Достижения</a>
                 <a href="shop.html">🛒 Магазин</a>
+                <a href="leaderboard.html">🥇 Лидеры</a>
                 <a href="register.html">Регистрация</a>
                 <a href="login.html" id="navAuthLink">Вход</a>
             </nav>
@@ -174,6 +175,7 @@
 
     <!-- JS -->
     <script src="js/navigation.js"></script>
+    <script src="js/paragraph-lock.js"></script>
     <script src="js/course.js"></script>
     <script src="js/gamification.js"></script>
     <script src="js/code-highlighter.js"></script>
@@ -181,30 +183,43 @@
     <script src="js/streak.js"></script>
     <script>
         // Update nav based on auth state — only update href, initHeaderUser() handles the name
-        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
         const navLink = document.getElementById('navAuthLink');
-        if (user && navLink) {
-            navLink.style.display = 'none'; // initHeaderUser() in navigation.js adds the profile link
-        }
+        // navAuthLink visibility is handled by initHeaderUser() in navigation.js after server validation
 
-        // Player card
-        function initPlayerCard() {
+        // Player card — данные с сервера
+        async function initPlayerCard() {
             const u = JSON.parse(localStorage.getItem('cpp_user') || 'null');
-            if (!u) return;
+            if (!u?.isuNumber) return;
+
+            // Загружаем профиль с сервера — никакого fallback на localStorage
+            let profile;
+            try {
+                const res = await fetch(`/api/profile/${u.isuNumber}`, {
+                    headers: { 'X-Isu-Number': u.isuNumber }
+                });
+                if (!res.ok) {
+                    localStorage.removeItem('cpp_user');
+                    return;
+                }
+                profile = await res.json();
+            } catch {
+                return; // offline — не показываем
+            }
+
             const section = document.getElementById('player-card-section');
             if (section) section.style.display = '';
 
-            const coins  = (() => { try { return JSON.parse(localStorage.getItem('gs_coins') || '0'); } catch { return 0; } })();
-            const keys   = (() => { try { return JSON.parse(localStorage.getItem('gs_keys')  || '0'); } catch { return 0; } })();
-            const level  = (() => { try { return JSON.parse(localStorage.getItem('gs_level') || '1'); } catch { return 1; } })();
-            const xp     = (() => { try { return JSON.parse(localStorage.getItem('gs_xp')    || '0'); } catch { return 0; } })();
-            const streak = u.currentStreak || 0;
+            const coins  = profile.coins  ?? 0;
+            const keys   = profile.keys   ?? 0;
+            const level  = profile.level  ?? 1;
+            const xp     = profile.xp     ?? 0;
+            const streak = profile.currentStreak ?? 0;
             const needed = level * 120;
 
             const LEVEL_TITLES = ['','Новичок','Ученик','Практикант','Программист','Эксперт','Мастер C++'];
             const LEVEL_ICONS  = ['','🌱','📘','⚙️','💻','🔬','👑'];
 
-            document.getElementById('pc-name').textContent    = u.firstName + ' ' + u.lastName;
+            document.getElementById('pc-name').textContent    = profile.firstName + ' ' + profile.lastName;
             document.getElementById('pc-level').innerHTML     = `${LEVEL_ICONS[level] || '⭐'} Уровень ${level} · ${LEVEL_TITLES[level] || ''}`;
             document.getElementById('pc-xp-fill').style.width = Math.min(xp / needed * 100, 100) + '%';
             document.getElementById('pc-xp-label').textContent = `${xp} / ${needed} XP`;
@@ -213,7 +228,7 @@
             document.getElementById('pc-streak').textContent  = streak;
             document.getElementById('pc-avatar').textContent  = LEVEL_ICONS[level] || '👤';
 
-            const freezeCount = u.freezeCount || 0;
+            const freezeCount = profile.freezeCount ?? 0;
             if (freezeCount > 0) {
                 const fw = document.getElementById('pc-freeze-wrap');
                 if (fw) { fw.style.display = ''; document.getElementById('pc-freeze').textContent = freezeCount; }
@@ -258,37 +273,11 @@
                 const paragraphs = chapter.paragraphs || [];
                 const chapterIndex = `theory/${chapter.id}/${chapter.groupId}/index.html`;
 
-                // Compute per-paragraph mastery from localStorage
-                // quiz_best_${paraId} is saved by quiz.js when a quiz is completed
-                function paraProgress(p) {
-                    const tests = p.tests && p.tests.length ? p.tests : [{ quizId: p.id }];
-                    const scores = tests.map(t => {
-                        try {
-                            const v = localStorage.getItem(`quiz_best_${t.quizId}`);
-                            return v !== null ? JSON.parse(v) : null;
-                        } catch { return null; }
-                    }).filter(s => s !== null);
-                    if (!scores.length) return { passed: false, mastery: null };
-                    const mastery = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-                    return { passed: mastery >= 70, mastery };
-                }
-
-                // Chapter overall mastery: один балл на параграф (среднее его тестов или 0), делим на кол-во параграфов
-                function paraScore(p) {
-                    const tests = p.tests && p.tests.length ? p.tests : [{ quizId: p.id }];
-                    const scores = tests.map(t => {
-                        try {
-                            const v = localStorage.getItem(`quiz_best_${t.quizId}`);
-                            return v !== null ? JSON.parse(v) : null;
-                        } catch { return null; }
-                    }).filter(s => s !== null);
-                    // null (не проходил) → 0
-                    return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-                }
-                const chapterMastery = paragraphs.length > 0
-                    ? Math.round(paragraphs.map(paraScore).reduce((a, b) => a + b, 0) / paragraphs.length)
-                    : 0;
-                const masteryColor = chapterMastery >= 90 ? '#fde68a' : chapterMastery >= 80 ? '#cd7f32' : chapterMastery >= 70 ? '#a8b5c8' : '#6b7280';
+                // Compute per-paragraph mastery — заполняется с сервера ниже
+                function paraProgress(p) { return { passed: false, mastery: null }; }
+                function paraScore(p) { return 0; }
+                const chapterMastery = 0;
+                const masteryColor = '#6b7280';
 
                 const PREVIEW = 6;
                 const hasMore = paragraphs.length > PREVIEW;
@@ -356,58 +345,115 @@
                 });
             });
 
+            // Плоский список всех параграфов для определения порядка
+            const allParas = structure.chapters.flatMap(ch => (ch.paragraphs || []).map(p => p.id));
+
             // If logged in — fetch real progress from server and update badges
             const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+            let unlockedSet = new Set();
+            let isAdmin = false;
+
             if (user?.isuNumber) {
-                fetch(`/api/progress/${user.isuNumber}/all`)
-                    .then(r => { console.log('[progress] status', r.status); return r.ok ? r.json() : null; })
-                    .then(progressMap => {
-                        console.log('[progress] map', progressMap);
-                        if (!progressMap) return;
-
-                        structure.chapters.forEach((chapter, ci) => {
-                            const paragraphs = chapter.paragraphs || [];
-                            const cardEl = document.getElementById(`chapter-card-${ci}`);
-                            if (!cardEl) return;
-
-                            let scoreSum = 0;
-                            paragraphs.forEach(p => {
-                                const prog = progressMap[p.id];
-                                if (!prog) return;
-                                const attempted = Object.values(prog.tests || {}).filter(t => t.attemptsCount > 0);
-                                if (attempted.length) {
-                                    scoreSum += Math.round(attempted.reduce((s, t) => s + t.bestScore, 0) / attempted.length);
-                                }
-                            });
-                            const mastery = paragraphs.length > 0 ? Math.round(scoreSum / paragraphs.length) : 0;
-                            const mc = mastery >= 90 ? '#fde68a' : mastery >= 80 ? '#cd7f32' : mastery >= 70 ? '#a8b5c8' : '#6b7280';
-                            const badge = cardEl.querySelector('.ch-mastery-badge');
-                            if (badge) {
-                                badge.style.color = mc;
-                                badge.style.borderColor = mc + '33';
-                                badge.textContent = mastery + '%';
-                            }
-
-                            paragraphs.forEach(p => {
-                                const prog = progressMap[p.id];
-                                const paraItem = cardEl.querySelector(`.para-item[data-para-id="${p.id}"]`);
-                                if (!paraItem || !prog) return;
-                                const attempted = Object.values(prog.tests || {}).filter(t => t.attemptsCount > 0);
-                                if (!attempted.length) return;
-
-                                const pMastery = Math.round(attempted.reduce((s, t) => s + t.bestScore, 0) / attempted.length);
-                                const badge = paraItem.querySelector('[data-para-badge]');
-                                if (!badge) return;
-
-                                if (pMastery === 100)     { badge.className = 'para-badge para-badge--gold';   badge.textContent = `🥇 100%`; }
-                                else if (pMastery >= 90)  { badge.className = 'para-badge para-badge--silver'; badge.textContent = `🥈 ${pMastery}%`; }
-                                else if (pMastery >= 80)  { badge.className = 'para-badge para-badge--bronze'; badge.textContent = `🥉 ${pMastery}%`; }
-                                else if (pMastery >= 70)  { badge.className = 'para-badge para-badge--pass';   badge.textContent = `✓ ${pMastery}%`; }
-                                else                      { badge.className = 'para-badge para-badge--fail';   badge.textContent = `${pMastery}%`; }
-                            });
-                        });
+                // Загружаем прогресс и разблокированные параграфы параллельно
+                const [progressMap, unlockedData] = await Promise.all([
+                    fetch(`/api/progress/${user.isuNumber}/all`)
+                        .then(r => r.ok ? r.json() : null)
+                        .catch(() => null),
+                    fetch(`/api/progress/${user.isuNumber}/unlocked-paragraphs`, {
+                        headers: { 'X-Isu-Number': user.isuNumber, ...(user.isAdmin ? { 'X-Is-Admin': '1' } : {}) }
                     })
-                    .catch(() => {});
+                        .then(r => r.ok ? r.json() : null)
+                        .catch(() => null)
+                ]);
+
+                unlockedSet = new Set(unlockedData?.unlocked || []);
+                isAdmin = unlockedData?.isAdmin || false;
+
+                if (progressMap) {
+                    structure.chapters.forEach((chapter, ci) => {
+                        const paragraphs = chapter.paragraphs || [];
+                        const cardEl = document.getElementById(`chapter-card-${ci}`);
+                        if (!cardEl) return;
+
+                        let scoreSum = 0;
+                        paragraphs.forEach(p => {
+                            const prog = progressMap[p.id];
+                            if (!prog) return;
+                            const attempted = Object.values(prog.tests || {}).filter(t => t.attemptsCount > 0);
+                            if (attempted.length) {
+                                scoreSum += Math.round(attempted.reduce((s, t) => s + t.bestScore, 0) / attempted.length);
+                            }
+                        });
+                        const mastery = paragraphs.length > 0 ? Math.round(scoreSum / paragraphs.length) : 0;
+                        const mc = mastery >= 90 ? '#fde68a' : mastery >= 80 ? '#cd7f32' : mastery >= 70 ? '#a8b5c8' : '#6b7280';
+                        const badge = cardEl.querySelector('.ch-mastery-badge');
+                        if (badge) {
+                            badge.style.color = mc;
+                            badge.style.borderColor = mc + '33';
+                            badge.textContent = mastery + '%';
+                        }
+
+                        paragraphs.forEach(p => {
+                            const prog = progressMap[p.id];
+                            const paraItem = cardEl.querySelector(`.para-item[data-para-id="${p.id}"]`);
+                            if (!paraItem || !prog) return;
+                            const attempted = Object.values(prog.tests || {}).filter(t => t.attemptsCount > 0);
+                            if (!attempted.length) return;
+
+                            const pMastery = Math.round(attempted.reduce((s, t) => s + t.bestScore, 0) / attempted.length);
+                            const badge = paraItem.querySelector('[data-para-badge]');
+                            if (!badge) return;
+
+                            if (pMastery === 100)     { badge.className = 'para-badge para-badge--gold';   badge.textContent = `🥇 100%`; }
+                            else if (pMastery >= 90)  { badge.className = 'para-badge para-badge--silver'; badge.textContent = `🥈 ${pMastery}%`; }
+                            else if (pMastery >= 80)  { badge.className = 'para-badge para-badge--bronze'; badge.textContent = `🥉 ${pMastery}%`; }
+                            else if (pMastery >= 70)  { badge.className = 'para-badge para-badge--pass';   badge.textContent = `✓ ${pMastery}%`; }
+                            else                      { badge.className = 'para-badge para-badge--fail';   badge.textContent = `${pMastery}%`; }
+                        });
+                    });
+                }
+            }
+
+            // Применяем замки к ссылкам параграфов (для всех — залогиненных и нет)
+            if (!isAdmin) {
+                function lockParaLink(link, isGuest) {
+                    link.classList.add('para-locked');
+                    link.title = isGuest ? 'Войдите в аккаунт, чтобы открывать параграфы' : 'Пройдите тесты предыдущего параграфа на ≥70%';
+                    link.addEventListener('click', e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const t = document.createElement('div');
+                        t.className = 'gs-toast';
+                        t.innerHTML = isGuest
+                            ? '<strong>🔒 Войдите в аккаунт</strong><br><span>Чтобы открывать параграфы, нужно войти</span>'
+                            : '<strong>🔒 Параграф закрыт</strong><br><span>Пройдите тесты предыдущего параграфа на ≥70%</span>';
+                        document.body.appendChild(t);
+                        requestAnimationFrame(() => t.classList.add('show'));
+                        setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 2800);
+                    });
+                }
+
+                structure.chapters.forEach((chapter, ci) => {
+                    const cardEl = document.getElementById(`chapter-card-${ci}`);
+                    if (!cardEl) return;
+                    (chapter.paragraphs || []).forEach(p => {
+                        const idx = allParas.indexOf(p.id);
+                        if (idx <= 0) return; // первый всегда открыт
+
+                        const paraItem = cardEl.querySelector(`.para-item[data-para-id="${p.id}"]`);
+                        if (!paraItem) return;
+                        const link = paraItem.querySelector('.chapter-section-link');
+                        if (!link) return;
+
+                        if (!user?.isuNumber) {
+                            // Незалогинен — всё кроме первого заблокировано
+                            lockParaLink(link, true);
+                        } else {
+                            const prevId = allParas[idx - 1];
+                            if (!unlockedSet.has(prevId)) lockParaLink(link, false);
+                        }
+                    });
+                });
             }
 
             // Плашки стандартов — показываем всем (статус покупки если залогинен)

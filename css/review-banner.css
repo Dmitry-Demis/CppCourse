@@ -1,0 +1,127 @@
+/* ============================================
+   REVIEW BANNER — уведомление о повторении
+   ============================================ */
+
+.review-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary, #1e1e2e);
+    border-bottom: 2px solid var(--accent-blue, #89b4fa);
+    color: var(--text-primary, #cdd6f4);
+    font-size: 0.9rem;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.review-banner.rb-visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.review-banner.rb-hiding {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.rb-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.rb-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.rb-title {
+    font-weight: 600;
+    color: var(--accent-blue, #89b4fa);
+    margin-bottom: 0.2rem;
+}
+
+.rb-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.rb-para-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.5rem;
+    background: var(--bg-tertiary, #313244);
+    border-radius: 4px;
+    color: var(--text-primary, #cdd6f4);
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: background 0.15s;
+}
+
+.rb-para-link:hover {
+    background: var(--accent-blue, #89b4fa);
+    color: var(--bg-primary, #1e1e2e);
+}
+
+.rb-score {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    font-weight: 600;
+}
+
+.rb-score--wrong {
+    color: var(--accent-red, #f38ba8);
+    opacity: 1;
+}
+
+.rb-extra {
+    font-size: 0.82rem;
+    opacity: 0.6;
+    padding: 0.15rem 0.3rem;
+}
+
+.rb-accept {
+    flex-shrink: 0;
+    padding: 0.35rem 0.9rem;
+    background: var(--accent-blue, #89b4fa);
+    color: var(--bg-primary, #1e1e2e);
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.rb-accept:hover { opacity: 0.85; }
+
+.rb-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted, #6c7086);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.25rem 0.4rem;
+    border-radius: 4px;
+    transition: color 0.15s;
+}
+
+.rb-close:hover { color: var(--text-primary, #cdd6f4); }
+
+@media (max-width: 600px) {
+    .review-banner {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .rb-body { width: 100%; }
+    .rb-accept { order: 3; }
+    .rb-close  { order: 4; }
+}

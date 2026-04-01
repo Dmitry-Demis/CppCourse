@@ -465,3 +465,15 @@
     .player-card { gap: var(--space-3); padding: var(--space-3) var(--space-4); }
     .pc-stats { gap: var(--space-3); }
 }
+
+/* ── Paragraph lock on index page ─────────────────────────────────────────── */
+.chapter-section-link.para-locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+.chapter-section-link.para-locked::after {
+    content: '🔒';
+    font-size: 0.65rem;
+    margin-left: 4px;
+}

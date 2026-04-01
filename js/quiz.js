@@ -343,67 +343,43 @@ class Quiz {
     }
 
     _saveResult(pct, passed) {
-        const key   = `quiz_${this.quizId}`;
-        const prev  = JSON.parse(localStorage.getItem(key) || '{}');
-        const entry = {
-            date:    new Date().toISOString(),
-            score:   this.score,
-            pct,
-            passed,
-            type:    this.type,
-            attempt: (prev.attempt || 0) + 1,
-            best:    Math.max(pct, prev.best || 0)
-        };
-        localStorage.setItem(key, JSON.stringify(entry));
-        // Store best score for quiz-widget
-        localStorage.setItem(`quiz_best_${this.quizId}`, JSON.stringify(entry.best));
-        // Store history for median calculation in quiz-widget
-        const histKey = `quiz_hist_${this.quizId}`;
-        const hist = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
-        hist.push(pct);
-        if (hist.length > 20) hist.splice(0, hist.length - 20);
-        localStorage.setItem(histKey, JSON.stringify(hist));
-
-        // Флаг прохождения финального теста (для разблокировки следующего параграфа)
-        if (passed && this.type === 'final') {
-            localStorage.setItem(`final_passed_${this.quizId}`, '1');
-        }
-
         // Отправляем прогресс на сервер если пользователь залогинен
         const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
-        if (user && user.isuNumber) {
-            // paragraphId = filename without extension (e.g. "comments" from /theory/chapter-1/basics/comments.html)
-            const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
-            const lastPart = parts[parts.length - 1] || '';
-            const paragraphId = lastPart.replace(/\.html$/, '') || 'unknown';
+        if (!user?.isuNumber) return;
 
-            const wrongIds = this.answers
-                .map((ans, idx) => (!ans?.isRight && this.questions[idx]?.id !== undefined) ? this.questions[idx].id : null)
-                .filter(id => id !== null);
+        const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+        const lastPart = parts[parts.length - 1] || '';
+        const paragraphId = lastPart.replace(/\.html$/, '') || 'unknown';
 
-            fetch('/api/test/complete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber },
-                body: JSON.stringify({
-                    paragraphId,
-                    testId:          this.quizId,
-                    testTitle:       this.title,
-                    score:           pct,
-                    correctAnswers:  this.answers.filter(a => a?.isRight).length,
-                    totalQuestions:  this.questions.length,
-                    wrongQuestionIds: wrongIds,
-                    correctQuestionIds: this.answers
-                        .map((ans, idx) => (ans?.isRight && this.questions[idx]?.id !== undefined) ? this.questions[idx].id : null)
-                        .filter(id => id !== null),
-                    timeSpent:       0
-                })
+        const wrongIds = this.answers
+            .map((ans, idx) => (!ans?.isRight && this.questions[idx]?.id !== undefined) ? this.questions[idx].id : null)
+            .filter(id => id !== null);
+
+        fetch('/api/test/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber },
+            body: JSON.stringify({
+                paragraphId,
+                testId:          this.quizId,
+                testTitle:       this.title,
+                score:           pct,
+                correctAnswers:  this.answers.filter(a => a?.isRight).length,
+                totalQuestions:  this.questions.length,
+                wrongQuestionIds: wrongIds,
+                correctQuestionIds: this.answers
+                    .map((ans, idx) => (ans?.isRight && this.questions[idx]?.id !== undefined) ? this.questions[idx].id : null)
+                    .filter(id => id !== null),
+                timeSpent:       0
             })
-            .then(r => r.json())
-            .then(data => {
-                if (data?.reward) this._showReward(data.reward);
-            })
-            .catch(e => console.error('[Quiz] Failed to save progress:', e));
-        }
+        })
+        .then(r => r.json())
+        .then(data => {
+            const reward = data?.reward ?? data;
+            if (reward?.coinsEarned !== undefined) this._showReward(reward);
+            window.dispatchEvent(new CustomEvent('quizCompleted', { detail: { testId: this.quizId } }));
+            if (window.ParagraphLock) window.ParagraphLock.invalidateCache();
+        })
+        .catch(e => console.error('[Quiz] Failed to save progress:', e));
     }
 }
 
@@ -446,7 +422,9 @@ const QuizLoader = {
             return;
         }
 
-        const questions = QuizLoader._pickQuestions(data);
+        // Получаем wrong IDs с сервера
+        const wrongIds = await QuizLoader._fetchWrongIds(data.quizId);
+        const questions = QuizLoader._pickQuestions(data, wrongIds);
 
         new Quiz(containerId, questions, {
             quizId:       data.quizId,
@@ -456,31 +434,37 @@ const QuizLoader = {
         });
     },
 
+    async _fetchWrongIds(quizId) {
+        try {
+            const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+            if (!user?.isuNumber) return new Set();
+            const res = await fetch(`/api/quiz/${quizId}/wrong-ids`, {
+                headers: { 'X-Isu-Number': user.isuNumber }
+            });
+            if (!res.ok) return new Set();
+            const ids = await res.json();
+            return new Set(ids);
+        } catch { return new Set(); }
+    },
+
     /**
      * Выбирает N вопросов из банка, приоритизируя ранее неправильно отвеченные.
+     * wrongIds — Set<int> полученный с сервера (передаётся снаружи).
      */
-    _pickQuestions(data) {
-        const all    = data.questions || [];
-        const pick   = Math.min(data.pick || all.length, all.length);
-        const quizId = data.quizId;
-
-        // Загружаем ID неправильно отвеченных вопросов
-        const wrongKey  = `quiz_wrong_${quizId}`;
-        const wrongIds  = new Set(JSON.parse(localStorage.getItem(wrongKey) || '[]'));
+    _pickQuestions(data, wrongIds = new Set()) {
+        const all  = data.questions || [];
+        const pick = Math.min(data.pick || all.length, all.length);
 
         const wrong   = all.filter(q => wrongIds.has(q.id));
         const correct = all.filter(q => !wrongIds.has(q.id));
 
-        // Перемешиваем каждую группу
         QuizLoader._shuffle(wrong);
         QuizLoader._shuffle(correct);
 
-        // Берём сначала неправильные, потом остальные, до pick штук
         const selected = [...wrong, ...correct].slice(0, pick);
         QuizLoader._shuffle(selected);
 
-        // Оборачиваем в прокси, чтобы после завершения сохранить неправильные
-        return QuizLoader._wrapQuestions(selected, quizId);
+        return QuizLoader._wrapQuestions(selected, data.quizId);
     },
 
     /**
@@ -523,32 +507,11 @@ const QuizLoader = {
     }
 };
 
-// Патчим Quiz._saveResult для сохранения неправильных вопросов
+// Патч Quiz._saveResult — больше не нужен (localStorage убран)
+// Оставляем пустой патч для совместимости
 const _origSaveResult = Quiz.prototype._saveResult;
 Quiz.prototype._saveResult = function(pct, passed) {
     _origSaveResult.call(this, pct, passed);
-
-    // Собираем ID неправильно отвеченных вопросов
-    const wrongIds = [];
-    this.answers.forEach((ans, idx) => {
-        if (ans && !ans.isRight) {
-            const q = this.questions[idx];
-            if (q && q.id !== undefined) wrongIds.push(q.id);
-        }
-    });
-
-    if (wrongIds.length > 0) {
-        const quizId  = this.questions[0]?._quizId || this.quizId;
-        const wrongKey = `quiz_wrong_${quizId}`;
-        // Объединяем с предыдущими неправильными
-        const prev = new Set(JSON.parse(localStorage.getItem(wrongKey) || '[]'));
-        wrongIds.forEach(id => prev.add(id));
-        localStorage.setItem(wrongKey, JSON.stringify([...prev]));
-    } else if (passed) {
-        // Если тест пройден без ошибок — очищаем список неправильных
-        const quizId  = this.questions[0]?._quizId || this.quizId;
-        localStorage.removeItem(`quiz_wrong_${quizId}`);
-    }
 };
 
 
@@ -563,14 +526,13 @@ Quiz.prototype._saveResult = function(pct, passed) {
  * Если их нет — создаёт автоматически.
  */
 window.openQuizModal = async function(quizId, title) {
-    // Fetch first — don't open modal if load fails
+    // Fetch quiz metadata
     let data;
     try {
         const res = await fetch(`/api/quiz/${quizId}`);
         if (!res.ok) throw new Error('not found');
         data = await res.json();
     } catch {
-        // Show inline error without opening modal
         const btn = document.querySelector(`[onclick*="openQuizModal('${quizId}'"]`);
         if (btn) {
             const orig = btn.textContent;
@@ -579,6 +541,31 @@ window.openQuizModal = async function(quizId, title) {
             setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
         }
         return;
+    }
+
+    // Получаем выборку вопросов с сервера (SR-алгоритм)
+    let pickedIds;
+    try {
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        const headers = user?.isuNumber ? { 'X-Isu-Number': user.isuNumber } : {};
+        const res = await fetch(`/api/quiz/${quizId}/pick-questions`, { headers });
+        if (res.ok) {
+            pickedIds = await res.json();
+        } else {
+            // Fallback — случайная выборка
+            const pick = Math.min(data.pick || data.questions.length, data.questions.length);
+            pickedIds = data.questions
+                .map(q => q.id)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, pick);
+        }
+    } catch {
+        // Fallback
+        const pick = Math.min(data.pick || data.questions.length, data.questions.length);
+        pickedIds = data.questions
+            .map(q => q.id)
+            .sort(() => Math.random() - 0.5)
+            .slice(0, pick);
     }
 
     let overlay = document.getElementById('quiz-modal-overlay');
@@ -598,7 +585,7 @@ window.openQuizModal = async function(quizId, title) {
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
     document.body.classList.add('modal-open');
-    window._activeModalQuiz = new ModalQuiz(content, data);
+    window._activeModalQuiz = new ModalQuiz(content, data, pickedIds);
 };
 
 window.closeQuizModal = function(e) {
@@ -617,26 +604,39 @@ document.addEventListener('keydown', e => {
 
 // ── ModalQuiz — рендерит тест внутри модалки ──────────────────────────────
 class ModalQuiz {
-    constructor(container, data) {
+    /**
+     * @param {Element}  container  — DOM-элемент для рендера
+     * @param {Object}   data       — ответ /api/quiz/{id}
+     * @param {number[]} pickedIds  — упорядоченный список ID вопросов от сервера (SR-алгоритм)
+     */
+    constructor(container, data, pickedIds = []) {
         this.container    = container;
         this.quizId       = data.quizId || data.id;
         this.title        = data.title;
         this.passingScore = data.passingScore ?? 70;
-        this.questions    = this._shuffle(ModalQuiz._pickQuestions(data));
+        this.questions    = ModalQuiz._buildQuestions(data, pickedIds);
         this.current      = 0;
         this.answers      = {};
         this.answered     = false;
         this._render();
     }
 
-    static _pickQuestions(data) {
-        const all    = data.questions || [];
-        const pick   = Math.min(data.pick || all.length, all.length);
-        const quizId = data.quizId;
+    /**
+     * Строит список вопросов в порядке pickedIds.
+     * Перемешивает варианты ответов и пересчитывает correct.
+     */
+    static _buildQuestions(data, pickedIds = []) {
+        const all = data.questions || [];
+        const byId = Object.fromEntries(all.map(q => [q.id, q]));
 
-        const wrongIds = new Set(JSON.parse(localStorage.getItem(`quiz_wrong_${quizId}`) || '[]'));
-        const wrong    = all.filter(q => wrongIds.has(q.id));
-        const rest     = all.filter(q => !wrongIds.has(q.id));
+        // Если pickedIds пустой — fallback: случайная выборка
+        let ordered;
+        if (pickedIds.length > 0) {
+            ordered = pickedIds.map(id => byId[id]).filter(Boolean);
+        } else {
+            const pick = Math.min(data.pick || all.length, all.length);
+            ordered = [...all].sort(() => Math.random() - 0.5).slice(0, pick);
+        }
 
         const shuffle = arr => {
             const a = [...arr];
@@ -647,10 +647,8 @@ class ModalQuiz {
             return a;
         };
 
-        const selected = [...shuffle(wrong), ...shuffle(rest)].slice(0, pick);
-
         // Перемешиваем варианты ответов и пересчитываем correct
-        return selected.map(q => {
+        return ordered.map(q => {
             if ((q.type === 'single' || q.type === 'code' || q.type === 'multiple') && Array.isArray(q.answers)) {
                 const indexed = q.answers.map((a, i) => ({ a, i }));
                 shuffle(indexed);
@@ -676,11 +674,7 @@ class ModalQuiz {
 
         // Накопленные очки за сессию
         const earnedPts = Object.values(this.answers).reduce((s, a) => s + a.pts, 0);
-        // Первая попытка = нет истории в localStorage
-        const histKey = `quiz_hist_${this.quizId}`;
-        const hist = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
-        const isFirstAttempt = hist.length === 0;
-        const firstBadge = isFirstAttempt ? `<span class="qm-score-first" title="Первая попытка">⚡</span>` : '';
+        const firstBadge = this._isFirstAttempt ? `<span class="qm-score-first" title="Первая попытка">⚡</span>` : '';
 
         this.container.innerHTML = `
             <div class="qm-header">
@@ -840,11 +834,6 @@ class ModalQuiz {
         const statusLabel = pct === 100 ? 'Золото' : pct >= 90 ? 'Серебро' : pct >= 80 ? 'Бронза' : pct >= 70 ? 'Зачёт' : 'Не зачтено';
         const statusCls   = pct === 100 ? 'gold' : pct >= 90 ? 'silver' : pct >= 80 ? 'bronze' : pct >= 70 ? 'pass' : 'fail';
 
-        // Первая попытка?
-        const histKey = `quiz_hist_${this.quizId}`;
-        const hist = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
-        const isFirstAttempt = hist.length === 0;
-
         this._saveProgress(pct, passed);
 
         this.container.innerHTML = `
@@ -852,7 +841,6 @@ class ModalQuiz {
                 <div class="qm-results-emoji">${medal}</div>
                 <h2>${passed ? 'Тест пройден!' : 'Попробуйте ещё раз'}</h2>
                 <span class="qm-status-badge qm-status--${statusCls}">${statusLabel}</span>
-                ${isFirstAttempt && passed ? `<div class="qm-first-badge">⚡ Первая попытка!</div>` : ''}
                 <div class="qm-results-circle">
                     <svg viewBox="0 0 100 100">
                         <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-primary)" stroke-width="8"/>
@@ -881,38 +869,16 @@ class ModalQuiz {
     }
 
     _saveProgress(pct, passed) {
-        // Update best score and attempts history in localStorage
-        const lsKey     = `quiz_best_${this.quizId}`;
-        const histKey   = `quiz_hist_${this.quizId}`;
-        const prev      = (() => { try { return JSON.parse(localStorage.getItem(lsKey) || '0'); } catch { return 0; } })();
-        if (pct > prev) localStorage.setItem(lsKey, JSON.stringify(pct));
-
-        // Append to history (keep last 20 attempts)
-        const hist = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
-        hist.push(pct);
-        if (hist.length > 20) hist.splice(0, hist.length - 20);
-        localStorage.setItem(histKey, JSON.stringify(hist));
-
-        // Track wrong question IDs for smart re-selection
-        const wrongIds = Object.values(this.answers)
-            .filter(a => !a.ok && a.qId !== undefined)
-            .map(a => a.qId);
-        if (wrongIds.length > 0) {
-            const wrongKey = `quiz_wrong_${this.quizId}`;
-            const prevWrong = new Set(JSON.parse(localStorage.getItem(wrongKey) || '[]'));
-            wrongIds.forEach(id => prevWrong.add(id));
-            localStorage.setItem(wrongKey, JSON.stringify([...prevWrong]));
-        } else if (passed) {
-            localStorage.removeItem(`quiz_wrong_${this.quizId}`);
-        }
-
-        // Send to server
         const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
         if (!user?.isuNumber) return;
 
         const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
         const lastPart = parts[parts.length - 1] || '';
         const paragraphId = lastPart.replace(/\.html$/, '') || 'unknown';
+
+        const wrongIds = Object.values(this.answers)
+            .filter(a => !a.ok && a.qId !== undefined)
+            .map(a => a.qId);
 
         fetch('/api/test/complete', {
             method: 'POST',
@@ -933,7 +899,11 @@ class ModalQuiz {
         })
         .then(r => r.json())
         .then(data => {
-            if (data?.reward) this._showReward(data.reward);
+            const reward = data?.reward ?? data;
+            if (reward?.coinsEarned !== undefined) this._showReward(reward);
+            // Сбрасываем кэш блокировок — параграф мог разблокироваться
+            window.dispatchEvent(new CustomEvent('quizCompleted', { detail: { testId: this.quizId } }));
+            if (window.ParagraphLock) window.ParagraphLock.invalidateCache();
         })
         .catch(() => {});
     }
@@ -973,35 +943,4 @@ class ModalQuiz {
     }
 }
 
-// ── Sync wrong questions from server on page load ─────────────────────────────
-// When navigating to a theory page via #tests link from profile,
-// we pre-populate quiz_wrong_* from the server's lastWrongQuestions
-// so the quiz widget prioritises those questions in the next session.
-(async function syncWrongQuestionsFromServer() {
-    const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
-    if (!user?.isuNumber) return;
-
-    const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
-    const lastPart = parts[parts.length - 1] || '';
-    const paragraphId = lastPart.replace(/\.html$/, '');
-    if (!paragraphId || paragraphId === 'unknown') return;
-
-    try {
-        const res = await fetch(`/api/progress/${user.isuNumber}/${paragraphId}`, {
-            headers: { 'X-Isu-Number': user.isuNumber }
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        const tests = data.tests || {};
-
-        // For each test in this paragraph, merge server's lastWrongQuestions into localStorage
-        Object.entries(tests).forEach(([testId, stats]) => {
-            const serverWrong = stats.lastWrongQuestions || [];
-            if (serverWrong.length === 0) return;
-            const key = `quiz_wrong_${testId}`;
-            const existing = new Set(JSON.parse(localStorage.getItem(key) || '[]'));
-            serverWrong.forEach(id => existing.add(id));
-            localStorage.setItem(key, JSON.stringify([...existing]));
-        });
-    } catch { /* silent */ }
-})();
+// (wrong questions are now fetched from server when opening a quiz, no sync needed)

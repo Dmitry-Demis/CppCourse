@@ -1,9 +1,8 @@
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 
 int main()
-{
-    std::vector primes { 2, 3, 5, 7, 11 };
+{std::vector primes {2, 3, 5, 7, 11};
 
     std::cout << primes[0] << '\n'; // 2 (первый)
     std::cout << primes[4] << '\n'; // 11 (последний)
@@ -14,5 +13,5 @@ int main()
     // Безопасный доступ с проверкой границ:
     std::cout << primes.at(1) << '\n'; // 3 (бросает исключение при выходе за границы)
 
-    return 0;
-}
+    return 0;}
+

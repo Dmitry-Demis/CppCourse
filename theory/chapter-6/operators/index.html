@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Побитовые операторы — Курс C++</title>
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/quiz.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav">
+                <a href="../../../index.html">Главная</a>
+                <a href="#" class="active">Глава XVI</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title"></div>
+                <ul class="sidebar-nav" id="course-nav"></ul>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Глава XVI</div>
+                <h1>Побитовые операторы</h1>
+                <p>Побитовые операции, битовые флаги и маски, std::bitset</p>
+                <div class="chapter-sections" id="sections-grid">
+                    <div class="chapter-sections-loading">Загрузка...</div>
+                </div>
+                <section class="feedback-section"></section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="toc-container">
+                <div class="toc-title">Содержание</div>
+                <nav class="toc-nav"></nav>
+            </div>
+        </aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/core/callout.js"></script>
+    <script src="../../../js/navigation.js"></script>
+    <script src="../../../js/paragraph-lock.js"></script>
+    <script src="../../../js/toc.js"></script>
+    <script src="../../../js/quiz.js"></script>
+    <script src="../../../js/gamification.js"></script>
+    <script>
+    (function () {
+        const bar = document.getElementById('reading-progress');
+        if (!bar) return;
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+        }, { passive: true });
+    })();
+    async function buildSectionsGrid() {
+        const grid = document.getElementById('sections-grid');
+        if (!grid) return;
+        try {
+            const data = await loadCourseStructure('../../../');
+            const chapter = data.chapters.find(c => c.id === 'chapter-6');
+            if (!chapter) { grid.innerHTML = '<p style="color:var(--text-secondary)">Глава не найдена.</p>'; return; }
+            const paragraphs = chapter.paragraphs || [];
+            if (!paragraphs.length) { grid.innerHTML = '<p style="color:var(--text-secondary)">Параграфы не найдены.</p>'; return; }
+            const chapterIndex = data.chapters.findIndex(c => c.id === chapter.id);
+            const chapterNum = chapterIndex >= 0 ? chapterIndex + 1 : 1;
+            grid.innerHTML = paragraphs.map((p, i) => {
+                const href = p.id + '.html';
+                const testCount = (p.tests || []).length;
+                const testBadge = testCount > 0
+                    ? `<span style="position:absolute;top:50%;right:2.5rem;transform:translateY(-50%);background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px;">${testCount > 1 ? testCount + ' теста' : 'Тест'}</span>`
+                    : '';
+                return `<a href="${href}" class="section-card"><div class="section-card__number">§${chapterNum}.${i+1}</div><div class="section-card__body"><div class="section-card__title">${p.title}</div></div>${testBadge}<span class="section-card__arrow">&rsaquo;</span></a>`;
+            }).join('');
+            if (window.ParagraphLock) await window.ParagraphLock.applyLocksToChapterIndex(data);
+        } catch (e) {
+            grid.innerHTML = '<p style="color:var(--text-secondary)">Не удалось загрузить секции: ' + e.message + '</p>';
+        }
+    }
+    buildSectionsGrid();
+    </script>
+    <script src="../../../js/theme.js"></script>
+    <script src="../../../js/feedback.js"></script>
+</body>
+</html>

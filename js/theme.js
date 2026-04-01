@@ -103,3 +103,43 @@ if (document.readyState === 'loading') {
 } else {
     buildThemePicker();
 }
+
+// ── Scroll tracker (all pages) ───────────────────────────────────────────────
+(function () {
+    'use strict';
+    let _px   = 0;
+    let _last = window.scrollY;
+    let _sent = false;
+
+    window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        _px += Math.abs(y - _last);
+        _last = y;
+    }, { passive: true });
+
+    function flush() {
+        if (_sent || _px < 10) return;
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        if (!user?.isuNumber) return;
+        const px = Math.round(_px);
+        _px = 0;   // сбрасываем накопленное
+        _sent = true;
+        fetch('/api/scroll', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber },
+            body: JSON.stringify({ pixels: px }),
+            keepalive: true
+        }).catch(() => {});
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            flush();
+        } else {
+            // Вернулись на вкладку — разрешаем следующую отправку
+            _sent = false;
+        }
+    });
+    window.addEventListener('pagehide',     flush);
+    window.addEventListener('beforeunload', flush);
+})();

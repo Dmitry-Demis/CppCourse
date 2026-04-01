@@ -1,18 +1,17 @@
-int getInt() { return 42; }
+﻿int getInt() {return 42;}
 
 int main()
-{
-    int x { 5 };
+{int x {5};
 
     // rvalue — временные значения без постоянного адреса:
-    // 5;           // литерал — rvalue
-    // 3.14;        // литерал — rvalue
+    // ;           // литерал — rvalue
+    // 14;        // литерал — rvalue
     // x + 1;       // результат операции — rvalue (временный объект)
     // x++;         // постфиксный инкремент — rvalue (возвращает копию)
     // getInt();    // возврат по значению — rvalue
 
-    int y { x + 1 }; // x+1 — rvalue, используется как инициализатор
-    int z { getInt() };
+    int y {x + 1}; // x+1 — rvalue, используется как инициализатор
+    int z {getInt()};
 
-    return 0;
-}
+    return 0;}
+

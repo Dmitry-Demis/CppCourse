@@ -155,3 +155,31 @@
     font-size: 0.9rem;
     font-style: italic;
 }
+
+/* ── Login prompt button ── */
+.qw-btn--login {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    background: rgba(99,102,241,.15);
+    color: var(--accent-violet, #a78bfa);
+    border: 1px solid rgba(99,102,241,.35);
+    border-radius: 6px;
+    padding: .5rem .9rem;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+    margin-top: auto;
+}
+.qw-btn--login:hover {
+    background: rgba(99,102,241,.28);
+}
+
+/* ── Unavailable card ── */
+.qw-card--unavailable {
+    opacity: .6;
+    border-style: dashed;
+    cursor: default;
+}
+.qw-card--unavailable:hover { border-color: var(--border-primary); }

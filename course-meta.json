@@ -20,7 +20,7 @@
       "id": "chapter-1b",
       "groupId": "constants",
       "level": "BEGINNER",
-      "title": "Константы и `constexpr`",
+      "title": "Константы и constexpr",
       "description": "`const`, `constexpr`, литералы, суффиксы, магические числа, системы счисления, константные выражения, `static_assert`, `constexpr`-функции, `consteval`",
       "paragraphs": [
         "constants",

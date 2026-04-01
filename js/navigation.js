@@ -39,6 +39,24 @@ const _siteRoot = (() => {
     document.head.appendChild(s);
 }());
 
+// ── review-banner.css + review-banner.js ──────────────────────────────────
+(function () {
+    if (document.getElementById('review-banner-css')) return;
+    const link = document.createElement('link');
+    link.id   = 'review-banner-css';
+    link.rel  = 'stylesheet';
+    link.href = _siteRoot + 'css/review-banner.css';
+    document.head.appendChild(link);
+
+    const s = document.createElement('script');
+    s.src = _siteRoot + 'js/review-banner.js';
+    document.head.appendChild(s);
+
+    const pl = document.createElement('script');
+    pl.src = _siteRoot + 'js/paragraph-lock.js';
+    document.head.appendChild(pl);
+}());
+
 document.addEventListener('DOMContentLoaded', async () => {
     initMobileMenu();
     initReadingProgress();
@@ -57,9 +75,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const structure = await _loadStructure();
     if (!structure) return;
 
-    buildCourseNav(structure);
+    // Загружаем прогресс тестов с сервера (один запрос)
+    const testProgress = await _loadAllTestProgress();
+
+    buildCourseNav(structure, testProgress);
     buildSectionNav(structure);
     buildParagraphNav(structure);
+
+    // Применяем замки к навигации после её построения
+    if (window.ParagraphLock) {
+        window.ParagraphLock.applyLocksToNav(structure);
+    } else {
+        // paragraph-lock.js ещё не загрузился — ждём
+        window.addEventListener('load', () => {
+            if (window.ParagraphLock) window.ParagraphLock.applyLocksToNav(structure);
+        });
+    }
 });
 
 // ------------------------------------------
@@ -75,9 +106,34 @@ async function _loadStructure() {
 }
 
 // ------------------------------------------
+// ЗАГРУЗКА ПРОГРЕССА ТЕСТОВ С СЕРВЕРА
+// Возвращает Map: quizId → { best, attempts }
+// ------------------------------------------
+async function _loadAllTestProgress() {
+    const result = {};
+    try {
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        if (!user?.isuNumber) return result;
+        const res = await fetch(`/api/progress/${user.isuNumber}/all`, {
+            headers: { 'X-Isu-Number': user.isuNumber }
+        });
+        if (!res.ok) return result;
+        const data = await res.json(); // { paragraphId: { tests: { testId: { bestScore, attemptsCount } } } }
+        for (const para of Object.values(data)) {
+            for (const [testId, stats] of Object.entries(para.tests || {})) {
+                if (stats.attemptsCount > 0) {
+                    result[testId] = { best: stats.bestScore, attempts: stats.attemptsCount };
+                }
+            }
+        }
+    } catch { /* silent */ }
+    return result;
+}
+
+// ------------------------------------------
 // ЛЕВЫЙ САЙДБАР (все главы и параграфы)
 // ------------------------------------------
-function buildCourseNav(structure) {
+function buildCourseNav(structure, testProgress = {}) {
     const nav = document.querySelector('.sidebar-nav');
     if (!nav) return;
 
@@ -149,11 +205,8 @@ function buildCourseNav(structure) {
             // Yellow pencil badge for mini/standard tests
             if (miniTests.length > 0) {
                 const bestMini = miniTests.reduce((best, t) => {
-                    try {
-                        const v = localStorage.getItem(`quiz_best_${t.quizId}`);
-                        const n = v !== null ? JSON.parse(v) : null;
-                        return (n !== null && (best === null || n > best)) ? n : best;
-                    } catch { return best; }
+                    const s = testProgress[t.quizId];
+                    return (s && (best === null || s.best > best)) ? s.best : best;
                 }, null);
                 const pct = bestMini !== null
                     ? `<span class="sb-badge__pct ${bestMini >= 70 ? 'pass' : 'fail'}">${bestMini}%</span>`
@@ -164,11 +217,8 @@ function buildCourseNav(structure) {
             // Pink-purple badge for paragraph/chapter final tests
             if (finalTests.length > 0) {
                 const bestFinal = finalTests.reduce((best, t) => {
-                    try {
-                        const v = localStorage.getItem(`quiz_best_${t.quizId}`);
-                        const n = v !== null ? JSON.parse(v) : null;
-                        return (n !== null && (best === null || n > best)) ? n : best;
-                    } catch { return best; }
+                    const s = testProgress[t.quizId];
+                    return (s && (best === null || s.best > best)) ? s.best : best;
                 }, null);
                 const pct = bestFinal !== null
                     ? `<span class="sb-badge__pct ${bestFinal >= 70 ? 'pass' : 'fail'}">${bestFinal}%</span>`
@@ -316,20 +366,16 @@ function initCopyCode() {
 // ВСПОМОГАТЕЛЬНЫЕ
 // ------------------------------------------
 function isParagraphUnlocked(paragraphs, idx) {
-    if (idx === 0) return true;
-    const prev = paragraphs[idx - 1];
-    if (!prev.finalTest) return true;
-    return !!localStorage.getItem(`final_passed_${prev.id}`);
+    // Блокировка по финальному тесту убрана — параграфы всегда доступны
+    return true;
 }
 
 function isParagraphDone(paraId) {
-    return !!localStorage.getItem(`final_passed_${paraId}`);
+    return false; // определяется только через сервер
 }
 
 function getQuizProgress(paraId) {
-    const data = localStorage.getItem(`quiz_final_${paraId}`);
-    if (!data) return null;
-    try { return JSON.parse(data).best; } catch { return null; }
+    return null;
 }
 
 function showLockedNotice() {

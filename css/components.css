@@ -468,6 +468,22 @@
 
 .section-card:hover .section-card__arrow { color: var(--accent-cyan); }
 
+.section-card.para-locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+.section-card.para-locked::after {
+    content: '🔒';
+    font-size: 0.7rem;
+    margin-left: auto;
+    padding-right: 0.5rem;
+}
+.section-card.para-locked:hover {
+    border-left-color: var(--border-primary);
+    background: var(--bg-secondary);
+}
+
 @media (max-width: 640px) {
     .info-grid {
         grid-template-columns: 1fr;

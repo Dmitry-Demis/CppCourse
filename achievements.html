@@ -92,7 +92,6 @@
     <script>
         // Per-achievement gradient palettes
         const ACH_GRADS = {
-            // activity
             first_code:   'linear-gradient(135deg,#f97316,#fbbf24)',
             first_quiz:   'linear-gradient(135deg,#06b6d4,#3b82f6)',
             streak3:      'linear-gradient(135deg,#ef4444,#f97316)',
@@ -101,21 +100,17 @@
             streak30:     'linear-gradient(135deg,#a855f7,#ec4899)',
             read60:       'linear-gradient(135deg,#10b981,#06b6d4)',
             read300:      'linear-gradient(135deg,#059669,#0891b2)',
-            // chapters
             chapter1:     'linear-gradient(135deg,#58a6ff,#a78bfa)',
             chapter2:     'linear-gradient(135deg,#f78166,#fb923c)',
             chapter3:     'linear-gradient(135deg,#7ee787,#22d3ee)',
             chapter4:     'linear-gradient(135deg,#d2a8ff,#a78bfa)',
-            // progress
             level5:       'linear-gradient(135deg,#fbbf24,#f59e0b)',
             level10:      'linear-gradient(135deg,#f59e0b,#ef4444)',
-            // code
             code50:       'linear-gradient(135deg,#6366f1,#8b5cf6)',
             code100:      'linear-gradient(135deg,#8b5cf6,#ec4899)',
             tests10:      'linear-gradient(135deg,#14b8a6,#06b6d4)',
             tests25:      'linear-gradient(135deg,#0ea5e9,#6366f1)',
             perfect_quiz: 'linear-gradient(135deg,#f59e0b,#ef4444)',
-            // special
             night_owl:    'linear-gradient(135deg,#1e1b4b,#4f46e5)',
             early_bird:   'linear-gradient(135deg,#fde68a,#f97316)',
             debugger:     'linear-gradient(135deg,#ef4444,#7c3aed)',
@@ -132,12 +127,25 @@
             special:  { icon: '✨', label: 'Особые' },
         };
 
-        function renderAchievements() {
-            const unlocked = (() => { try { return JSON.parse(localStorage.getItem('gs_achievements') || '[]'); } catch { return []; } })();
-            const achDates = (() => { try { return JSON.parse(localStorage.getItem('gs_ach_dates') || '{}'); } catch { return {}; } })();
-
+        async function renderAchievements() {
             const container = document.getElementById('ach-groups-container');
             if (!container) return;
+
+            // Загружаем достижения с сервера
+            const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+            let unlockedMap = {}; // achievementId → unlockedAt
+
+            if (user?.isuNumber) {
+                try {
+                    const res = await fetch(`/api/achievements/${user.isuNumber}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        data.forEach(a => { unlockedMap[a.achievementId] = a.unlockedAt; });
+                    }
+                } catch {}
+            }
+
+            const unlocked = Object.keys(unlockedMap);
 
             // Stats
             const total = ACHIEVEMENT_DEFS.length;
@@ -167,9 +175,13 @@
 
                 const grid = section.querySelector('.ach-hex-grid');
                 defs.forEach(def => {
-                    const isUnlocked = unlocked.includes(def.id);
+                    const isUnlocked = def.id in unlockedMap;
                     const grad = ACH_GRADS[def.id] || 'linear-gradient(135deg,#5b4fcf,#3b82f6)';
-                    const dateStr = achDates[def.id] ? `<div class="ach-hex-card-date">${achDates[def.id]}</div>` : '';
+                    let dateStr = '';
+                    if (isUnlocked && unlockedMap[def.id]) {
+                        const d = new Date(unlockedMap[def.id]);
+                        dateStr = `<div class="ach-hex-card-date">${d.toLocaleDateString('ru-RU')}</div>`;
+                    }
 
                     const card = document.createElement('div');
                     card.className = 'ach-hex-card' + (isUnlocked ? '' : ' locked');

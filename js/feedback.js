@@ -45,8 +45,34 @@
     }
 
     function init() {
-        const section   = document.querySelector('.feedback-section');
+        let section = document.querySelector('.feedback-section');
         if (!section) return;
+
+        // Если секция пустая — рендерим разметку
+        if (!section.querySelector('.feedback-star')) {
+            section.innerHTML = `
+                <div class="feedback-section__title">Оцените этот параграф</div>
+                <div class="feedback-section__subtitle">Нажмите на звезду, чтобы оставить оценку</div>
+                <div class="feedback-stars-row">
+                    <div class="feedback-stars">
+                        ${[1,2,3,4,5,6,7,8,9,10].map(n =>
+                            `<span class="feedback-star" aria-label="Оценка ${n}"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>`
+                        ).join('')}
+                    </div>
+                    <span class="feedback-rating-value">—</span>
+                </div>
+                <div class="feedback-form">
+                    <textarea class="feedback-form__textarea" maxlength="1024" placeholder="Комментарий (необязательно)…"></textarea>
+                    <div class="feedback-form__row">
+                        <span class="feedback-form__char">0 / 1024</span>
+                        <button class="feedback-form__submit">Отправить</button>
+                    </div>
+                </div>
+                <div class="feedback-done">
+                    <span class="feedback-done__icon">✓</span>
+                    <span>Спасибо за отзыв!</span>
+                </div>`;
+        }
 
         const stars     = [...section.querySelectorAll('.feedback-star')];
         const ratingVal = section.querySelector('.feedback-rating-value');

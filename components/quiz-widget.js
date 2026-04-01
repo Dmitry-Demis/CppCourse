@@ -44,13 +44,24 @@
 
         el.classList.add('quiz-widget-section');
 
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        const isLoggedIn = !!(user?.isuNumber);
+
+        // Загружаем серверную статистику для всех тестов виджета
+        const allIds = [...quizIds, ...(finalId ? [finalId] : [])];
+        const serverStats = isLoggedIn ? await fetchServerStats(allIds) : {};
+
         // Карточки мини/стандартных тестов
         if (quizIds.length > 0) {
             const metas = await Promise.all(quizIds.map(fetchMeta));
             const grid  = document.createElement('div');
             grid.className = 'qw-cards';
-            metas.forEach(meta => {
-                if (meta) grid.appendChild(buildCard(meta));
+            metas.forEach((meta, i) => {
+                if (meta) {
+                    grid.appendChild(buildCard(meta, serverStats[meta.quizId] || null, isLoggedIn));
+                } else {
+                    grid.appendChild(buildUnavailable(quizIds[i]));
+                }
             });
             el.appendChild(grid);
         }
@@ -59,14 +70,54 @@
         if (finalId) {
             const meta = await fetchMeta(finalId);
             if (meta) {
-                el.appendChild(buildFinal(meta, el.dataset.finalDesc || ''));
+                el.appendChild(buildFinal(meta, el.dataset.finalDesc || '', serverStats[meta.quizId] || null, isLoggedIn));
             } else {
-                const msg = document.createElement('div');
-                msg.className = 'qw-unavailable';
-                msg.textContent = 'Данных нет';
-                el.appendChild(msg);
+                el.appendChild(buildUnavailable(finalId));
             }
         }
+    }
+
+    // ── Плашка «Тест в разработке» ────────────────────────────────────────
+    function buildUnavailable(quizId) {
+        const div = document.createElement('div');
+        div.className = 'qw-card qw-card--unavailable';
+        div.innerHTML = `
+            <div class="qw-card__icon">🚧</div>
+            <div class="qw-card__title">Тест в разработке</div>
+            <div class="qw-card__desc" style="color:var(--text-muted);font-size:.8rem">${esc(quizId)}</div>`;
+        return div;
+    }
+
+    // ── Загрузить статистику тестов с сервера ─────────────────────────────
+    async function fetchServerStats(quizIds) {
+        const result = {};
+        try {
+            const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+            if (!user?.isuNumber || quizIds.length === 0) return result;
+
+            const parts = location.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+            const lastPart = parts[parts.length - 1] || '';
+            const paragraphId = lastPart.replace(/\.html$/, '');
+            if (!paragraphId) return result;
+
+            const res = await fetch(`/api/progress/${user.isuNumber}/${paragraphId}`, {
+                headers: { 'X-Isu-Number': user.isuNumber }
+            });
+            if (!res.ok) return result;
+            const data = await res.json();
+            const tests = data.tests || {};
+
+            for (const [testId, stats] of Object.entries(tests)) {
+                if (stats.attemptsCount > 0) {
+                    result[testId] = {
+                        best:     stats.bestScore,
+                        attempts: stats.attemptsCount,
+                        median:   null  // сервер не возвращает медиану — можно добавить позже
+                    };
+                }
+            }
+        } catch { /* silent */ }
+        return result;
     }
 
     // ── Получить метаданные теста (только title/type/pick) ───────────────
@@ -93,11 +144,10 @@
     }
 
     // ── Карточка теста ────────────────────────────────────────────────────
-    function buildCard(meta) {
+    function buildCard(meta, stats, isLoggedIn) {
         const type  = meta.type || 'mini';
         const info  = TYPE_LABELS[type] || TYPE_LABELS.mini;
         const pick  = calcPick(meta);
-        const stats = getStats(meta.quizId);
 
         const card = document.createElement('div');
         card.className = 'qw-card';
@@ -111,18 +161,22 @@
                 ${stats.median !== null ? `<span class="qw-stat"><span class="qw-stat__label">Медиана</span><span class="qw-stat__val">${stats.median}%</span></span>` : ''}
                 <span class="qw-stat"><span class="qw-stat__label">Попыток</span><span class="qw-stat__val">${stats.attempts}</span></span>
             </div>` : ''}
-            <button class="qw-btn qw-btn--${type}">Пройти тест &gt;</button>`;
+            ${isLoggedIn
+                ? `<button class="qw-btn qw-btn--${type}">Пройти тест &gt;</button>`
+                : `<a href="/login.html" class="qw-btn qw-btn--login">🔑 Войдите для прохождения</a>`
+            }`;
 
-        card.querySelector('button').addEventListener('click', () => openModal(meta.quizId, meta.title));
+        if (isLoggedIn) {
+            card.querySelector('button').addEventListener('click', () => openModal(meta.quizId, meta.title));
+        }
         return card;
     }
 
-    // ── Итоговый блок — такой же стиль как карточка ───────────────────────
-    function buildFinal(meta, desc) {
+    // ── Итоговый блок ─────────────────────────────────────────────────────
+    function buildFinal(meta, desc, stats, isLoggedIn) {
         const type  = meta.type || 'paragraph';
         const info  = TYPE_LABELS[type] || TYPE_LABELS.paragraph;
         const pick  = calcPick(meta);
-        const stats = getStats(meta.quizId);
         const descText = desc || `${pick} вопросов по всем темам`;
 
         const statsHtml = stats ? `
@@ -131,6 +185,10 @@
                 ${stats.median !== null ? `<span class="qw-stat"><span class="qw-stat__label">Медиана</span><span class="qw-stat__val">${stats.median}%</span></span>` : ''}
                 <span class="qw-stat"><span class="qw-stat__label">Попыток</span><span class="qw-stat__val">${stats.attempts}</span></span>
             </div>` : '';
+
+        const btnHtml = isLoggedIn
+            ? `<button class="qw-btn qw-btn--${type}" style="margin-top:0">Пройти итоговый тест &gt;</button>`
+            : `<a href="/login.html" class="qw-btn qw-btn--login" style="margin-top:0">🔑 Войдите для прохождения</a>`;
 
         const card = document.createElement('div');
         card.className = `qw-card qw-card--final qw-card--final-${type}`;
@@ -143,10 +201,12 @@
             <div class="qw-card__desc">${esc(descText)} · ${pick} вопросов</div>
             <div class="qw-card__row">
                 ${statsHtml}
-                <button class="qw-btn qw-btn--${type}" style="margin-top:0">Пройти итоговый тест &gt;</button>
+                ${btnHtml}
             </div>`;
 
-        card.querySelector('button').addEventListener('click', () => openModal(meta.quizId, meta.title));
+        if (isLoggedIn) {
+            card.querySelector('button').addEventListener('click', () => openModal(meta.quizId, meta.title));
+        }
         return card;
     }
 
@@ -202,24 +262,6 @@
     // Экспортируем для совместимости с quiz.js
     window.openQuizModal  = window.openQuizModal  || openModal;
     window.closeQuizModal = window.closeQuizModal || function(e) { if (e === null || e === undefined) closeModal(); };
-
-    // ── Вспомогательные ───────────────────────────────────────────────────
-    function getStats(quizId) {
-        try {
-            const best = JSON.parse(localStorage.getItem(`quiz_best_${quizId}`));
-            const hist = JSON.parse(localStorage.getItem(`quiz_hist_${quizId}`) || '[]');
-            if (best === null) return null;
-            let median = null;
-            if (hist.length > 0) {
-                const sorted = [...hist].sort((a, b) => a - b);
-                const mid = Math.floor(sorted.length / 2);
-                median = sorted.length % 2 === 0
-                    ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
-                    : sorted[mid];
-            }
-            return { best, median, attempts: hist.length };
-        } catch { return null; }
-    }
 
     function scoreEmoji(pct) {
         if (pct >= 100) return '🥇';

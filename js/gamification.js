@@ -65,11 +65,12 @@ const ACHIEVEMENT_DEFS = [
 // ── Main class ────────────────────────────────────────────────────────────────
 class GameSystem {
     constructor() {
-        this.coins        = GS.get('gs_coins', 0);
-        this.keys         = GS.get('gs_keys', 0);
-        this.xp           = GS.get('gs_xp', 0);
-        this.level        = GS.get('gs_level', 1);
-        this.achievements = GS.get('gs_achievements', []);
+        // Coins/XP/level/keys загружаются с сервера в initFromServer()
+        this.coins        = 0;
+        this.keys         = 0;
+        this.xp           = 0;
+        this.level        = 1;
+        this.achievements = []; // загружается с сервера
         this.quests       = this._initQuests();
         this._checkDailyReset();
         this._checkDailyReward();
@@ -79,6 +80,34 @@ class GameSystem {
     init() {
         this._buildHUD();
         this._checkTimeAchievements();
+        // Загружаем актуальные данные с сервера
+        this._loadFromServer();
+    }
+
+    async _loadFromServer() {
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        if (!user?.isuNumber) return;
+        try {
+            const res = await fetch(`/api/profile/${user.isuNumber}`, {
+                headers: { 'X-Isu-Number': user.isuNumber }
+            });
+            if (!res.ok) return;
+            const profile = await res.json();
+            this.coins = profile.coins ?? 0;
+            this.keys  = profile.keys  ?? 0;
+            this.xp    = profile.xp    ?? 0;
+            this.level = profile.level ?? 1;
+            this._updateHUD();
+        } catch {}
+
+        // Загружаем достижения
+        try {
+            const res = await fetch(`/api/achievements/${user.isuNumber}`);
+            if (res.ok) {
+                const data = await res.json();
+                this.achievements = data.map(a => a.achievementId);
+            }
+        } catch {}
     }
 
     // ── HUD ──────────────────────────────────────────────────────────────────
@@ -210,15 +239,12 @@ class GameSystem {
     // ── Economy ───────────────────────────────────────────────────────────────
     earnCoins(amount, reason = '') {
         this.coins += amount;
-        GS.set('gs_coins', this.coins);
         this._updateHUD();
         this._toast(`+${amount} 🪙`, reason);
-        this._checkAchievement('coin_collector', this.coins >= 5000);
     }
 
     earnKeys(amount, reason = '') {
         this.keys += amount;
-        GS.set('gs_keys', this.keys);
         this._updateHUD();
         this._toast(`+${amount} 🗝️`, reason);
     }
@@ -229,13 +255,11 @@ class GameSystem {
         if (this.xp >= needed) {
             this.xp -= needed;
             this.level++;
-            GS.set('gs_level', this.level);
             this._toast(`🎉 Уровень ${this.level}!`, 'Новый уровень');
             this.earnCoins(this.level * 50, 'за уровень');
             if (this.level >= 5)  this._checkAchievement('level5', true);
             if (this.level >= 10) this._checkAchievement('level10', true);
         }
-        GS.set('gs_xp', this.xp);
         this._updateHUD();
     }
 
@@ -274,7 +298,17 @@ class GameSystem {
     _checkAchievement(id, condition) {
         if (!condition || this.achievements.includes(id)) return;
         this.achievements.push(id);
-        GS.set('gs_achievements', this.achievements);
+
+        // Сохраняем на сервер
+        const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
+        if (user?.isuNumber) {
+            fetch(`/api/achievements/${user.isuNumber}/unlock`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ achievementId: id })
+            }).catch(() => {});
+        }
+
         const def = ACHIEVEMENT_DEFS.find(a => a.id === id);
         if (def) {
             this.earnCoins(def.reward, `достижение: ${def.name}`);
@@ -423,9 +457,19 @@ class ReadingTracker {
     }
 
     _tick() {
-        this._sessionSecs = 0;
-        this._codeWasRun  = false;
-        this._paused      = false;
+        this._sessionSecs  = 0;
+        this._codeWasRun   = false;
+        this._paused       = false;
+        this._scrollPixels = 0;
+        this._lastScrollY  = window.scrollY;
+
+        // Track scroll pixels
+        document.addEventListener('scroll', () => {
+            const current = window.scrollY;
+            const delta = Math.abs(current - this._lastScrollY);
+            this._scrollPixels += delta;
+            this._lastScrollY = current;
+        }, { passive: true });
 
         // Track code runs during this session
         const origOnCodeRun = this.gs.onCodeRun.bind(this.gs);
@@ -464,10 +508,12 @@ class ReadingTracker {
             const payload = JSON.stringify({
                 paragraphId,
                 timeSpent: this._sessionSecs,
-                codeWasRun: this._codeWasRun
+                codeWasRun: this._codeWasRun,
+                scrollPixels: this._scrollPixels
             });
 
-            this._sessionSecs = 0; // сбрасываем чтобы не отправить дважды
+            this._sessionSecs  = 0;
+            this._scrollPixels = 0;
 
             const url = '/api/reading/complete';
             const headers = { 'Content-Type': 'application/json', 'X-Isu-Number': user.isuNumber };
@@ -500,9 +546,12 @@ document.addEventListener('DOMContentLoaded', () => {
     gameSystem = new GameSystem();
     new ReadingTracker(gameSystem);
 
-    // Sync streak from localStorage user
-    const user = JSON.parse(localStorage.getItem('cpp_user') || 'null');
-    if (user?.currentStreak) gameSystem.onStreakUpdate(user.currentStreak);
+    // Streak sync is handled by streak.js via server data — no localStorage needed here
+});
+
+// После завершения теста — перезагружаем данные с сервера (coins/xp обновились)
+window.addEventListener('quizCompleted', () => {
+    if (gameSystem) gameSystem._loadFromServer();
 });
 
 // Global helper for external callers (e.g. index.html player card)
