@@ -59,18 +59,9 @@
                     существующий дольше одного выражения. Проще говоря: если у выражения есть имя или адрес — это lvalue.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="lvalues">
                     <div class="code-header"><span class="code-lang">C++ — примеры lvalue</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">int x { 5 };       // x — lvalue (переменная с именем)
-const double d {}; // d — lvalue (константная переменная)
-
-int arr[3] {};
-arr[0];            // arr[0] — lvalue (элемент массива)
-
-int& ref { x };    // ref — lvalue (ссылка)
-++x;               // ++x — lvalue (префиксный инкремент возвращает lvalue)</code></pre>
-                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
                 </div>
 
                 <h2 id="rvalue">rvalue — «временное значение»</h2>
@@ -79,15 +70,9 @@ int& ref { x };    // ref — lvalue (ссылка)
                     но не имеет постоянного адреса. Существует только в рамках выражения.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="rvalues">
                     <div class="code-header"><span class="code-lang">C++ — примеры rvalue</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">5;           // литерал — rvalue
-3.14;        // литерал — rvalue
-x + 1;       // результат операции — rvalue (временный объект)
-x++;         // постфиксный инкремент — rvalue (возвращает копию)
-getInt();    // возврат по значению — rvalue</code></pre>
-                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
                 </div>
 
                 <h2 id="why-matters">Почему это важно</h2>
@@ -105,16 +90,9 @@ getInt();    // возврат по значению — rvalue</code></pre>
                 </svg>
                 </div>
 
-                <div class="code-block">
+                <div class="code-block" data-example="assignment">
                     <div class="code-header"><span class="code-lang">C++ — присваивание требует lvalue слева</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">int x { 5 };
-x = 10;  // OK: x — lvalue, можно присвоить
-5 = x;   // ОШИБКА: 5 — rvalue, нельзя присвоить
-
-// lvalue неявно конвертируется в rvalue когда нужно:
-int y { x }; // x (lvalue) → rvalue (значение 5) → копируется в y</code></pre>
-                    </div>
+                    <div class="code-content"><pre><code class="language-cpp">// загрузка...</code></pre></div>
                 </div>
 
                 <div class="info-card">

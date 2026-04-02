@@ -70,29 +70,13 @@
                     Кроме того, функция привязана к конкретному типу и размеру.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="by-value">
                     <div class="code-header">
                         <span class="code-lang">C++ — по значению (не рекомендуется для больших массивов)</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-#include &lt;iostream&gt;
-
-// Принимает только std::array&lt;int, 5&gt; — жёсткая привязка к типу и размеру
-void printArray(std::array&lt;int, 5&gt; arr)
-{
-    for (int x : arr)
-        std::cout &lt;&lt; x &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-}
-
-int main()
-{
-    std::array a { 1, 2, 3, 4, 5 };
-    printArray(a); // копирует весь массив
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -103,28 +87,13 @@ int main()
                     Копирования нет, массив защищён от изменений.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="by-ref">
                     <div class="code-header">
                         <span class="code-lang">C++ — по const-ссылке</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-#include &lt;iostream&gt;
-
-void printArray(const std::array&lt;int, 5&gt;&amp; arr)
-{
-    for (int x : arr)
-        std::cout &lt;&lt; x &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-}
-
-int main()
-{
-    constexpr std::array primes { 2, 3, 5, 7, 11 };
-    printArray(primes); // без копирования
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -135,34 +104,13 @@ int main()
                     Это самый гибкий и идиоматичный подход.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="template">
                     <div class="code-header">
                         <span class="code-lang">C++ — шаблонная функция</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-#include &lt;iostream&gt;
-
-// T — тип элемента, N — размер (нетиповой параметр шаблона)
-template &lt;typename T, std::size_t N&gt;
-void printArray(const std::array&lt;T, N&gt;&amp; arr)
-{
-    for (const auto&amp; x : arr)
-        std::cout &lt;&lt; x &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-}
-
-int main()
-{
-    constexpr std::array ints { 1, 2, 3, 4, 5 };
-    constexpr std::array doubles { 1.1, 2.2, 3.3 };
-
-    printArray(ints);    // T=int, N=5
-    printArray(doubles); // T=double, N=3
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -193,29 +141,13 @@ int main()
                     и избежит лишнего копирования.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="returning">
                     <div class="code-header">
                         <span class="code-lang">C++ — возврат массива</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-#include &lt;iostream&gt;
-
-// Возвращаем массив первых N натуральных чисел
-std::array&lt;int, 5&gt; makeSequence()
-{
-    return { 1, 2, 3, 4, 5 };
-}
-
-int main()
-{
-    auto seq { makeSequence() };
-    for (int x : seq)
-        std::cout &lt;&lt; x &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -225,6 +157,9 @@ int main()
                     Для изменения — <code>std::array&lt;T,N&gt;&amp;</code>.<br>
                     Возврат по значению — нормально, компилятор оптимизирует.</p>
                 </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="array-passing" data-final-desc="Передача и возврат std::array"></div>
 
                 <section class="feedback-section">
                     <div class="feedback-section__title">Оцените этот параграф</div>

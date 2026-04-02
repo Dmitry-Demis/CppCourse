@@ -103,28 +103,13 @@
                     При объявлении нужно указать два шаблонных аргумента: тип элемента и длину.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="declaring">
                     <div class="code-header">
                         <span class="code-lang">C++ — объявление</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-
-int main()
-{
-    std::array&lt;int, 5&gt; a {};       // массив из 5 int, все = 0
-    std::array&lt;double, 3&gt; b {};    // массив из 3 double
-
-    // Длина должна быть константным выражением:
-    constexpr int len { 8 };
-    std::array&lt;int, len&gt; c {};     // OK: len — constexpr
-
-    // int n { 5 };
-    // std::array&lt;int, n&gt; d {};    // ОШИБКА: n не константа
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -140,26 +125,13 @@ int main()
                     Без инициализатора элементы остаются неинициализированными — всегда используй <code>{}</code>.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="init">
                     <div class="code-header">
                         <span class="code-lang">C++ — инициализация</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-
-int main()
-{
-    std::array&lt;int, 5&gt; a { 1, 2, 3, 4, 5 };  // все элементы заданы
-    std::array&lt;int, 5&gt; b { 1, 2 };            // b[2], b[3], b[4] = 0
-    std::array&lt;int, 5&gt; c {};                  // все = 0 (value-init)
-    // std::array&lt;int, 5&gt; d;                  // мусор! (default-init)
-
-    // constexpr — ключевое преимущество std::array:
-    constexpr std::array&lt;int, 5&gt; primes { 2, 3, 5, 7, 11 };
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -170,109 +142,49 @@ int main()
                     Это называется <span class="key-term">CTAD</span> (Class Template Argument Deduction).
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="ctad">
                     <div class="code-header">
                         <span class="code-lang">C++ — CTAD</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-
-int main()
-{
-    // Компилятор выводит std::array&lt;int, 5&gt;
-    constexpr std::array a { 9, 7, 5, 3, 1 };
-
-    // Компилятор выводит std::array&lt;double, 2&gt;
-    constexpr std::array b { 3.14, 2.71 };
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
                 <h2 id="access">Доступ к элементам</h2>
 
-                <div class="code-block">
+                <div class="code-block" data-example="access">
                     <div class="code-header">
                         <span class="code-lang">C++ — индексация</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-#include &lt;iostream&gt;
-
-int main()
-{
-    constexpr std::array primes { 2, 3, 5, 7, 11 };
-
-    std::cout &lt;&lt; primes[0] &lt;&lt; '\n';    // 2 — без проверки границ
-    std::cout &lt;&lt; primes.at(3) &lt;&lt; '\n'; // 7 — с проверкой (бросает исключение)
-    std::cout &lt;&lt; primes.front() &lt;&lt; '\n'; // 2 — первый элемент
-    std::cout &lt;&lt; primes.back() &lt;&lt; '\n';  // 11 — последний элемент
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
                 <h2 id="size">Размер массива</h2>
 
-                <div class="code-block">
+                <div class="code-block" data-example="size">
                     <div class="code-header">
                         <span class="code-lang">C++ — размер</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-#include &lt;iostream&gt;
-
-int main()
-{
-    constexpr std::array primes { 2, 3, 5, 7, 11 };
-
-    std::cout &lt;&lt; primes.size() &lt;&lt; '\n';       // 5 (тип size_t)
-    std::cout &lt;&lt; std::size(primes) &lt;&lt; '\n';   // 5 (C++17)
-
-    // Если нужен int:
-    int len { static_cast&lt;int&gt;(primes.size()) };
-
-    // Нулевой массив:
-    std::array&lt;int, 0&gt; empty {};
-    std::cout &lt;&lt; empty.empty() &lt;&lt; '\n'; // 1 (true)
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
                 <h2 id="loop">Перебор элементов</h2>
 
-                <div class="code-block">
+                <div class="code-block" data-example="loop">
                     <div class="code-header">
                         <span class="code-lang">C++ — циклы</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;array&gt;
-#include &lt;iostream&gt;
-
-int main()
-{
-    constexpr std::array scores { 85, 92, 78, 96, 61 };
-
-    // Range-for (предпочтительно)
-    for (int s : scores)
-        std::cout &lt;&lt; s &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-
-    // Индексный цикл
-    for (std::size_t i { 0 }; i &lt; scores.size(); ++i)
-        std::cout &lt;&lt; scores[i] &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -280,6 +192,9 @@ int main()
                     <div class="info-card__title">Ссылка на cppreference</div>
                     <p>Полная документация: <a href="https://en.cppreference.com/w/cpp/container/array" target="_blank" rel="noopener">cppreference — std::array</a></p>
                 </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="array-intro" data-final-desc="Введение в std::array"></div>
 
                 <section class="feedback-section">
                     <div class="feedback-section__title">Оцените этот параграф</div>

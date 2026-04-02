@@ -72,46 +72,25 @@
 
                 <h2 id="why-array">Зачем нужны массивы</h2>
 
-                <div class="code-block">
+                <div class="code-block" data-example="why-array">
                     <div class="code-header">
                         <span class="code-lang">C++ — без массива vs с массивом</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">// Без массива: 5 переменных, не масштабируется
-int score1 { 84 }, score2 { 92 }, score3 { 76 }, score4 { 81 }, score5 { 56 };
-int avg = (score1 + score2 + score3 + score4 + score5) / 5;
-
-// С массивом: одна переменная, легко масштабировать
-#include &lt;vector&gt;
-std::vector scores { 84, 92, 76, 81, 56 }; // 5 элементов</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
                 <h2 id="creating">Создание std::vector</h2>
 
-                <div class="code-block">
+                <div class="code-block" data-example="creating">
                     <div class="code-header">
                         <span class="code-lang">C++ — способы создания</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;vector&gt;
-
-// Пустой вектор
-std::vector&lt;int&gt; empty {};
-
-// Инициализация списком (предпочтительно)
-std::vector&lt;int&gt; primes { 2, 3, 5, 7, 11 };
-
-// CTAD (C++17): компилятор выводит тип элемента
-std::vector vowels { 'a', 'e', 'i', 'o', 'u' }; // std::vector&lt;char&gt;
-
-// Вектор заданной длины (все элементы = 0)
-std::vector&lt;int&gt; data(10); // 10 элементов, инициализированы нулём
-
-// const вектор
-const std::vector&lt;int&gt; fixed { 1, 2, 3 }; // нельзя изменить</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -166,30 +145,13 @@ const std::vector&lt;int&gt; fixed { 1, 2, 3 }; // нельзя изменить
                     Оператор <code>[]</code> не проверяет границы — выход за пределы даёт неопределённое поведение.
                 </p>
 
-                <div class="code-block">
+                <div class="code-block" data-example="indexing">
                     <div class="code-header">
                         <span class="code-lang">C++ — доступ к элементам</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;vector&gt;
-
-int main()
-{
-    std::vector primes { 2, 3, 5, 7, 11 };
-
-    std::cout &lt;&lt; primes[0] &lt;&lt; '\n'; // 2 (первый)
-    std::cout &lt;&lt; primes[4] &lt;&lt; '\n'; // 11 (последний)
-
-    primes[2] = 99; // изменяем элемент с индексом 2
-    std::cout &lt;&lt; primes[2] &lt;&lt; '\n'; // 99
-
-    // Безопасный доступ с проверкой границ:
-    std::cout &lt;&lt; primes.at(1) &lt;&lt; '\n'; // 3 (бросает исключение при выходе за границы)
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
@@ -200,28 +162,13 @@ int main()
 
                 <h2 id="real-use">Живое применение</h2>
 
-                <div class="code-block">
+                <div class="code-block" data-example="grades">
                     <div class="code-header">
                         <span class="code-lang">C++ — хранение оценок студентов</span>
                         <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;vector&gt;
-
-int main()
-{
-    std::vector&lt;double&gt; grades { 4.5, 3.8, 5.0, 4.2, 3.5 };
-
-    // Сумма всех оценок
-    double sum { 0.0 };
-    sum += grades[0]; sum += grades[1]; sum += grades[2];
-    sum += grades[3]; sum += grades[4];
-
-    std::cout &lt;&lt; "Средняя оценка: " &lt;&lt; sum / 5 &lt;&lt; '\n'; // 4.2
-
-    return 0;
-}</code></pre>
+<pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 

@@ -1,0 +1,173 @@
+F.1 — Constexpr functions
+Alex February 18, 2025
+
+In lesson 5.6 -- Constexpr variables, we introduced the constexpr keyword, which we used to create compile-time (symbolic) constants. We also introduced constant expressions, which are expressions that can be evaluated at compile-time rather than runtime.
+
+One challenge with constant expressions is that function call to a normal function are not allowed in constant expressions. This means we cannot use such function calls anywhere a constant expression is required.
+
+    x
+
+    Now Playing
+
+x
+video of: Why Pascal Lost to C++: The Rise of a Programming Giant
+Why Pascal Lost to C++: The Rise of a Programming Giant
+Watch on
+Video channel logo
+Why Pascal Lost to C++: The Rise of a Programming Giant
+
+Consider the following program:
+
+#include <iostream>
+
+int main()
+{
+    constexpr double radius { 3.0 };
+    constexpr double pi { 3.14159265359 };
+    constexpr double circumference { 2.0 * radius * pi };
+
+    std::cout << "Our circle has circumference " << circumference << "\n";
+
+    return 0;
+}
+
+This produces the result:
+Ezoic
+
+Our circle has circumference 18.8496
+
+Having a complex initializer for circumference isn’t great (and requires us to instantiate two supporting variables, radius and pi). So let’s make it a function instead:
+
+#include <iostream>
+
+double calcCircumference(double radius)
+{
+    constexpr double pi { 3.14159265359 };
+    return 2.0 * pi * radius;
+}
+
+int main()
+{
+    constexpr double circumference { calcCircumference(3.0) }; // compile error
+
+    std::cout << "Our circle has circumference " << circumference << "\n";
+
+    return 0;
+}
+
+This code is much cleaner. It also doesn’t compile. Constexpr variable circumference requires that its initializer is a constant expression, and the call calcCircumference() isn’t a constant expression.
+
+In this particular case, we could make circumference non-constexpr, and the program would compile. While we’d lose the benefits of constant expressions, at least the program would run.
+Ezoic
+
+However, there are other cases in C++ (which we’ll introduce in the future) where we do not have alternate options available, and only a constant expression will do. In those cases, we’d really like to be able to use functions, but calls to normal functions just won’t work. So what are we to do?
+
+Constexpr functions can be used in constant expressions
+
+A constexpr function is a function that is allowed to be called in a constant expression.
+
+To make a function a constexpr function, we simply use the constexpr keyword in front of the function’s return type.
+
+Key insight
+
+The constexpr keyword is used to signal to the compiler and other developers that a function can be used in a constant expression.
+
+Here’s the same example as above, but using a constexpr function:
+Ezoic
+
+#include <iostream>
+
+constexpr double calcCircumference(double radius) // now a constexpr function
+{
+    constexpr double pi { 3.14159265359 };
+    return 2.0 * pi * radius;
+}
+
+int main()
+{
+    constexpr double circumference { calcCircumference(3.0) }; // now compiles
+
+    std::cout << "Our circle has circumference " << circumference << "\n";
+
+    return 0;
+}
+
+Because calcCircumference() is now a constexpr function, it can be used in a constant expression, such as the initializer of circumference.
+
+Constexpr functions can be evaluated at compile time
+
+In lesson 5.5 -- Constant expressions, we noted that in contexts that require a constant expression (such as the initialization of a constexpr variable), a constant expression is required to evaluate at compile-time. If a required constant expression contains a constexpr function call, that constexpr function call must evaluate at compile-time.
+
+In our example above, variable circumference is constexpr and thus requires a constant expression initializer. Since calcCircumference() is part of this required constant expression, calcCircumference() must be evaluated at compile-time.
+
+When a function call is evaluated at compile-time, the compiler will calculate the return value of the function call at compile-time, and then replace the function call with the return value.
+Ezoic
+
+So in our example, the call to calcCircumference(3.0) is replaced with the result of the function call, which is 18.8496. In other words, the compiler will compile this:
+
+#include <iostream>
+
+constexpr double calcCircumference(double radius)
+{
+    constexpr double pi { 3.14159265359 };
+    return 2.0 * pi * radius;
+}
+
+int main()
+{
+    constexpr double circumference { 18.8496 };
+
+    std::cout << "Our circle has circumference " << circumference << "\n";
+
+    return 0;
+}
+
+To evaluate at compile-time, two other things must also be true:
+Ezoic
+
+    The call to the constexpr function must have arguments that are known at compile time (e.g. are constant expressions).
+    All statements and expressions within the constexpr function must be evaluatable at compile-time.
+
+When a constexpr (or consteval) function is being evaluated at compile-time, any other functions it calls are required to be evaluated at compile-time (otherwise the initial function would not be able to return a result at compile-time).
+
+For advanced readers
+
+There are some other lesser encountered criteria as well. These can be found here.
+
+Constexpr functions can also be evaluated at runtime
+
+Constexpr functions can also be evaluated at runtime, in which case they will return a non-constexpr result. For example:
+Ezoic
+
+#include <iostream>
+
+constexpr int greater(int x, int y)
+{
+    return (x > y ? x : y);
+}
+
+int main()
+{
+    int x{ 5 }; // not constexpr
+    int y{ 6 }; // not constexpr
+
+    std::cout << greater(x, y) << " is greater!\n"; // will be evaluated at runtime
+
+    return 0;
+}
+
+In this example, because arguments x and y are not constant expressions, the function cannot be resolved at compile-time. However, the function will still be resolved at runtime, returning the expected value as a non-constexpr int.
+
+Key insight
+
+When a constexpr function evaluates at runtime, it evaluates just like a normal (non-constexpr) function would. In other words, the constexpr has no effect in this case.
+
+Key insight
+
+Allowing functions with a constexpr return type to be evaluated at either compile-time or runtime was allowed so that a single function can serve both cases.
+
+Otherwise, you’d need to have separate functions (a function with a constexpr return type, and a function with a non-constexpr return type). This would not only require duplicate code, the two functions would also need to have different names!
+
+Remind me again why we care whether our functions execute at compile-time?
+
+Now would be a great time to review the benefits that compile-time programming techniques can provide: 5.5 -- Constant expressions.
