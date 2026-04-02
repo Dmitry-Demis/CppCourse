@@ -24,8 +24,14 @@ export function attachListeners(q, container, checkBtn, onCorrect) {
         if (checkBtn) checkBtn.hidden = true;
         onCorrect(input.value.trim());
     };
-    if (checkBtn) checkBtn.addEventListener('click', doCheck);
-    if (input)    input.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
+    if (checkBtn) {
+        checkBtn.disabled = true;
+        checkBtn.addEventListener('click', doCheck);
+    }
+    if (input) {
+        input.addEventListener('input', () => { if (checkBtn) checkBtn.disabled = !input.value.trim(); });
+        input.addEventListener('keydown', e => { if (e.key === 'Enter' && input.value.trim()) doCheck(); });
+    }
 }
 
 export function submit(q, value, container) {

@@ -19,7 +19,7 @@ export function buildNodes(q, quizId, tplGet, escape, md, shuffle) {
             ? cardTpl.content.cloneNode(true).querySelector('.quiz-matching-card')
             : _makeCard(item, escape, md);
         card.dataset.value = item;
-        if (cardTpl) card.querySelector('.js-card-text').innerHTML = md(escape(item));
+        if (cardTpl) card.querySelector('.js-card-text').innerHTML = md(item);
         pool.appendChild(card);
     });
 
@@ -50,14 +50,14 @@ function _makeCard(item, escape, md) {
     handle.className = 'quiz-matching-drag-handle';
     handle.textContent = '⠿';
     const text = document.createElement('span');
-    text.innerHTML = md(escape(item));
+    text.innerHTML = md(item);
     card.append(handle, text);
     return card;
 }
 
 function _fillRow(row, pair, i, quizId, escape, md) {
     row.querySelector('.js-row-letter').textContent = i + 1;
-    row.querySelector('.js-row-left').innerHTML = md(escape(pair.left));
+    row.querySelector('.js-row-left').innerHTML = md(pair.left);
     const slot = row.querySelector('.js-slot');
     slot.dataset.slot = i;
     slot.dataset.expected = pair.right;   // сохраняем правильный ответ для этого слота
@@ -75,7 +75,7 @@ function _makeRow(pair, i, quizId, escape, md) {
     letter.className = 'quiz-answer-letter';
     letter.textContent = i + 1;
     const left = document.createElement('span');
-    left.innerHTML = md(escape(pair.left));
+    left.innerHTML = md(pair.left);
     label.append(letter, left);
 
     const slot = document.createElement('div');
@@ -95,6 +95,14 @@ function _makeRow(pair, i, quizId, escape, md) {
 export function attachListeners(q, container, checkBtn, quizId, onCorrect) {
     initDnd(container, quizId);
     if (!checkBtn) return;
+    checkBtn.disabled = true;
+
+    // Разблокировать при первом drop в слот
+    const enableOnDrop = () => { checkBtn.disabled = false; };
+    container.querySelectorAll('.quiz-matching-slot').forEach(slot => {
+        slot.addEventListener('drop', enableOnDrop, { once: true });
+    });
+
     checkBtn.addEventListener('click', () => {
         checkBtn.hidden = true;
         onCorrect(null);

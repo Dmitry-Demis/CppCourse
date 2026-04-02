@@ -1,7 +1,45 @@
 // Тип: fill-code-drag — перетаскивание фрагментов кода в слоты
+//
+// Формат correct — массив допустимых полных комбинаций:
+//   [["/*", "*/"], ["//", null]]
+//   — комбинация 1: слот0="/*" И слот1="*/"
+//   — комбинация 2: слот0="//" И слот1=пусто (null = ничего не вставлено)
+//
+// Засчитывается если пользователь совпал с ЛЮБОЙ комбинацией полностью.
+// Очки — пропорционально слотам лучшей частично совпавшей комбинации.
+//
+// Для одной комбинации можно писать просто: "correct": ["/*", "*/"]
+
+function _parseCombinations(raw) {
+    // Возвращает массив комбинаций: (string|null)[][]
+    // Каждая комбинация — массив значений для слотов (null = пустой слот)
+    if (!Array.isArray(raw)) return [[raw]];
+    // Если первый элемент — массив, то это массив комбинаций
+    const combos = Array.isArray(raw[0]) ? raw : [raw];
+    // Выравниваем все комбинации до длины самой длинной (хвостовые null дописываются)
+    const maxLen = Math.max(...combos.map(c => c.length));
+    return combos.map(c => {
+        const padded = [...c];
+        while (padded.length < maxLen) padded.push(null);
+        return padded;
+    });
+}
+
+// Возвращает маску активных слотов по первой комбинации
+// (слот активен если хотя бы в одной комбинации он не null)
+function _activeSlots(combos, slotCount) {
+    const active = new Array(slotCount).fill(false);
+    combos.forEach(combo => {
+        combo.forEach((v, i) => { if (v !== null && v !== undefined) active[i] = true; });
+    });
+    return active;
+}
 
 export function buildNodes(q, quizId, tplGet, escape, md, shuffle) {
-    const shuffled = shuffle([...q.answers]);
+    const combos     = _parseCombinations(q.correct);
+    const slotCount  = combos[0]?.length ?? 0;
+    const active     = _activeSlots(combos, slotCount);
+    const shuffled   = shuffle([...q.answers]);
 
     // Пул карточек
     const poolTpl = tplGet('tpl-fill-drag-pool');
@@ -14,9 +52,9 @@ export function buildNodes(q, quizId, tplGet, escape, md, shuffle) {
     shuffled.forEach(card => {
         const el = cardTpl
             ? cardTpl.content.cloneNode(true).querySelector('.quiz-fill-drag-card')
-            : _makeCard(card, escape, md);
+            : _makeCard(card, md);
         el.dataset.value = card;
-        if (cardTpl) el.querySelector('.js-drag-card-text').innerHTML = md(escape(card));
+        if (cardTpl) el.querySelector('.js-drag-card-text').innerHTML = md(card);
         pool.appendChild(el);
     });
 
@@ -35,20 +73,28 @@ export function buildNodes(q, quizId, tplGet, escape, md, shuffle) {
     }
 
     const slotTpl = tplGet('tpl-fill-drag-slot');
-    const parts = q.code.split(/_{3,}/);
-    const frag  = document.createDocumentFragment();
+    const parts   = q.code.split(/_{3,}/);
+    const frag    = document.createDocumentFragment();
     let idx = 0;
 
     parts.forEach((part, pi) => {
         frag.appendChild(document.createTextNode(part));
         if (pi < parts.length - 1) {
-            const slot = slotTpl
-                ? slotTpl.content.cloneNode(true).querySelector('.quiz-fill-drop-slot')
-                : _makeSlot();
-            slot.dataset.slot = idx;
-            slot.id = `fdslot-${quizId}-${idx}`;
+            if (active[idx]) {
+                const slot = slotTpl
+                    ? slotTpl.content.cloneNode(true).querySelector('.quiz-fill-drop-slot')
+                    : _makeSlot();
+                slot.dataset.slot = idx;
+                slot.id = `fdslot-${quizId}-${idx}`;
+                frag.appendChild(slot);
+            } else {
+                // Слот не нужен ни в одной комбинации — невидимое место
+                const fixed = document.createElement('span');
+                fixed.className = 'quiz-fill-fixed-slot';
+                fixed.dataset.slot = idx;
+                frag.appendChild(fixed);
+            }
             idx++;
-            frag.appendChild(slot);
         }
     });
 
@@ -56,11 +102,11 @@ export function buildNodes(q, quizId, tplGet, escape, md, shuffle) {
     return [pool, pre];
 }
 
-function _makeCard(value, escape, md) {
+function _makeCard(value, md) {
     const el = document.createElement('div');
     el.className = 'quiz-fill-drag-card';
     el.draggable = true;
-    el.innerHTML = md(escape(value));
+    el.innerHTML = md(value);
     return el;
 }
 
@@ -77,6 +123,14 @@ function _makeSlot() {
 export function attachListeners(q, container, checkBtn, quizId, onCorrect) {
     initDnd(container, quizId);
     if (!checkBtn) return;
+    checkBtn.disabled = true;
+
+    // Разблокировать при первом drop в слот
+    const enableOnDrop = () => { checkBtn.disabled = false; };
+    container.querySelectorAll('.quiz-fill-drop-slot').forEach(slot => {
+        slot.addEventListener('drop', enableOnDrop, { once: true });
+    });
+
     checkBtn.addEventListener('click', () => {
         checkBtn.hidden = true;
         onCorrect(null);
@@ -84,20 +138,19 @@ export function attachListeners(q, container, checkBtn, quizId, onCorrect) {
 }
 
 export function initDnd(container, quizId) {
-    // draggedSource — оригинальная карточка (из пула или из слота)
-    let draggedSource = null;
-    let draggedFromSlot = null; // слот откуда тащим (если из слота)
+    let draggedSource   = null;
+    let draggedFromSlot = null;
 
     const bindCard = card => {
         card.addEventListener('dragstart', e => {
-            draggedSource = card;
+            draggedSource   = card;
             draggedFromSlot = card.closest('.quiz-fill-drop-slot') || null;
             card.classList.add('quiz-fill-drag-card--dragging');
             e.dataTransfer.effectAllowed = 'copy';
         });
         card.addEventListener('dragend', () => {
             card.classList.remove('quiz-fill-drag-card--dragging');
-            draggedSource = null;
+            draggedSource   = null;
             draggedFromSlot = null;
         });
     };
@@ -105,18 +158,16 @@ export function initDnd(container, quizId) {
     container.querySelectorAll('.quiz-fill-drag-card').forEach(bindCard);
 
     container.querySelectorAll('.quiz-fill-drop-slot').forEach(slot => {
-        slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('quiz-fill-drop-slot--over'); });
+        slot.addEventListener('dragover',  e => { e.preventDefault(); slot.classList.add('quiz-fill-drop-slot--over'); });
         slot.addEventListener('dragleave', () => slot.classList.remove('quiz-fill-drop-slot--over'));
         slot.addEventListener('drop', e => {
             e.preventDefault();
             slot.classList.remove('quiz-fill-drop-slot--over');
             if (!draggedSource) return;
 
-            // Если в слоте уже есть карточка — убираем её (она была клоном, просто удаляем)
             slot.querySelector('.quiz-fill-drag-card')?.remove();
             slot.querySelector('.quiz-fill-slot-hint')?.remove();
 
-            // Если тащим из другого слота — убираем карточку оттуда
             if (draggedFromSlot && draggedFromSlot !== slot) {
                 draggedSource.remove();
                 const hint = document.createElement('span');
@@ -125,7 +176,6 @@ export function initDnd(container, quizId) {
                 draggedFromSlot.appendChild(hint);
             }
 
-            // Клонируем карточку из пула, или перемещаем из слота
             const clone = draggedFromSlot ? draggedSource : draggedSource.cloneNode(true);
             bindCard(clone);
             slot.appendChild(clone);
@@ -138,7 +188,6 @@ export function initDnd(container, quizId) {
         pool.addEventListener('drop', e => {
             e.preventDefault();
             if (!draggedSource || !draggedFromSlot) return;
-            // Возврат карточки из слота в пул — удаляем из слота, восстанавливаем hint
             draggedSource.remove();
             const hint = document.createElement('span');
             hint.className = 'quiz-fill-slot-hint';
@@ -149,29 +198,57 @@ export function initDnd(container, quizId) {
 }
 
 export function submit(q, _value, container, quizId, tplGet) {
-    const slots   = container.querySelectorAll('.quiz-fill-drop-slot');
-    const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
+    const combos = _parseCombinations(q.correct);
+    const slots  = container.querySelectorAll('.quiz-fill-drop-slot');
+
+    // Собираем текущие значения слотов
+    const placed = {};
+    slots.forEach(slot => {
+        const i   = parseInt(slot.dataset.slot);
+        const card = slot.querySelector('.quiz-fill-drag-card');
+        placed[i] = card?.dataset.value ?? null;
+    });
+
+    // Находим лучшую комбинацию (максимум совпадений)
+    let bestCombo   = combos[0];
+    let bestMatches = -1;
+
+    combos.forEach(combo => {
+        let matches = 0;
+        combo.forEach((expected, i) => {
+            const actual = placed[i] ?? null;
+            if (expected === actual) matches++;
+        });
+        if (matches > bestMatches) { bestMatches = matches; bestCombo = combo; }
+    });
+
+    // Проверяем по лучшей комбинации
     let rightCount = 0;
 
-    slots.forEach((slot, i) => {
-        const card     = slot.querySelector('.quiz-fill-drag-card');
-        const placed   = card?.dataset.value ?? null;
-        const expected = correct[i] ?? '';
-        const ok       = placed === expected;
+    slots.forEach(slot => {
+        const i        = parseInt(slot.dataset.slot);
+        const expected = bestCombo[i] ?? null;
+        const actual   = placed[i] ?? null;
+        const ok       = expected === actual;
+
         if (ok) rightCount++;
         slot.classList.add(ok ? 'quiz-fill-drop-slot--ok' : 'quiz-fill-drop-slot--err');
+
         if (!ok) {
             const answerTpl = tplGet('tpl-fill-drag-answer');
             const hint = answerTpl
                 ? answerTpl.content.cloneNode(true).querySelector('.quiz-fill-slot-answer')
                 : Object.assign(document.createElement('span'), { className: 'quiz-fill-slot-answer' });
-            hint.textContent = expected;
+            // Показываем все допустимые значения для этого слота из всех комбинаций
+            const allVariants = [...new Set(combos.map(c => c[i]).filter(v => v !== null))];
+            hint.textContent  = allVariants.join(' / ') || '(пусто)';
             slot.appendChild(hint);
         }
     });
 
-    const isRight = rightCount === slots.length;
-    const earned  = Math.round((rightCount / slots.length) * 10);
-    const extra   = isRight ? null : `Правильно: ${rightCount} из ${slots.length}`;
+    const slotCount = slots.length;
+    const isRight   = rightCount === slotCount;
+    const earned    = slotCount > 0 ? Math.round((rightCount / slotCount) * 10) : 10;
+    const extra     = isRight ? null : `Правильно: ${rightCount} из ${slotCount}`;
     return { isRight, earned, extra };
 }

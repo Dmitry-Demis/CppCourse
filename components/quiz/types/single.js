@@ -9,7 +9,7 @@ export function buildNodes(q, quizId, tplGet, escape, md) {
 
         btn.dataset.index = i;
         btn.querySelector('.quiz-answer-letter').textContent = String.fromCharCode(65 + i);
-        btn.querySelector('.quiz-answer-text').innerHTML = md(q.type === 'code' ? escape(ans) : ans);
+        btn.querySelector('.quiz-answer-text').innerHTML = md(ans);
         return btn;
     });
 }

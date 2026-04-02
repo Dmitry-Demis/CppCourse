@@ -535,6 +535,29 @@ body.modal-open .site-footer {
 .qm-fill--ok  { border-color: var(--accent-green, #a6e3a1) !important; }
 .qm-fill--err { border-color: var(--accent-red,   #f38ba8) !important; }
 
+/* ── Fill type — текстовый ввод ── */
+.quiz-fill-wrap {
+    margin-bottom: var(--space-4);
+}
+.quiz-fill-input {
+    width: 100%;
+    max-width: 320px;
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: var(--fs-base);
+    box-sizing: border-box;
+    transition: border-color .15s;
+}
+.quiz-fill-input:focus { outline: none; border-color: var(--accent-blue); }
+.quiz-fill-input::placeholder { color: var(--text-tertiary); }
+.quiz-fill-input.fill--correct { border-color: var(--accent-green, #a6e3a1) !important; background: rgba(166,227,161,.08); }
+.quiz-fill-input.fill--wrong   { border-color: var(--accent-red,   #f38ba8) !important; background: rgba(243,139,168,.08); }
+.quiz-fill-input:disabled { opacity: .7; cursor: not-allowed; }
+
 .qm-feedback {
     display: flex;
     gap: var(--space-3);
@@ -883,6 +906,21 @@ body.modal-open .site-footer {
     background: rgba(137,180,250,.12) !important;
 }
 
+/* ── Letter badge (кружочек с буквой) ── */
+.quiz-answer-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    flex-shrink: 0;
+}
+
 /* ── Matching ── */
 .quiz-matching {
     display: flex;
@@ -971,6 +1009,90 @@ body.modal-open .site-footer {
     font-style: italic;
 }
 
+/* ── Classify (распределение по категориям) ── */
+.quiz-classify { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.quiz-classify-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--bg-tertiary);
+    border: 2px dashed var(--border-primary);
+    border-radius: var(--radius-md);
+    min-height: 52px;
+}
+
+.quiz-classify-cols {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.quiz-classify-col {
+    flex: 1;
+    min-width: 160px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.quiz-classify-col-header {
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-heading);
+    text-align: center;
+}
+
+.quiz-classify-dropzone {
+    flex: 1;
+    min-height: 80px;
+    padding: var(--space-2);
+    background: var(--bg-tertiary);
+    border: 2px dashed var(--border-primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    transition: border-color .15s, background .15s;
+}
+.quiz-classify-over { border-color: var(--accent-blue); background: rgba(137,180,250,.06); }
+
+.quiz-classify-card {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-card);
+    border: 2px solid var(--accent-blue);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    cursor: grab;
+    user-select: none;
+    transition: opacity .15s, box-shadow .15s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.quiz-classify-card:hover { box-shadow: 0 2px 8px rgba(137,180,250,.3); }
+.quiz-classify-card--ok  { border-color: var(--accent-green) !important; background: rgba(166,227,161,.1) !important; }
+.quiz-classify-card--err { border-color: var(--accent-red)   !important; background: rgba(243,139,168,.1) !important; }
+
+.quiz-classify-hint {
+    font-size: var(--fs-xs);
+    color: var(--accent-green);
+    font-style: italic;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+/* ── Type badge for classify ── */
+.qm-type--classify { background: rgba(250,179,135,.15); color: var(--accent-orange, #fab387); }
+
 /* ── Fill-code (inline inputs) ── */
 .quiz-fill-code-pre {
     position: relative;
@@ -1039,6 +1161,12 @@ body.modal-open .site-footer {
 .quiz-fill-drop-slot--over { border-color: var(--accent-purple); background: rgba(203,166,247,.1); }
 .quiz-fill-drop-slot--ok   { border-color: var(--accent-green) !important; background: rgba(166,227,161,.1) !important; }
 .quiz-fill-drop-slot--err  { border-color: var(--accent-red)   !important; background: rgba(243,139,168,.1) !important; }
+
+/* Фиксированный слот (null в correct) — невидимый, не принимает карточки */
+.quiz-fill-fixed-slot {
+    display: inline-block;
+    min-width: 4px;
+}
 
 .quiz-fill-slot-hint {
     font-size: var(--fs-xs);

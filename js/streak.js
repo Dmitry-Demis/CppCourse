@@ -152,11 +152,12 @@
     background: rgba(255,255,255,.05);
     border: 1px solid rgba(255,255,255,.1);
     border-radius: 10px;
-    padding: 4px 10px 4px 5px;
+    padding: 5px 12px 5px 6px;
     text-decoration: none;
     color: var(--text-primary, #cdd6f4);
     transition: background .15s, border-color .15s;
     cursor: pointer;
+    flex-shrink: 0;
 }
 .header-profile-mini:hover {
     background: rgba(255,255,255,.09);
@@ -165,20 +166,56 @@
     color: var(--text-primary, #cdd6f4);
 }
 .hpm-avatar {
-    width: 28px; height: 28px;
-    border-radius: 7px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
     background: linear-gradient(135deg, #cba6f7, #89b4fa);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1rem; flex-shrink: 0;
+    font-size: 1.1rem; flex-shrink: 0;
 }
-.hpm-info { display: flex; flex-direction: column; gap: 1px; }
-.hpm-name { font-size: .78rem; font-weight: 700; line-height: 1; white-space: nowrap; }
-.hpm-sub  { font-size: .65rem; color: rgba(205,214,244,.5); line-height: 1; white-space: nowrap; }
-.hpm-streak { font-size: .7rem; font-weight: 700; color: #fab387; }
+.hpm-info { display: flex; flex-direction: column; gap: 3px; }
+.hpm-name { font-size: .8rem; font-weight: 700; line-height: 1; white-space: nowrap; }
+.hpm-level-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: .68rem; color: rgba(205,214,244,.55); white-space: nowrap;
+}
+.hpm-level-badge {
+    font-size: .65rem; font-weight: 700;
+    background: rgba(203,166,247,.15);
+    color: #cba6f7;
+    border: 1px solid rgba(203,166,247,.3);
+    border-radius: 4px;
+    padding: 1px 6px;
+    white-space: nowrap;
+}
+.hpm-xp-bar-wrap { display: flex; align-items: center; gap: 5px; }
+.hpm-xp-bar {
+    width: 60px; height: 4px;
+    background: rgba(255,255,255,.1);
+    border-radius: 99px; overflow: hidden;
+}
+.hpm-xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #cba6f7, #89b4fa);
+    border-radius: 99px;
+    transition: width .4s;
+}
+.hpm-xp-val { font-size: .62rem; color: #a78bfa; font-weight: 700; white-space: nowrap; }
+.hpm-stats-row {
+    display: flex; align-items: center; gap: 7px;
+    font-size: .68rem; white-space: nowrap;
+}
+.hpm-coins  { font-weight: 700; color: #fde68a; }
+.hpm-keys   { font-weight: 700; color: rgba(205,214,244,.7); }
+.hpm-streak { font-weight: 700; color: #fab387; }
 
+@media (max-width: 768px) {
+    .hpm-xp-bar-wrap { display: none; }
+    .hpm-stats-row { display: none; }
+}
 @media (max-width: 480px) {
     .streak-modal { padding: 1.5rem 1.25rem 1.25rem; }
     .streak-modal__count { font-size: 2.4rem; }
+    .header-profile-mini { display: none; }
 }`;
 
     function injectStyle() {
@@ -193,37 +230,54 @@
     function renderHeaderProfile(profile) {
         // Remove old
         document.querySelectorAll('.header-profile-mini').forEach(el => el.remove());
-        // Also hide the plain text link added by navigation.js
         document.querySelectorAll('.header-profile-link').forEach(el => el.remove());
 
-        const LEVEL_ICONS = ['','🌱','📘','⚙️','💻','🔬','👑'];
-        const level  = profile.level  ?? 1;
-        const xp     = profile.xp     ?? 0;
-        const streak = profile.currentStreak ?? 0;
-        const needed = level * 120;
-        const xpPct  = Math.min(Math.round(xp / needed * 100), 100);
-        const icon   = LEVEL_ICONS[Math.min(level, LEVEL_ICONS.length - 1)] || '⭐';
+        const LEVEL_ICONS  = ['','🌱','📘','⚙️','💻','🔬','👑'];
+        const LEVEL_TITLES = ['','Новичок','Ученик','Практикант','Программист','Эксперт','Мастер C++'];
+        const level   = profile.level  ?? 1;
+        const xp      = profile.xp     ?? 0;
+        const coins   = profile.coins  ?? 0;
+        const keys    = profile.keys   ?? 0;
+        const streak  = profile.currentStreak ?? 0;
+        const needed  = 500;
+        const inLevel = xp % needed;
+        const pct     = Math.min(inLevel / needed * 100, 100).toFixed(1);
+        const icon    = LEVEL_ICONS[Math.min(level, LEVEL_ICONS.length - 1)] || '⭐';
+        const title   = LEVEL_TITLES[Math.min(level, LEVEL_TITLES.length - 1)] || '';
 
         const mini = document.createElement('a');
         mini.href = (typeof _siteRoot !== 'undefined' ? _siteRoot : '') + 'profile.html';
         mini.className = 'header-profile-mini';
-        mini.title = `${profile.firstName} ${profile.lastName} · Ур. ${level} · ${xp} XP`;
+        mini.title = `${profile.firstName} ${profile.lastName} · Ур. ${level} · ${inLevel}/${needed} XP`;
         mini.innerHTML = `
             <div class="hpm-avatar">${icon}</div>
             <div class="hpm-info">
                 <div class="hpm-name">${profile.firstName} ${profile.lastName}</div>
-                <div class="hpm-sub">Ур. ${level} · ${xpPct}% XP${streak > 0 ? ` · <span class="hpm-streak">🔥${streak}</span>` : ''}</div>
+                <div class="hpm-level-row">
+                    <span class="hpm-level-badge">Ур. ${level} · ${title}</span>
+                    <div class="hpm-xp-bar-wrap">
+                        <div class="hpm-xp-bar"><div class="hpm-xp-fill" style="width:${pct}%"></div></div>
+                        <span class="hpm-xp-val">${inLevel}/${needed} XP</span>
+                    </div>
+                </div>
+                <div class="hpm-stats-row">
+                    <span class="hpm-coins">🪙 ${coins}</span>
+                    <span class="hpm-keys">🗝️ ${keys}</span>
+                    ${streak > 0 ? `<span class="hpm-streak">🔥 ${streak}</span>` : ''}
+                </div>
             </div>`;
 
-        // Insert after logo in header
+        // Insert before mobile-menu-btn (at the end of header-inner)
         const headerInner = document.querySelector('.header-inner');
-        const logo = headerInner?.querySelector('.header-logo');
-        if (logo && logo.nextSibling) {
-            headerInner.insertBefore(mini, logo.nextSibling);
+        const mobileBtn = headerInner?.querySelector('.mobile-menu-btn');
+        if (mobileBtn) {
+            headerInner.insertBefore(mini, mobileBtn);
         } else if (headerInner) {
             headerInner.appendChild(mini);
         }
     }
+    // Экспортируем глобально чтобы gamification.js мог вызвать после загрузки данных
+    window.renderHeaderProfile = renderHeaderProfile;
 
     // ── Streak Modal ──────────────────────────────────────────────────────
     function renderModal(data, user) {

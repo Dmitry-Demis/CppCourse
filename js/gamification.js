@@ -98,6 +98,10 @@ class GameSystem {
             this.xp    = profile.xp    ?? 0;
             this.level = profile.level ?? 1;
             this._updateHUD();
+            // Обновляем плашку в хедере актуальными данными с сервера
+            if (typeof window.renderHeaderProfile === 'function') {
+                window.renderHeaderProfile(profile);
+            }
         } catch {}
 
         // Загружаем достижения
@@ -114,8 +118,10 @@ class GameSystem {
     _buildHUD() {
         if (document.getElementById('gs-hud')) return;
         if (document.body.classList.contains('landing-page')) return;
+        // HUD скрыт — данные хранятся в DOM, отображение идёт через .header-profile-mini
         const hud = document.createElement('div');
         hud.id = 'gs-hud';
+        hud.style.display = 'none';
         hud.innerHTML = `
             <div class="gs-hud-inner">
                 <div class="gs-coins" title="Монеты">🪙 <span id="gs-coins-val">${this.coins}</span></div>
@@ -126,13 +132,7 @@ class GameSystem {
                     <span class="gs-xp-val" id="gs-xp-val"></span>
                 </div>
             </div>`;
-        // Вставляем в header-inner если он есть, иначе в body
-        const headerInner = document.querySelector('.header-inner');
-        if (headerInner) {
-            headerInner.appendChild(hud);
-        } else {
-            document.body.appendChild(hud);
-        }
+        document.body.appendChild(hud);
         this._updateHUD();
     }
 
@@ -144,11 +144,28 @@ class GameSystem {
         const lblEl   = document.querySelector('.gs-xp-label');
         if (coinsEl) coinsEl.textContent = this.coins;
         if (keysEl)  keysEl.textContent  = this.keys;
-        const inLevel = this._xpInLevel();   // XP внутри текущего уровня
-        const needed  = 500;                  // XP до следующего уровня всегда 500
+        const inLevel = this._xpInLevel();
+        const needed  = 500;
         if (fillEl)  fillEl.style.width = Math.min(inLevel / needed * 100, 100) + '%';
         if (valEl)   valEl.textContent  = `${inLevel}/${needed}`;
         if (lblEl)   lblEl.textContent  = `Ур.${this.level}`;
+
+        // Синхронизируем .header-profile-mini
+        const mini = document.querySelector('.header-profile-mini');
+        if (mini) {
+            const hpmCoins = mini.querySelector('.hpm-coins');
+            const hpmKeys  = mini.querySelector('.hpm-keys');
+            const hpmXpVal = mini.querySelector('.hpm-xp-val');
+            const hpmXpFill = mini.querySelector('.hpm-xp-fill');
+            const hpmLvl   = mini.querySelector('.hpm-level-badge');
+            const LEVEL_TITLES = ['','Новичок','Ученик','Практикант','Программист','Эксперт','Мастер C++'];
+            const title = LEVEL_TITLES[Math.min(this.level, LEVEL_TITLES.length - 1)] || '';
+            if (hpmCoins)   hpmCoins.textContent  = `🪙 ${this.coins}`;
+            if (hpmKeys)    hpmKeys.textContent   = `🗝️ ${this.keys}`;
+            if (hpmXpVal)   hpmXpVal.textContent  = `${inLevel}/${needed} XP`;
+            if (hpmXpFill)  hpmXpFill.style.width = Math.min(inLevel / needed * 100, 100) + '%';
+            if (hpmLvl)     hpmLvl.textContent    = `Ур. ${this.level} · ${title}`;
+        }
     }
 
     _xpNeeded() { return this.level * 500; }

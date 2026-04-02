@@ -118,7 +118,7 @@
                         <div class="pc-stat" title="Streak">🔥 <span id="pc-streak">0</span></div>
                         <div class="pc-stat" id="pc-freeze-wrap" title="Заморозки стрика" style="display:none">🧊 <span id="pc-freeze">0</span></div>
                     </div>
-                    <button class="pc-missions-btn" onclick="openQuestsPanel()">🎯 Миссии</button>
+                    <button class="pc-missions-btn" onclick="openQuestsPanel()" style="display:none">🎯 Миссии</button>
                 </div>
             </section>
 
@@ -214,15 +214,16 @@
             const level  = profile.level  ?? 1;
             const xp     = profile.xp     ?? 0;
             const streak = profile.currentStreak ?? 0;
-            const needed = level * 120;
+            const needed = 500;
+            const inLevel = xp % 500;
 
             const LEVEL_TITLES = ['','Новичок','Ученик','Практикант','Программист','Эксперт','Мастер C++'];
             const LEVEL_ICONS  = ['','🌱','📘','⚙️','💻','🔬','👑'];
 
             document.getElementById('pc-name').textContent    = profile.firstName + ' ' + profile.lastName;
             document.getElementById('pc-level').innerHTML     = `${LEVEL_ICONS[level] || '⭐'} Уровень ${level} · ${LEVEL_TITLES[level] || ''}`;
-            document.getElementById('pc-xp-fill').style.width = Math.min(xp / needed * 100, 100) + '%';
-            document.getElementById('pc-xp-label').textContent = `${xp} / ${needed} XP`;
+            document.getElementById('pc-xp-fill').style.width = Math.min(inLevel / needed * 100, 100) + '%';
+            document.getElementById('pc-xp-label').textContent = `${inLevel} / ${needed} XP`;
             document.getElementById('pc-coins').textContent   = coins;
             document.getElementById('pc-keys').textContent    = keys;
             document.getElementById('pc-streak').textContent  = streak;

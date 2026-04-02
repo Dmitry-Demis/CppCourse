@@ -2,7 +2,7 @@
 
 import { get } from './templates.js';
 import { buildNodes, attachListeners, submit } from './dispatcher.js';
-import { quizMd, shuffle, shuffleAnswers, typeLabel, resultMood, rewardParts, saveResult, highlightCode } from './helpers.js';
+import { quizMd, safeQuizMd, shuffle, shuffleAnswers, typeLabel, resultMood, rewardParts, saveResult, highlightCode } from './helpers.js';
 
 function buildModalQuestions(data, pickedIds = []) {
     const all  = data.questions || [];
@@ -46,7 +46,7 @@ export class ModalQuiz {
         node.querySelector('.qm-progress-fill').style.width = pct + '%';
         node.querySelector('.qm-type-badge').textContent    = typeLabel(q.type);
         node.querySelector('.qm-type-badge').className      = `qm-type-badge qm-type--${q.type}`;
-        node.querySelector('.qm-question').innerHTML        = quizMd(q.question);
+        node.querySelector('.qm-question').innerHTML        = safeQuizMd(q.question);
         node.querySelector('.qm-score-val').textContent     = earnedPts;
 
         const codeEl = node.querySelector('.qm-code');
@@ -80,6 +80,33 @@ export class ModalQuiz {
 
         nextBtn.hidden = true;
         nextBtn.addEventListener('click', () => { this.current++; this._render(); });
+
+        // Enter: до ответа — проверить (если кнопка активна и помечена ready), после — далее
+        // Ctrl+Shift+Enter — DEBUG: пропустить вопрос без ответа
+        const onEnter = e => {
+            if (e.key !== 'Enter') return;
+            if (e.target.matches('input, textarea')) return;
+            e.preventDefault();
+
+            // DEBUG: Ctrl+Shift+Enter — пропуск вопроса
+            if (e.ctrlKey && e.shiftKey) {
+                this._clearEnterHandler();
+                this.answers[this.current] = { isRight: true, pts: 10, qId: q.id };
+                this.current++;
+                this._render();
+                return;
+            }
+
+            if (!nextBtn.hidden) {
+                nextBtn.click();
+            } else if (!checkBtn.hidden && !checkBtn.disabled) {
+                checkBtn.click();
+            }
+        };
+        this._enterHandler = onEnter;
+        document.addEventListener('keydown', onEnter);
+        // Убираем слушатель при переходе к следующему вопросу
+        nextBtn.addEventListener('click', () => document.removeEventListener('keydown', onEnter), { once: true });
 
         attachListeners(q, this.container, checkBtn, this.quizId, value => {
             if (this.answered) return;
@@ -117,7 +144,17 @@ export class ModalQuiz {
         if (earned && window.gameSystem) window.gameSystem.earnXP(earned, 'за правильный ответ');
     }
 
+    _clearEnterHandler() {
+        if (this._enterHandler) {
+            document.removeEventListener('keydown', this._enterHandler);
+            this._enterHandler = null;
+        }
+    }
+
     _saveAbandoned() {
+        this._clearEnterHandler();
+        // Не сохраняем если не было ни одного ответа
+        if (Object.keys(this.answers).length === 0) return;
         // Сохраняем попытку если тест не был завершён (закрыт крестиком)
         // Неотвеченные вопросы считаются неправильными
         if (this.current >= this.questions.length) return; // уже завершён нормально
@@ -135,6 +172,7 @@ export class ModalQuiz {
     }
 
     _showResults() {
+        this._clearEnterHandler();
         const total   = this.questions.length;
         const earned  = Object.values(this.answers).reduce((s, a) => s + (a.pts ?? 0), 0);
         const pct     = Math.round((earned / (total * 10)) * 100);

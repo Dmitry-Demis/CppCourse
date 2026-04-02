@@ -29,11 +29,17 @@ export function buildNodes(q, quizId, tplGet, escape, md) {
 
 export function attachListeners(q, container, checkBtn, onCorrect) {
     if (!checkBtn) return;
+    checkBtn.disabled = true;
     checkBtn.addEventListener('click', () => {
         checkBtn.hidden = true;
         const checked = Array.from(container.querySelectorAll('.quiz-checkbox:checked'))
             .map(cb => parseInt(cb.dataset.index));
         onCorrect(checked);
+    });
+
+    // Разблокировать при первом выборе
+    container.querySelectorAll('.quiz-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => { checkBtn.disabled = false; }, { once: true });
     });
 }
 

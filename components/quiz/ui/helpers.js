@@ -4,6 +4,15 @@ export function quizMd(text) {
     return String(text).replace(/`([^`]+)`/g, '<code>$1</code>');
 }
 
+// Безопасная версия — экранирует HTML перед обработкой backtick-разметки
+export function safeQuizMd(text) {
+    const escaped = String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    return escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
 export function escape(text) {
     const d = document.createElement('div');
     d.textContent = text;
@@ -37,6 +46,7 @@ export function typeLabel(type) {
         single: 'Один ответ', multiple: 'Несколько ответов', fill: 'Введите ответ',
         code: 'Что выведет код?', matching: 'Соответствие',
         'fill-code': 'Восстановите код', 'fill-code-drag': 'Расставьте фрагменты',
+        'classify': 'Распределите по категориям',
     }[type] || type;
 }
 
