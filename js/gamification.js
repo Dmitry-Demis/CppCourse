@@ -113,26 +113,27 @@ class GameSystem {
     // ── HUD ──────────────────────────────────────────────────────────────────
     _buildHUD() {
         if (document.getElementById('gs-hud')) return;
-        // Don't render HUD on landing page
         if (document.body.classList.contains('landing-page')) return;
         const hud = document.createElement('div');
         hud.id = 'gs-hud';
         hud.innerHTML = `
             <div class="gs-hud-inner">
                 <div class="gs-coins" title="Монеты">🪙 <span id="gs-coins-val">${this.coins}</span></div>
-                <div class="gs-coins" title="Ключи">🗝️ <span id="gs-keys-val">${this.keys}</span></div>
+                <div class="gs-coins gs-keys" title="Ключи">🗝️ <span id="gs-keys-val">${this.keys}</span></div>
                 <div class="gs-xp-wrap" title="Опыт">
                     <span class="gs-xp-label">Ур.${this.level}</span>
                     <div class="gs-xp-bar"><div class="gs-xp-fill" id="gs-xp-fill"></div></div>
                     <span class="gs-xp-val" id="gs-xp-val"></span>
                 </div>
-                <button class="gs-quests-btn" id="gs-quests-btn" title="Квесты">🎯</button>
             </div>`;
-        document.body.appendChild(hud);
+        // Вставляем в header-inner если он есть, иначе в body
+        const headerInner = document.querySelector('.header-inner');
+        if (headerInner) {
+            headerInner.appendChild(hud);
+        } else {
+            document.body.appendChild(hud);
+        }
         this._updateHUD();
-
-        document.getElementById('gs-quests-btn').addEventListener('click', () => this._toggleQuestsPanel());
-        this._buildQuestsPanel();
     }
 
     _updateHUD() {
@@ -143,13 +144,16 @@ class GameSystem {
         const lblEl   = document.querySelector('.gs-xp-label');
         if (coinsEl) coinsEl.textContent = this.coins;
         if (keysEl)  keysEl.textContent  = this.keys;
-        const needed = this._xpNeeded();
-        if (fillEl)  fillEl.style.width = Math.min(this.xp / needed * 100, 100) + '%';
-        if (valEl)   valEl.textContent  = `${this.xp}/${needed}`;
+        const inLevel = this._xpInLevel();   // XP внутри текущего уровня
+        const needed  = 500;                  // XP до следующего уровня всегда 500
+        if (fillEl)  fillEl.style.width = Math.min(inLevel / needed * 100, 100) + '%';
+        if (valEl)   valEl.textContent  = `${inLevel}/${needed}`;
         if (lblEl)   lblEl.textContent  = `Ур.${this.level}`;
     }
 
-    _xpNeeded() { return this.level * 120; }
+    _xpNeeded() { return this.level * 500; }
+
+    _xpInLevel() { return this.xp % 500; }
 
     // ── Quests panel ─────────────────────────────────────────────────────────
     _buildQuestsPanel() {

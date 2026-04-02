@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
     <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
-    <link rel="stylesheet" href="../../../css/quiz.css">
-    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/widget.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
@@ -171,7 +171,7 @@ int main()
         <aside class="right-sidebar"><div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div></aside>
     </div>
     <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
-    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../js/quiz.js"></script><script src="../../../components/quiz-widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
+    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../components/quiz/quiz.js" type="module"></script><script src="../../../components/quiz/widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
     <script>
     (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
     function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}

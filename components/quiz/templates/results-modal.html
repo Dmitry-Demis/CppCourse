@@ -1,0 +1,26 @@
+<!-- Результаты (ModalQuiz) -->
+<template id="tpl-qm-results">
+  <div class="qm-results">
+    <div class="qm-results-emoji"></div>
+    <h2 class="qm-results-heading"></h2>
+    <div class="qm-results-circle">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border-primary)" stroke-width="8"/>
+        <circle class="qm-results-arc" cx="50" cy="50" r="42" fill="none"
+                stroke-width="8" stroke-linecap="round"
+                transform="rotate(-90 50 50)"/>
+      </svg>
+      <div class="qm-results-pct"></div>
+    </div>
+    <div class="qm-results-stats">
+      <div><div class="qm-stat-v js-earned"></div><div class="qm-stat-l">Очков</div></div>
+      <div><div class="qm-stat-v js-correct"></div><div class="qm-stat-l">Правильных</div></div>
+      <div><div class="qm-stat-v js-total"></div><div class="qm-stat-l">Вопросов</div></div>
+    </div>
+    <div class="qm-rewards" hidden></div>
+    <div class="qm-results-actions">
+      <button class="btn-qm btn-qm--check js-qm-retry">Пройти снова</button>
+      <button class="btn-qm btn-qm--next js-qm-close">Закрыть</button>
+    </div>
+  </div>
+</template>

@@ -21,14 +21,12 @@
       "groupId": "constants",
       "level": "BEGINNER",
       "title": "Константы и constexpr",
-      "description": "`const`, `constexpr`, литералы, суффиксы, магические числа, системы счисления, константные выражения, `static_assert`, `constexpr`-функции, `consteval`",
+      "description": "`const`, `constexpr`, литералы, суффиксы, магические числа, системы счисления, константные выражения",
       "paragraphs": [
         "constants",
         "literals",
         "numeral-systems",
-        "constant-expressions",
-        "constexpr-functions",
-        "consteval"
+        "constant-expressions"
       ]
     },
     {
@@ -264,6 +262,20 @@
         "inline-functions-variables",
         "global-constants",
         "scope-summary"
+      ]
+    },
+    {
+      "id": "chapter-8b",
+      "groupId": "constexpr",
+      "level": "MIDDLE",
+      "title": "Продвинутые constexpr",
+      "description": "`constexpr`-функции, когда гарантировано compile-time вычисление, параметры не constexpr, неявный inline, `consteval`, принудительное compile-time, `std::is_constant_evaluated`, локальные переменные, лучшие практики",
+      "paragraphs": [
+        "constexpr-functions",
+        "consteval",
+        "constexpr-functions-advanced",
+        "constexpr-compiletime-force",
+        "constexpr-best-practices"
       ]
     },
     {

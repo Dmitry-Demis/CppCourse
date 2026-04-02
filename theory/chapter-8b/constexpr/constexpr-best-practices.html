@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2026-04-01">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constexpr-функции: локальные переменные и лучшие практики — Курс C++</title>
+    <meta name="description" content="Локальные переменные в constexpr, вызовы внутри constexpr, когда делать функцию constexpr.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    <div class="page-wrapper">
+        <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Продвинутые constexpr</div>
+                <h1>constexpr-функции: локальные переменные и лучшие практики</h1>
+
+                <p>
+                    Разберём, что можно делать внутри <code>constexpr</code>-функций:
+                    использовать изменяемые локальные переменные, вызывать другие <code>constexpr</code>-функции
+                    с параметрами, и когда вообще стоит помечать функцию как <code>constexpr</code>.
+                </p>
+
+                <h2 id="local-vars">Локальные переменные внутри constexpr</h2>
+                <p>
+                    Внутри <code>constexpr</code> и <code>consteval</code>-функций можно объявлять
+                    и изменять локальные переменные, которые сами не являются <code>constexpr</code>.
+                    При вычислении при компиляции компилятор «выполняет» функцию и вычисляет результат.
+                </p>
+
+                <div class="code-block" data-example="constexpr-best-practices/local-vars">
+                    <div class="code-header"><span class="code-lang">C++</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+consteval int doSomething(int x, int y)
+{
+    x = x + 2;        // можно изменять параметры
+    int z { x + y };  // можно объявлять не-constexpr локальные переменные
+    if (x &gt; y)
+        z = z - 1;    // и изменять их
+    return z;
+}
+
+int main()
+{
+    constexpr int g { doSomething(5, 6) }; // 5+2=7, z=7+6=13, 7>6 → z=12
+    std::cout &lt;&lt; g &lt;&lt; '\n'; // 12
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="params-as-args">Параметры как аргументы вложенных constexpr-вызовов</h2>
+                <p>
+                    Хотя параметры <code>constexpr</code>-функции не являются константными выражениями,
+                    их можно передавать в другие <code>constexpr</code>-функции внутри.
+                    Если внешняя функция вычисляется при компиляции, компилятор знает значения всех
+                    параметров и может вычислить вложенные вызовы тоже при компиляции.
+                </p>
+
+                <div class="code-block" data-example="constexpr-best-practices/nested-calls">
+                    <div class="code-header"><span class="code-lang">C++</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+constexpr int goo(int c) { return c; }
+
+constexpr int foo(int b) // b — не constexpr
+{
+    return goo(b); // OK: если foo вычисляется при компиляции, goo(b) тоже
+}
+
+int main()
+{
+    constexpr int r { foo(5) }; // вычисляется при компиляции
+    std::cout &lt;&lt; r &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="non-constexpr-calls">Вызов не-constexpr функций из constexpr</h2>
+                <p>
+                    <code>constexpr</code>-функция <em>может</em> вызывать обычные функции,
+                    но только в runtime-контексте. При compile-time вычислении такой вызов — ошибка.
+                </p>
+
+                <div class="code-block" data-example="constexpr-best-practices/non-constexpr-call">
+                    <div class="code-header"><span class="code-lang">C++</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;type_traits&gt;
+
+int runtimeOnly(int x) { return x * 3; }
+constexpr int compileOnly(int x) { return x * 2; }
+
+constexpr int smart(int x)
+{
+    if (std::is_constant_evaluated())
+        return compileOnly(x); // только при компиляции
+    else
+        return runtimeOnly(x); // только при выполнении
+}
+
+int main()
+{
+    constexpr int a { smart(5) }; // compile-time: 10
+    int b { smart(5) };           // runtime: 15
+    std::cout &lt;&lt; a &lt;&lt; ' ' &lt;&lt; b &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="when-constexpr">Когда делать функцию constexpr?</h2>
+
+                <div class="info-card">
+                    <div class="info-card__title">📋 Правило</div>
+                    <ul>
+                        <li>Если функция <strong>может</strong> быть частью константного выражения — сделайте её <code>constexpr</code></li>
+                        <li><strong>Чистые функции</strong> (одинаковый результат для одинаковых аргументов, нет побочных эффектов) — почти всегда стоит делать <code>constexpr</code></li>
+                        <li>Если функция <strong>не может</strong> вычисляться при компиляции (ввод/вывод, глобальное состояние) — не помечайте <code>constexpr</code></li>
+                    </ul>
+                </div>
+
+                <div class="callout callout--tip">
+                    <div class="callout__title">Почему constexpr даже без compile-time использования?</div>
+                    <p>
+                        Даже если сейчас функция вызывается только с runtime-аргументами,
+                        <code>constexpr</code> не мешает и может помочь в будущем.
+                        Добавить <code>constexpr</code> позже — значит рисковать сломать что-то и перетестировать.
+                        Лучше сразу.
+                    </p>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Лучшая практика</div>
+                    <p>Если функция может быть частью константного выражения — сделайте её <code>constexpr</code>, даже если сейчас она используется только в runtime-контексте.</p>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="constexpr-best-practices" data-final-desc="constexpr-функции: локальные переменные и лучшие практики"></div>
+                <section class="feedback-section"></section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar"><div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div></aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../components/quiz/quiz.js" type="module"></script><script src="../../../components/quiz/widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script><script src="../../../js/feedback.js"></script>
+</body>
+</html>

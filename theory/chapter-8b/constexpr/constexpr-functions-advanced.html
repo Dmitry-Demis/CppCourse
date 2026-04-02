@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2026-04-01">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constexpr-функции: детали — Курс C++</title>
+    <meta name="description" content="Когда constexpr-функция гарантированно вычисляется при компиляции, параметры не constexpr, неявный inline.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    <div class="page-wrapper">
+        <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Продвинутые constexpr</div>
+                <h1>constexpr-функции: детали</h1>
+
+                <p>
+                    В главе «Константы» мы познакомились с <code>constexpr</code>-функциями.
+                    Здесь разберём тонкости: когда вычисление при компиляции <em>гарантировано</em>,
+                    а когда нет, почему параметры не являются <code>constexpr</code>,
+                    и зачем функции неявно <code>inline</code>.
+                </p>
+
+                <h2 id="not-always-compiletime">Не всегда при компиляции</h2>
+                <p>
+                    <code>constexpr</code>-функция <em>может</em> вычисляться при компиляции, но не обязана.
+                    Компилятор вычисляет её при компиляции только тогда, когда это <strong>требуется</strong> —
+                    то есть результат используется там, где нужно константное выражение.
+                </p>
+
+                <div class="code-block" data-example="constexpr-functions-advanced/not-always">
+                    <div class="code-header"><span class="code-lang">C++</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+constexpr int getValue(int x) { return x; }
+
+int main()
+{
+    constexpr int a { getValue(5) }; // гарантировано при компиляции
+    int b { getValue(5) };           // может быть при выполнении — компилятор решает
+    std::cout &lt;&lt; a &lt;&lt; ' ' &lt;&lt; b &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-card__title">📋 Когда гарантировано compile-time?</div>
+                    <ul>
+                        <li><strong>Всегда</strong> — результат используется в контексте, требующем константного выражения (инициализатор <code>constexpr</code>, размер массива, аргумент шаблона)</li>
+                        <li><strong>Вероятно</strong> — все аргументы — константные выражения, но результат не обязан быть константным</li>
+                        <li><strong>Скорее при выполнении</strong> — хотя бы один аргумент не является константным выражением, но его значение известно при компиляции</li>
+                        <li><strong>Всегда при выполнении</strong> — аргумент зависит от ввода пользователя или других runtime-данных</li>
+                    </ul>
+                </div>
+
+                <div class="callout callout--tip">
+                    <div class="callout__title">Ключевая идея</div>
+                    <p>Compile-time вычисление <code>constexpr</code>-функций гарантировано только там, где требуется константное выражение.</p>
+                </div>
+
+                <h2 id="diagnose">Диагностика: ошибки только при compile-time вызове</h2>
+                <p>
+                    Компилятор не обязан проверять, может ли <code>constexpr</code>-функция вычисляться при компиляции,
+                    пока она не вызвана в таком контексте. Функция может успешно компилироваться для runtime,
+                    но падать при compile-time вызове.
+                </p>
+
+                <div class="code-block" data-example="constexpr-functions-advanced/diagnose">
+                    <div class="code-header"><span class="code-lang">C++ — ошибка только при constexpr</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int getValue(int x) { return x; } // обычная функция, не constexpr
+
+constexpr int foo(int x)
+{
+    return getValue(x); // вызов не-constexpr функции
+}
+
+int main()
+{
+    int a { foo(5) };           // OK: вычисляется при выполнении
+    // constexpr int b { foo(5) }; // ошибка: foo не может вычислиться при компиляции
+    std::cout &lt;&lt; a &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Лучшая практика</div>
+                    <p>Всегда проверяйте <code>constexpr</code>-функцию в контексте, требующем константного выражения — например, инициализируя <code>constexpr</code>-переменную. Иначе ошибка проявится позже.</p>
+                </div>
+
+                <h2 id="params-not-constexpr">Параметры не являются constexpr</h2>
+                <p>
+                    Параметры <code>constexpr</code>-функции <strong>не являются</strong> <code>constexpr</code>
+                    и не могут быть объявлены таковыми. Это сделано намеренно: функция может вызываться
+                    и с runtime-аргументами, поэтому параметры нельзя использовать там, где требуется константное выражение.
+                </p>
+
+                <div class="code-block" data-example="constexpr-functions-advanced/params">
+                    <div class="code-header"><span class="code-lang">C++ — параметры не constexpr</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">constexpr int foo(int b) // b — не constexpr
+{
+    // constexpr int b2 { b }; // ошибка: b не константное выражение
+    return b * 2;
+}
+
+int main()
+{
+    constexpr int a { 5 };
+    constexpr int r { foo(a) }; // OK: a — константное выражение, передаётся как аргумент
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="callout callout--info">
+                    <div class="callout__title">Нужны параметры-константы?</div>
+                    <p>Если нужны параметры, которые являются константными выражениями, используйте нетиповые параметры шаблонов (<code>template &lt;int N&gt;</code>).</p>
+                </div>
+
+                <h2 id="inline">constexpr-функции неявно inline</h2>
+                <p>
+                    Для вычисления при компиляции компилятор должен видеть <strong>полное определение</strong>
+                    функции, а не только объявление. Чтобы не нарушать ODR при включении в несколько
+                    единиц трансляции, <code>constexpr</code>-функции неявно <code>inline</code>.
+                </p>
+                <p>
+                    Поэтому <code>constexpr</code>-функции, используемые в нескольких <code>.cpp</code>-файлах,
+                    обычно определяют в заголовочных файлах.
+                </p>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Правило</div>
+                    <p>Компилятор должен видеть полное определение <code>constexpr</code>-функции до её вызова в контексте, требующем константного выражения. Предварительного объявления недостаточно.</p>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="constexpr-functions-advanced" data-final-desc="constexpr-функции: детали"></div>
+                <section class="feedback-section"></section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar"><div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div></aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../components/quiz/quiz.js" type="module"></script><script src="../../../components/quiz/widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script><script src="../../../js/feedback.js"></script>
+</body>
+</html>

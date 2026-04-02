@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
     <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
 <head>
@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
-    <link rel="stylesheet" href="../../../css/quiz.css">
-    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/widget.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
@@ -52,30 +52,6 @@
                     Компилятор C++ умеет вычислять некоторые выражения прямо во время компиляции,
                     не оставляя работу на время выполнения программы. Это делает программы быстрее и надёжнее.
                 </p>
-
-                <h2 id="as-if">Правило as-if: компилятор оптимизирует сам</h2>
-                <p>
-                    Компилятор может изменять программу как угодно, если результат не меняется.
-                    Это называется <span class="key-term">правилом as-if</span>.
-                </p>
-                <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — constant folding</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-int main()
-{
-    int x { 3 + 4 }; // компилятор заменяет на int x { 7 }
-    std::cout &lt;&lt; x &lt;&lt; '\n'; // 7
-
-    // Цепочка оптимизаций:
-    int a { 7 };
-    int b { 3 };
-    std::cout &lt;&lt; a + b &lt;&lt; '\n'; // компилятор может вычислить 10 при компиляции
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
 
                 <h2 id="constant-expr">Константные выражения</h2>
                 <p>
@@ -124,28 +100,6 @@ int arr[a];                      // OK: a — constexpr
                     </div>
                 </div>
 
-                <h2 id="static-assert">static_assert: проверка при компиляции</h2>
-                <div class="code-block">
-                    <div class="code-header"><span class="code-lang">C++ — static_assert</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
-                    <div class="code-content">
-<pre><code class="language-cpp">#include &lt;cassert&gt;
-
-constexpr int maxSize { 100 };
-
-// Проверяется при компиляции — не нужно запускать программу!
-static_assert(maxSize &gt; 0, "maxSize должен быть положительным");
-static_assert(sizeof(int) == 4, "Ожидается 4-байтовый int");
-
-int main()
-{
-    // assert — проверяется при выполнении (только в debug-сборке)
-    int x { 5 };
-    assert(x &gt; 0 &amp;&amp; "x должен быть положительным");
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
                 <div class="info-card">
                     <div class="info-card__title">🔗 Подробнее на cppreference</div>
                     <p><a href="https://en.cppreference.com/w/cpp/language/constant_expression" target="_blank" rel="noopener">Константные выражения (cppreference)</a> — полное определение и список допустимых операций.</p>
@@ -160,7 +114,7 @@ int main()
         <aside class="right-sidebar"><div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div></aside>
     </div>
     <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
-    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../js/quiz.js"></script><script src="../../../components/quiz-widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
+    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../components/quiz/quiz.js" type="module"></script><script src="../../../components/quiz/widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
     <script>
     (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
     function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}

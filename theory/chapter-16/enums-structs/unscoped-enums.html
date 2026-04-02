@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2025-04-02">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Перечисления (enum) — Курс C++</title>
+    <meta name="description" content="Unscoped enumerations в C++: синтаксис enum, именование, область видимости, сравнение перечислителей.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔢</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    <div class="page-wrapper">
+        <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Перечисления и структуры</div>
+                <h1>Перечисления (unscoped enum)</h1>
+
+                <p>
+                    <span class="key-term">Перечисление</span> (enumeration, enum) — это составной тип данных,
+                    значения которого ограничены набором именованных символических констант, называемых <em>перечислителями</em>.
+                    Перечисления позволяют заменить «магические числа» читаемыми именами.
+                </p>
+
+                <h2 id="motivation">Зачем нужны перечисления</h2>
+                <p>Без перечислений цвет яблока пришлось бы хранить как число:</p>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — без enum (плохо)</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">int appleColor{ 0 }; // 0 = red? green? кто знает...
+int shirtColor{ 1 };</code></pre>
+                    </div>
+                </div>
+                <p>С перечислением код становится самодокументируемым:</p>
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — с enum (хорошо)</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">enum Color
+{
+    red,
+    green,
+    blue,
+};
+
+int main()
+{
+    Color apple { red };   // очевидно: яблоко красное
+    Color shirt { green }; // рубашка зелёная
+
+    // Color socks { white }; // ошибка: white не является перечислителем Color
+    // Color hat { 2 };       // ошибка: 2 не является перечислителем Color
+
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="syntax">Синтаксис</h2>
+                <p>
+                    Перечисление объявляется ключевым словом <code>enum</code>, за которым следует имя типа
+                    и список перечислителей в фигурных скобках. Перечислители разделяются запятыми.
+                    Определение заканчивается точкой с запятой.
+                </p>
+                <div class="info-card">
+                    <div class="info-card__title">📋 Правила именования</div>
+                    <ul>
+                        <li>Имя перечисления начинается с заглавной буквы: <code>Color</code>, <code>Direction</code></li>
+                        <li>Имена перечислителей начинаются со строчной буквы: <code>red</code>, <code>north</code></li>
+                        <li>Перечислители являются неявно <code>constexpr</code></li>
+                    </ul>
+        

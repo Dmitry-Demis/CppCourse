@@ -2,12 +2,9 @@
    GAMIFICATION — HUD, Quests, Toasts
    ============================================ */
 
-/* ── HUD bar (top-right) ── */
+/* ── HUD bar (встроен в header-inner) ── */
 #gs-hud {
-    position: fixed;
-    top: 68px;
-    right: 16px;
-    z-index: 200;
+    margin-left: auto;
 }
 .gs-hud-inner {
     display: flex;
@@ -16,11 +13,11 @@
     background: var(--bg-card, #1e1c3a);
     border: 1px solid var(--border-primary, #2e2b55);
     border-radius: 99px;
-    padding: 6px 14px;
-    box-shadow: 0 4px 20px rgba(10,8,40,.5);
-    font-size: .85rem;
+    padding: 5px 12px;
+    font-size: .82rem;
 }
 .gs-coins { color: var(--accent-yellow, #fde68a); font-weight: 700; white-space: nowrap; }
+.gs-keys  { color: var(--text-secondary, #b8bfe8); }
 .gs-timer  { color: var(--text-secondary, #b8bfe8); font-size: .82rem; white-space: nowrap; opacity: .85; }
 .gs-xp-wrap {
     display: flex;
@@ -44,22 +41,7 @@
     transition: width .4s;
 }
 .gs-xp-val { white-space: nowrap; }
-.gs-quests-btn {
-    background: none;
-    border: none;
-    font-size: 1.1rem;
-    cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 6px;
-    transition: background .15s;
-    line-height: 1;
-}
-.gs-quests-btn:hover { background: rgba(255,255,255,.08); }
-.gs-quests-btn.gs-pulse { animation: gs-pulse 1s ease-in-out infinite; }
-@keyframes gs-pulse {
-    0%,100% { transform: scale(1); }
-    50%      { transform: scale(1.3); }
-}
+.gs-quests-btn { display: none; }
 
 /* ── Quests panel ── */
 #gs-panel {
@@ -196,7 +178,7 @@
 
 /* ── Mobile ── */
 @media (max-width: 640px) {
-    #gs-hud { top: auto; bottom: 16px; right: 16px; }
+    #gs-hud { display: none; } /* на мобиле хедер и так тесный */
     #gs-panel { top: auto; bottom: 70px; right: 16px; max-height: 60vh; }
     .gs-xp-bar { width: 50px; }
 }

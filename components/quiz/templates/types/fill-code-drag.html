@@ -1,0 +1,30 @@
+<!-- fill-code-drag — перетаскивание фрагментов кода в слоты -->
+
+<!-- Пул карточек-фрагментов -->
+<template id="tpl-fill-drag-pool">
+  <div class="quiz-fill-drag-cards js-fill-drag-pool"></div>
+</template>
+
+<!-- Одна карточка-фрагмент -->
+<template id="tpl-fill-drag-card">
+  <div class="quiz-fill-drag-card" draggable="true">
+    <span class="js-drag-card-text"></span>
+  </div>
+</template>
+
+<!-- Обёртка кода со слотами -->
+<template id="tpl-fill-drag-code">
+  <pre class="quiz-code quiz-fill-code-pre"><code class="language-cpp js-fill-drag-code"></code></pre>
+</template>
+
+<!-- Один слот для вставки -->
+<template id="tpl-fill-drag-slot">
+  <span class="quiz-fill-drop-slot js-drop-slot">
+    <span class="quiz-fill-slot-hint">?</span>
+  </span>
+</template>
+
+<!-- Подсказка правильного ответа при ошибке -->
+<template id="tpl-fill-drag-answer">
+  <span class="quiz-fill-slot-answer js-slot-answer-text"></span>
+</template>

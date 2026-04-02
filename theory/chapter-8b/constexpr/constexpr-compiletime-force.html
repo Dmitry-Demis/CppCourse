@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<head>
+    <meta charset="UTF-8"><meta name="created" content="2026-04-01">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>consteval и принудительное compile-time — Курс C++</title>
+    <meta name="description" content="consteval в C++20, принудительное вычисление constexpr при компиляции, std::is_constant_evaluated, if consteval.">
+    <link rel="stylesheet" href="../../../css/variables.css?v=3">
+    <link rel="stylesheet" href="../../../css/theme-picker.css">
+    <link rel="stylesheet" href="../../../css/base.css">
+    <link rel="stylesheet" href="../../../css/layout.css">
+    <link rel="stylesheet" href="../../../css/components.css">
+    <link rel="stylesheet" href="../../../css/theory.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/widget.css">
+    <link rel="stylesheet" href="../../../css/gamification.css">
+    <link rel="stylesheet" href="../../../css/code-highlight.css">
+    <link rel="stylesheet" href="../../../css/compiler.css">
+    <link rel="stylesheet" href="../../../css/feedback.css">
+    <link rel="stylesheet" href="../../../css/callout.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+    <div class="reading-progress-bar" id="reading-progress"></div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="../../../index.html" class="header-logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Курс C++
+            </a>
+            <nav class="header-nav"><a href="../../../index.html">Главная</a><a href="#" class="active">Глава</a></nav>
+            <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    <div class="page-wrapper">
+        <aside class="sidebar"><div class="sidebar-section"><div class="sidebar-title"></div><ul class="sidebar-nav" id="course-nav"></ul></div></aside>
+        <main class="main-content">
+            <div class="chapter-content">
+                <div class="section-badge">Продвинутые constexpr</div>
+                <h1>Принудительное compile-time вычисление</h1>
+
+                <p>
+                    <code>constexpr</code>-функция не гарантирует вычисление при компиляции везде.
+                    Иногда нужно <em>заставить</em> компилятор вычислить результат именно при компиляции.
+                    C++20 предлагает для этого <span class="key-term">consteval</span>.
+                </p>
+
+                <h2 id="force-via-var">Способ 1: constexpr-переменная</h2>
+                <p>
+                    Самый простой способ — сохранить результат в <code>constexpr</code>-переменную.
+                    Это вынуждает компилятор вычислить функцию при компиляции.
+                </p>
+
+                <div class="code-block" data-example="constexpr-compiletime-force/via-var">
+                    <div class="code-header"><span class="code-lang">C++</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+constexpr int greater(int x, int y) { return x &gt; y ? x : y; }
+
+int main()
+{
+    constexpr int g { greater(5, 6) }; // гарантировано при компиляции
+    std::cout &lt;&lt; g &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <p>Недостаток: приходится вводить лишнюю переменную. C++20 решает это через <code>consteval</code>.</p>
+
+                <h2 id="consteval">Способ 2: consteval-обёртка (C++20)</h2>
+                <p>
+                    Аргументы <code>consteval</code>-функции всегда вычисляются в константном контексте.
+                    Если передать в неё вызов <code>constexpr</code>-функции, тот тоже будет вычислен при компиляции.
+                </p>
+
+                <div class="code-block" data-example="constexpr-compiletime-force/consteval-wrapper">
+                    <div class="code-header"><span class="code-lang">C++20</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+// Обёртка: принимает любое значение и возвращает его, гарантируя compile-time вычисление аргумента
+consteval auto CONSTEVAL(auto value) { return value; }
+
+constexpr int greater(int x, int y) { return x &gt; y ? x : y; }
+
+int main()
+{
+    std::cout &lt;&lt; greater(5, 6) &lt;&lt; '\n';          // может быть при выполнении
+    std::cout &lt;&lt; CONSTEVAL(greater(5, 6)) &lt;&lt; '\n'; // гарантировано при компиляции
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="callout callout--tip">
+                    <div class="callout__title">Как это работает</div>
+                    <p>
+                        Поскольку <code>CONSTEVAL</code> — это <code>consteval</code>-функция, её аргументы
+                        вычисляются в константном контексте. Значит, <code>greater(5, 6)</code> внутри
+                        тоже обязан вычислиться при компиляции.
+                    </p>
+                </div>
+
+                <h2 id="is-constant-evaluated">std::is_constant_evaluated (C++20)</h2>
+                <p>
+                    <code>std::is_constant_evaluated()</code> возвращает <code>true</code>, если функция
+                    выполняется в <em>обязательном</em> константном контексте. Это позволяет писать
+                    разное поведение для compile-time и runtime:
+                </p>
+
+                <div class="code-block" data-example="constexpr-compiletime-force/is-constant-evaluated">
+                    <div class="code-header"><span class="code-lang">C++20</span><div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div></div>
+                    <div class="code-content">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;type_traits&gt;
+
+constexpr int compute(int x)
+{
+    if (std::is_constant_evaluated())
+        return x * x;   // compile-time ветка
+    else
+        return x + x;   // runtime ветка
+}
+
+int main()
+{
+    constexpr int a { compute(5) }; // compile-time: 25
+    int b { compute(5) };           // runtime: 10 (или 25 — зависит от оптимизации)
+    std::cout &lt;&lt; a &lt;&lt; ' ' &lt;&lt; b &lt;&lt; '\n';
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-block">
+                    <div class="warning-block__title">Важно</div>
+                    <p>
+                        <code>std::is_constant_evaluated()</code> возвращает <code>true</code> только когда
+                        компилятор <em>обязан</em> вычислить выражение при компиляции, а не просто когда
+                        он решил это сделать по оптимизации. В C++23 появился <code>if consteval</code>
+                        с более чистым синтаксисом и теми же правилами.
+                    </p>
+                </div>
+
+                <h2 id="tests">Проверьте знания</h2>
+                <div class="quiz-widget" data-final="constexpr-compiletime-force" data-final-desc="Принудительное compile-time вычисление"></div>
+                <section class="feedback-section"></section>
+                <div class="paragraph-nav"></div>
+            </div>
+        </main>
+        <aside class="right-sidebar"><div class="toc-container"><div class="toc-title">Содержание</div><nav class="toc-nav"></nav></div></aside>
+    </div>
+    <footer class="site-footer"><p>Интерактивный курс по языку программирования C++</p></footer>
+    <script src="../../../js/course.js"></script><script src="../../../js/core/callout.js"></script><script src="../../../js/navigation.js"></script><script src="../../../js/toc.js"></script><script src="../../../components/quiz/quiz.js" type="module"></script><script src="../../../components/quiz/widget.js"></script><script src="../../../js/compiler.js"></script><script src="../../../js/gamification.js"></script>
+    <script>
+    (function(){const b=document.getElementById('reading-progress');if(!b)return;window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;b.style.width=h>0?(window.scrollY/h*100)+'%':'0%';},{passive:true});})();
+    function copyCode(btn){const c=btn.closest('.code-block')?.querySelector('code')?.textContent||'';navigator.clipboard.writeText(c).then(()=>{btn.textContent='Скопировано!';setTimeout(()=>btn.textContent='Копировать',2000);});}
+    </script>
+    <script src="../../../js/theme.js"></script><script src="../../../js/feedback.js"></script>
+</body>
+</html>

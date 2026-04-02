@@ -29,8 +29,6 @@
 
     // ── Инициализация всех виджетов на странице ──────────────────────────
     async function initAll() {
-        ensureModal();
-
         const widgets = document.querySelectorAll('.quiz-widget');
         for (const el of widgets) {
             await renderWidget(el);
@@ -100,9 +98,13 @@
             const paragraphId = lastPart.replace(/\.html$/, '');
             if (!paragraphId) return result;
 
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 4000);
             const res = await fetch(`/api/progress/${user.isuNumber}/${paragraphId}`, {
-                headers: { 'X-Isu-Number': user.isuNumber }
+                headers: { 'X-Isu-Number': user.isuNumber },
+                signal: ctrl.signal
             });
+            clearTimeout(timer);
             if (!res.ok) return result;
             const data = await res.json();
             const tests = data.tests || {};
@@ -112,7 +114,7 @@
                     result[testId] = {
                         best:     stats.bestScore,
                         attempts: stats.attemptsCount,
-                        median:   null  // сервер не возвращает медиану — можно добавить позже
+                        median:   null
                     };
                 }
             }
@@ -125,7 +127,10 @@
     async function fetchMeta(quizId) {
         if (_cache[quizId]) return _cache[quizId];
         try {
-            const r = await fetch(`/api/quiz/${quizId}`);
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 5000);
+            const r = await fetch(`/api/quiz/${quizId}`, { signal: ctrl.signal });
+            clearTimeout(timer);
             if (!r.ok) return null;
             const d = await r.json();
             _cache[quizId] = d;
@@ -167,7 +172,7 @@
             }`;
 
         if (isLoggedIn) {
-            card.querySelector('button').addEventListener('click', () => openModal(meta.quizId, meta.title));
+            card.querySelector('button').addEventListener('click', () => openModal(meta.quizId));
         }
         return card;
     }
@@ -205,63 +210,24 @@
             </div>`;
 
         if (isLoggedIn) {
-            card.querySelector('button').addEventListener('click', () => openModal(meta.quizId, meta.title));
+            card.querySelector('button').addEventListener('click', () => openModal(meta.quizId));
         }
         return card;
     }
 
     // ── Модальное окно ────────────────────────────────────────────────────
-    function ensureModal() {
-        if (document.getElementById('qw-modal-overlay')) return;
-
-        const overlay = document.createElement('div');
-        overlay.id        = 'qw-modal-overlay';
-        overlay.className = 'qw-modal-overlay';
-        overlay.innerHTML = `
-            <div class="qw-modal-box" id="qw-modal-box">
-                <button class="qw-modal-close" id="qw-modal-close" aria-label="Закрыть">✕</button>
-                <div id="qw-modal-content"></div>
-            </div>`;
-        document.body.appendChild(overlay);
-
-        document.getElementById('qw-modal-close').addEventListener('click', closeModal);
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-    }
-
-    async function openModal(quizId, title) {
-        // Используем существующую систему из quiz.js если доступна
+    function openModal(quizId) {
+        // Делегируем в quiz.js — он определяет window.openQuizModal как async function
         if (typeof window.openQuizModal === 'function') {
-            window.openQuizModal(quizId, title);
-            return;
+            window.openQuizModal(quizId);
         }
-
-        const overlay = document.getElementById('qw-modal-overlay');
-        const content = document.getElementById('qw-modal-content');
-        if (!overlay || !content) return;
-
-        content.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted)">⏳ Загрузка...</div>';
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-        const data = await fetchMeta(quizId);
-        if (!data) {
-            content.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--accent-red)">❌ Тест недоступен</div>';
-            return;
-        }
-
-        window._activeModalQuiz = new ModalQuiz(content, data);
     }
 
     function closeModal() {
-        const overlay = document.getElementById('qw-modal-overlay');
-        if (overlay) overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        window._activeModalQuiz = null;
+        if (typeof window.closeQuizModal === 'function') {
+            window.closeQuizModal(null);
+        }
     }
-
-    // Экспортируем для совместимости с quiz.js
-    window.openQuizModal  = window.openQuizModal  || openModal;
-    window.closeQuizModal = window.closeQuizModal || function(e) { if (e === null || e === undefined) closeModal(); };
 
     function scoreEmoji(pct) {
         if (pct >= 100) return '🥇';
@@ -281,4 +247,16 @@
     } else {
         initAll();
     }
+
+    // ── Обновление после завершения теста ─────────────────────────────────
+    // Перерисовываем все виджеты на странице чтобы показать новую статистику
+    window.addEventListener('quizCompleted', async () => {
+        // Сбрасываем кэш метаданных чтобы подтянуть свежую статистику
+        Object.keys(_cache).forEach(k => delete _cache[k]);
+
+        for (const el of document.querySelectorAll('.quiz-widget')) {
+            el.innerHTML = '';
+            await renderWidget(el);
+        }
+    });
 })();

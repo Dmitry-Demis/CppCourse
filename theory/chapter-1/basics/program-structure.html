@@ -1,37 +1,43 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
-    <script>document.documentElement.setAttribute("data-theme",localStorage.getItem("cpp_theme")||"dark")</script>
+<script>document.documentElement.setAttribute("data-theme", localStorage.getItem("cpp_theme") || "dark")</script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="created" content="2025-03-17">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Структура программы — Курс C++</title>
-    <meta name="description" content="Структура программы на C++: функция main, инструкции, препроцессорные директивы, порядок выполнения.">
+    <meta name="description"
+        content="Структура программы на C++: функция main, инструкции, препроцессорные директивы, порядок выполнения.">
     <link rel="stylesheet" href="../../../css/variables.css?v=3">
     <link rel="stylesheet" href="../../../css/theme-picker.css">
     <link rel="stylesheet" href="../../../css/base.css">
     <link rel="stylesheet" href="../../../css/layout.css">
     <link rel="stylesheet" href="../../../css/components.css">
     <link rel="stylesheet" href="../../../css/theory.css">
-    <link rel="stylesheet" href="../../../css/quiz.css">
-    <link rel="stylesheet" href="../../../components/quiz-widget.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/quiz.css">
+    <link rel="stylesheet" href="../../../components/quiz/css/widget.css">
     <link rel="stylesheet" href="../../../css/gamification.css">
     <link rel="stylesheet" href="../../../css/code-highlight.css">
     <link rel="stylesheet" href="../../../css/compiler.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>??</text></svg>">
     <link rel="stylesheet" href="../../../css/std-gate.css">
     <link rel="stylesheet" href="../../../css/feedback.css">
     <link rel="stylesheet" href="../../../css/callout.css">
 </head>
+
 <body>
     <div class="reading-progress-bar" id="reading-progress"></div>
     <header class="site-header">
         <div class="header-inner">
             <a href="../../../index.html" class="header-logo">
                 <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
-                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" />
+                    <path d="M10 10 L10 18 M10 14 L14 14" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" />
+                    <path d="M18 10 L18 18 M18 14 L22 14" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" />
                 </svg>
                 Курс C++
             </a>
@@ -40,8 +46,11 @@
                 <a href="#" class="active">Глава I</a>
             </nav>
             <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
                 </svg>
             </button>
         </div>
@@ -79,15 +88,41 @@
                     <div class="callout__title">Типы инструкций</div>
                     <div class="callout__body">
                         <ul>
-                            <li><strong>Инструкции объявления</strong> — создают переменные: <code>int x {5};</code></li>
+                            <li><strong>Инструкции объявления</strong> — создают переменные: <code>int x { 5 };</code>
+                            </li>
                             <li><strong>Инструкции выражений</strong> — вычисляют значение: <code>x = x + 1;</code></li>
-                            <li><strong>Инструкции вывода</strong> — выводят данные: <code>std::cout &lt;&lt; x;</code></li>
+                            <li><strong>Инструкции вывода</strong> — выводят данные: <code>std::cout &lt;&lt; x;</code>
+                            </li>
                             <li><strong>Инструкции возврата</strong> — завершают функцию: <code>return 0;</code></li>
                         </ul>
                     </div>
                 </div>
 
-                <h2 id="main-function">Функция main()</h2>
+                <h2 id="blocks">Блоки кода</h2>
+
+                <p>
+                    Несколько инструкций можно объединить в <span class="key-term">блок кода</span>,
+                    заключив их в фигурные скобки <code>{ }</code>.
+                    Блок воспринимается компилятором как единая составная инструкция.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — блок кода</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+<pre><code class="language-cpp">
+{
+std::cout &lt;&lt; "Hello World!\n";
+std::cout &lt;&lt; "Bye World!\n";
+}   // конец блока</code></pre>
+                    </div>
+                </div>
+
+                <p>Функция — это именованный блок кода. Тело функции тоже заключается в фигурные скобки.</p>
+
+                <h2 id="main-function">Функция <code>main()</code></h2>
 
                 <p>
                     Каждая программа на C++ должна содержать функцию <code>main()</code> —
@@ -95,16 +130,65 @@
                     Когда программа запускается, ОС вызывает <code>main()</code>.
                 </p>
 
-                <div class="code-block" data-example="chapter-1/basics/program-structure.cpp">
+                <div class="code-block" data-example="main">
                     <div class="code-header">
-                        <span class="code-lang">C++ — структура программы</span>
-                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button></div>
+                        <span class="code-lang">C++ — функция main</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
                     </div>
                     <div class="code-content">
-<pre><code class="language-cpp">// загрузка...</code></pre>
+                        <pre><code class="language-cpp">// загрузка...</code></pre>
                     </div>
                 </div>
 
+
+
+                <h2 id="return-value">Возвращаемое значение main()</h2>
+
+                <p>
+                    <code>main()</code> возвращает <code>int</code> — код завершения для операционной системы.
+                    <code>return 0</code> означает «программа завершилась успешно».
+                    Любое ненулевое значение сигнализирует об ошибке.
+                </p>
+
+                <h2 id="main-params">Параметры main()</h2>
+
+                <p>
+                    Функция <code>main()</code> может принимать аргументы командной строки:
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header"><span class="code-lang">C++ — main с параметрами</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">int main(int argc, char* argv[])
+{
+    // argc — количество аргументов командной строки
+    // argv — массив строк-аргументов
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <p>
+                    <code>argc</code> (<em>argument count</em>) — количество переданных аргументов. <br>
+                    <code>argv</code> (<em>argument vector</em>) — массив строк, где <code>argv[0]</code> — имя
+                    программы.
+                    Для простых программ используется вариант без параметров: <code>int main()</code>.
+                </p>
+
+                <div class="code-block" data-example="main-args">
+                    <div class="code-header">
+                        <span class="code-lang">C++ — функция main</span>
+                        <div class="code-actions"><button class="btn-code" onclick="copyCode(this)">Копировать</button>
+                        </div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code class="language-cpp">// загрузка...</code></pre>
+                    </div>
+                </div>
                 <h2 id="preprocessor">Препроцессорные директивы</h2>
 
                 <p>
@@ -123,23 +207,52 @@
                         </p>
                     </div>
                 </div>
-
-                <h2 id="return-value">Возвращаемое значение main()</h2>
+                <h2 id="compilation">Этапы компиляции</h2>
 
                 <p>
-                    <code>main()</code> возвращает <code>int</code> — код завершения для операционной системы.
-                    <code>return 0</code> означает «программа завершилась успешно».
-                    Любое ненулевое значение сигнализирует об ошибке.
+                    Превращение исходного кода в исполняемый файл проходит три этапа:
                 </p>
+
+                <div style="display:flex;flex-direction:column;gap:0.75rem;margin:1.5rem 0">
+                    <div
+                        style="display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--bg-secondary);border:1px solid var(--border-primary);border-radius:8px">
+                        <span style="font-size:1.5rem;flex-shrink:0">1️⃣</span>
+                        <div>
+                            <strong>Препроцессор</strong> — обрабатывает директивы <code>#include</code>,
+                            <code>#define</code> и другие.
+                            Вставляет содержимое заголовочных файлов, раскрывает макросы.
+                        </div>
+                    </div>
+                    <div
+                        style="display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--bg-secondary);border:1px solid var(--border-primary);border-radius:8px">
+                        <span style="font-size:1.5rem;flex-shrink:0">2️⃣</span>
+                        <div>
+                            <strong>Компилятор</strong> — переводит каждый <code>.cpp</code>-файл в объектный файл
+                            (<code>.o</code> / <code>.obj</code>)
+                            с машинным кодом. Проверяет синтаксис и типы.
+                        </div>
+                    </div>
+                    <div
+                        style="display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--bg-secondary);border:1px solid var(--border-primary);border-radius:8px">
+                        <span style="font-size:1.5rem;flex-shrink:0">3️⃣</span>
+                        <div>
+                            <strong>Компоновщик (линкер)</strong> — объединяет все объектные файлы и библиотеки
+                            в единый исполняемый файл (<code>.exe</code> / ELF).
+                        </div>
+                    </div>
+                </div>
 
                 <div data-slot="1" data-std="11"></div>
 
                 <h2 id="tests">Проверьте знания</h2>
-                <div class="quiz-widget" data-final="program-structure" data-final-desc="Функция main, инструкции, директивы препроцессора, return"></div>
+                <div class="quiz-widget"
+                    data-quizzes="program-structure-interactive"
+                    data-final="program-structure"
+                    data-final-desc="Функция main, инструкции, директивы препроцессора, return"></div>
 
                 <!-- Навигация -->
 
-                
+
                 <section class="feedback-section"></section>
 
                 <div class="paragraph-nav"></div>
@@ -158,37 +271,35 @@
         <p>Интерактивный курс по языку программирования C++</p>
     </footer>
 
-    <script src="../../../js/course.js"></script><script src="../../../js/navigation.js"></script>
+    <script src="../../../js/course.js"></script>
+    <script src="../../../js/navigation.js"></script>
     <script src="../../../js/toc.js"></script>
-    <script src="../../../js/quiz.js"></script>
-    <script src="../../../components/quiz-widget.js"></script>
+    <script src="../../../components/quiz/quiz.js" type="module"></script>
+    <script src="../../../components/quiz/widget.js"></script>
     <script src="../../../js/compiler.js"></script>
     <script src="../../../js/gamification.js"></script>
     <script src="../../../js/std-gate.js"></script>
     <script>
-    (function () {
-        const bar = document.getElementById('reading-progress');
-        if (!bar) return;
-        window.addEventListener('scroll', () => {
-            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
-        }, { passive: true });
-    })();
-    function copyCode(btn) {
-        const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
-        navigator.clipboard.writeText(code).then(() => {
-            btn.textContent = 'Скопировано!';
-            setTimeout(() => btn.textContent = 'Копировать', 2000);
-        });
-    }
-    // openQuizModal / closeQuizModal provided by quiz.js
+            (function () {
+                const bar = document.getElementById('reading-progress');
+                if (!bar) return;
+                window.addEventListener('scroll', () => {
+                    const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+                }, { passive: true });
+            })();
+        function copyCode(btn) {
+            const code = btn.closest('.code-block')?.querySelector('code')?.textContent || '';
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = 'Скопировано!';
+                setTimeout(() => btn.textContent = 'Копировать', 2000);
+            });
+        }
+        // openQuizModal / closeQuizModal provided by quiz.js
     </script>
     <script src="../../../js/theme.js"></script>
     <script src="../../../js/feedback.js"></script>
     <script src="../../../js/core/callout.js"></script>
 </body>
+
 </html>
-
-
-
-

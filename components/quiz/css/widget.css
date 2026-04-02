@@ -183,3 +183,29 @@
     cursor: default;
 }
 .qw-card--unavailable:hover { border-color: var(--border-primary); }
+
+/* ── Адаптив ── */
+@media (max-width: 640px) {
+    .qw-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .qw-card--final .qw-card__row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .qw-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .qw-btn--login {
+        width: 100%;
+        text-align: center;
+    }
+
+    .qw-card__stats {
+        width: 100%;
+    }
+}

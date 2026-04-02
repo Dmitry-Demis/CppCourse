@@ -1,0 +1,28 @@
+<!-- Вопрос (ModalQuiz) -->
+<template id="tpl-qm-question">
+  <div class="qm-header">
+    <div class="qm-title"></div>
+    <div class="qm-counter"></div>
+  </div>
+  <div class="qm-progress">
+    <div class="qm-progress-fill"></div>
+  </div>
+  <div class="qm-body">
+    <div class="qm-type-badge"></div>
+    <div class="qm-question"></div>
+    <pre class="qm-code" hidden><code class="language-cpp"></code></pre>
+    <div class="qm-answers"></div>
+    <div class="qm-feedback" hidden></div>
+  </div>
+  <div class="qm-footer">
+    <div class="qm-score">
+      <span class="qm-score-coin">🪙</span>
+      <span class="qm-score-val">0</span>
+      <span class="qm-score-label">очков</span>
+    </div>
+    <div class="qm-actions">
+      <button class="btn-qm btn-qm--check js-qm-check" hidden>Проверить</button>
+      <button class="btn-qm btn-qm--next js-qm-next" hidden></button>
+    </div>
+  </div>
+</template>

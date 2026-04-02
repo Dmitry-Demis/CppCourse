@@ -17,7 +17,7 @@ class Quiz {
      */
     constructor(containerId, questions, options = {}) {
         this.container     = document.getElementById(containerId);
-        this.questions     = this._shuffle(questions);
+        this.questions     = this._shuffle(questions).map(q => this._shuffleAnswers(q));
         this.quizId        = options.quizId    || containerId;
         this.title         = options.title     || 'Тест';
         this.type          = options.type      || 'mini';   // 'mini' | 'final'
@@ -73,8 +73,13 @@ class Quiz {
                         <button class="btn-quiz btn--primary" id="btn-next-${this.quizId}" style="display:none;">
                             ${this.current + 1 < this.questions.length ? 'Далее →' : 'Завершить →'}
                         </button>
-                        ${q.type === 'multiple' ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
-                        ${q.type === 'fill'     ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
+                        ${q.type === 'single'    ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
+                        ${q.type === 'code'      ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
+                        ${q.type === 'multiple'  ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
+                        ${q.type === 'fill'      ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
+                        ${q.type === 'matching'  ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
+                        ${q.type === 'fill-code' ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
+                        ${q.type === 'fill-code-drag' ? `<button class="btn-quiz btn--check" id="btn-check-${this.quizId}">Проверить</button>` : ''}
                     </div>
                 </div>
             </div>`;
@@ -118,9 +123,70 @@ class Quiz {
                         <span>${quizMd(this._escape(ans))}</span>
                     </button>`).join('');
 
+            case 'matching':
+                return this._renderMatching(q);
+
+            case 'fill-code':
+                return this._renderFillCode(q);
+
+            case 'fill-code-drag':
+                return this._renderFillCodeDrag(q);
+
             default:
                 return '';
         }
+    }
+
+    _renderMatching(q) {
+        const shuffled = this._shuffle(q.pairs.map(p => p.right));
+        return `<div class="quiz-matching">
+            <div class="quiz-matching-cards" id="matching-cards-${this.quizId}">
+                ${shuffled.map(item => `
+                    <div class="quiz-matching-card" draggable="true" data-value="${this._escape(item)}">
+                        <span class="quiz-matching-drag-handle">⠿</span>
+                        <span>${quizMd(this._escape(item))}</span>
+                    </div>`).join('')}
+            </div>
+            <div class="quiz-matching-slots">
+                ${q.pairs.map((pair, i) => `
+                    <div class="quiz-matching-row">
+                        <div class="quiz-matching-label">
+                            <span class="quiz-answer-letter">${i + 1}</span>
+                            <span>${quizMd(this._escape(pair.left))}</span>
+                        </div>
+                        <div class="quiz-matching-slot" data-slot="${i}" id="mslot-${this.quizId}-${i}">
+                            <span class="quiz-matching-slot-hint">Перетащите сюда</span>
+                        </div>
+                    </div>`).join('')}
+            </div>
+        </div>`;
+    }
+
+    _renderFillCode(q) {
+        let html = this._escape(q.code);
+        let idx = 0;
+        html = html.replace(/___/g, () => {
+            const i = idx++;
+            return `<input class="quiz-fill-inline" data-fill-index="${i}" autocomplete="off" spellcheck="false" placeholder="?">`;
+        });
+        return `<pre class="quiz-code quiz-fill-code-pre"><code class="language-cpp">${html}</code></pre>`;
+    }
+
+    _renderFillCodeDrag(q) {
+        const shuffled = this._shuffle([...q.answers]);
+        let html = this._escape(q.code);
+        let idx = 0;
+        html = html.replace(/___/g, () => {
+            const i = idx++;
+            return `<span class="quiz-fill-drop-slot" data-slot="${i}" id="fdslot-${this.quizId}-${i}"><span class="quiz-fill-slot-hint">?</span></span>`;
+        });
+        return `
+            <div class="quiz-fill-drag-cards" id="fdcards-${this.quizId}">
+                ${shuffled.map(card => `
+                    <div class="quiz-fill-drag-card" draggable="true" data-value="${this._escape(card)}">${quizMd(this._escape(card))}</div>
+                `).join('')}
+            </div>
+            <pre class="quiz-code quiz-fill-code-pre"><code class="language-cpp">${html}</code></pre>`;
     }
 
     // ------------------------------------------
@@ -134,15 +200,24 @@ class Quiz {
         if (prevBtn) prevBtn.addEventListener('click', () => { this.current--; this._render(); });
         if (nextBtn) nextBtn.addEventListener('click', () => { this.current++; this._render(); });
 
-        // single / code — клик по кнопке-ответу
-        if (q.type === 'single' || q.type === 'code') {
+        // single / code — теперь через кнопку «Проверить»
+        if ((q.type === 'single' || q.type === 'code') && checkBtn) {
+            let selected = null;
             this.container.querySelectorAll('.quiz-answer').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', () => {
                     if (this.answered) return;
-                    this.answered = true;
-                    const idx = parseInt(btn.dataset.index);
-                    this._submitSingle(q, idx);
+                    this.container.querySelectorAll('.quiz-answer').forEach(b => b.classList.remove('quiz-answer--selected'));
+                    btn.classList.add('quiz-answer--selected');
+                    selected = parseInt(btn.dataset.index);
+                    checkBtn.disabled = false;
                 });
+            });
+            checkBtn.disabled = true;
+            checkBtn.addEventListener('click', () => {
+                if (this.answered || selected === null) return;
+                this.answered = true;
+                checkBtn.style.display = 'none';
+                this._submitSingle(q, selected);
             });
         }
 
@@ -170,6 +245,42 @@ class Quiz {
             };
             if (checkBtn) checkBtn.addEventListener('click', doCheck);
             if (input)    input.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
+        }
+
+        // matching — drag & drop
+        if (q.type === 'matching') {
+            this._initMatchingDnd(q, this.quizId);
+            if (checkBtn) {
+                checkBtn.addEventListener('click', () => {
+                    if (this.answered) return;
+                    this.answered = true;
+                    checkBtn.style.display = 'none';
+                    this._submitMatching(q);
+                });
+            }
+        }
+
+        // fill-code — inline inputs
+        if (q.type === 'fill-code' && checkBtn) {
+            checkBtn.addEventListener('click', () => {
+                if (this.answered) return;
+                this.answered = true;
+                checkBtn.style.display = 'none';
+                this._submitFillCode(q);
+            });
+        }
+
+        // fill-code-drag — drag cards into slots
+        if (q.type === 'fill-code-drag') {
+            this._initFillCodeDragDnd(q, this.quizId);
+            if (checkBtn) {
+                checkBtn.addEventListener('click', () => {
+                    if (this.answered) return;
+                    this.answered = true;
+                    checkBtn.style.display = 'none';
+                    this._submitFillCodeDrag(q);
+                });
+            }
         }
     }
 
@@ -229,9 +340,162 @@ class Quiz {
         this._showNextButton();
     }
 
-    // ------------------------------------------
-    // ВСПОМОГАТЕЛЬНЫЕ
-    // ------------------------------------------
+    _submitMatching(q) {
+        const slots = this.container.querySelectorAll('.quiz-matching-slot');
+        let correct = 0;
+        slots.forEach((slot, i) => {
+            const card = slot.querySelector('.quiz-matching-card');
+            const placed = card ? card.dataset.value : null;
+            const expected = q.pairs[i].right;
+            const ok = placed === expected;
+            if (ok) correct++;
+            slot.classList.add(ok ? 'quiz-matching-slot--correct' : 'quiz-matching-slot--wrong');
+            if (!ok && !card) {
+                slot.innerHTML += `<span class="quiz-matching-answer-hint">${this._escape(expected)}</span>`;
+            }
+        });
+        const isRight = correct === q.pairs.length;
+        const earned  = Math.round((correct / q.pairs.length) * 10);
+        this.score   += earned;
+        this.answers[this.current] = { isRight, qId: q.id };
+        this._showFeedback(isRight, q.explanation, earned,
+            isRight ? null : `Правильно: ${correct} из ${q.pairs.length}`);
+        this._showNextButton();
+    }
+
+    _submitFillCode(q) {
+        const inputs  = this.container.querySelectorAll('.quiz-fill-inline');
+        const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
+        let rightCount = 0;
+        inputs.forEach((inp, i) => {
+            inp.disabled = true;
+            const expected = correct[i] ?? '';
+            const ok = inp.value.trim().toLowerCase() === expected.toLowerCase();
+            if (ok) rightCount++;
+            inp.classList.add(ok ? 'quiz-fill-inline--ok' : 'quiz-fill-inline--err');
+            if (!ok) inp.title = `Правильно: ${expected}`;
+        });
+        const isRight = rightCount === inputs.length;
+        const earned  = Math.round((rightCount / inputs.length) * 10);
+        this.score   += earned;
+        this.answers[this.current] = { isRight, qId: q.id };
+        this._showFeedback(isRight, q.explanation, earned,
+            isRight ? null : `Правильно: ${rightCount} из ${inputs.length}`);
+        this._showNextButton();
+    }
+
+    _submitFillCodeDrag(q) {
+        const slots   = this.container.querySelectorAll('.quiz-fill-drop-slot');
+        const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
+        let rightCount = 0;
+        slots.forEach((slot, i) => {
+            const card = slot.querySelector('.quiz-fill-drag-card');
+            const placed = card ? card.dataset.value : null;
+            const expected = correct[i] ?? '';
+            const ok = placed === expected;
+            if (ok) rightCount++;
+            slot.classList.add(ok ? 'quiz-fill-drop-slot--ok' : 'quiz-fill-drop-slot--err');
+            if (!ok) slot.insertAdjacentHTML('beforeend', `<span class="quiz-fill-slot-answer">${this._escape(expected)}</span>`);
+        });
+        const isRight = rightCount === slots.length;
+        const earned  = Math.round((rightCount / slots.length) * 10);
+        this.score   += earned;
+        this.answers[this.current] = { isRight, qId: q.id };
+        this._showFeedback(isRight, q.explanation, earned,
+            isRight ? null : `Правильно: ${rightCount} из ${slots.length}`);
+        this._showNextButton();
+    }
+
+    _initMatchingDnd(q, id) {
+        const container = this.container;
+        let dragged = null;
+
+        const bindCard = (card) => {
+            card.addEventListener('dragstart', e => {
+                dragged = card;
+                card.classList.add('quiz-matching-card--dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            card.addEventListener('dragend', () => {
+                card.classList.remove('quiz-matching-card--dragging');
+                dragged = null;
+            });
+        };
+
+        container.querySelectorAll('.quiz-matching-card').forEach(bindCard);
+
+        container.querySelectorAll('.quiz-matching-slot').forEach(slot => {
+            slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('quiz-matching-slot--over'); });
+            slot.addEventListener('dragleave', () => slot.classList.remove('quiz-matching-slot--over'));
+            slot.addEventListener('drop', e => {
+                e.preventDefault();
+                slot.classList.remove('quiz-matching-slot--over');
+                if (!dragged) return;
+                // If slot already has a card, swap it back to the pool
+                const existing = slot.querySelector('.quiz-matching-card');
+                const pool = container.querySelector(`#matching-cards-${id}`);
+                if (existing && pool) { pool.appendChild(existing); bindCard(existing); }
+                // Remove hint
+                const hint = slot.querySelector('.quiz-matching-slot-hint');
+                if (hint) hint.remove();
+                slot.appendChild(dragged);
+            });
+        });
+
+        // Allow dropping back to pool
+        const pool = container.querySelector(`#matching-cards-${id}`);
+        if (pool) {
+            pool.addEventListener('dragover', e => e.preventDefault());
+            pool.addEventListener('drop', e => {
+                e.preventDefault();
+                if (dragged) pool.appendChild(dragged);
+            });
+        }
+    }
+
+    _initFillCodeDragDnd(q, id) {
+        const container = this.container;
+        let dragged = null;
+
+        const bindCard = (card) => {
+            card.addEventListener('dragstart', e => {
+                dragged = card;
+                card.classList.add('quiz-fill-drag-card--dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            card.addEventListener('dragend', () => {
+                card.classList.remove('quiz-fill-drag-card--dragging');
+                dragged = null;
+            });
+        };
+
+        container.querySelectorAll('.quiz-fill-drag-card').forEach(bindCard);
+
+        container.querySelectorAll('.quiz-fill-drop-slot').forEach(slot => {
+            slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('quiz-fill-drop-slot--over'); });
+            slot.addEventListener('dragleave', () => slot.classList.remove('quiz-fill-drop-slot--over'));
+            slot.addEventListener('drop', e => {
+                e.preventDefault();
+                slot.classList.remove('quiz-fill-drop-slot--over');
+                if (!dragged) return;
+                const existing = slot.querySelector('.quiz-fill-drag-card');
+                const pool = container.querySelector(`#fdcards-${id}`);
+                if (existing && pool) { pool.appendChild(existing); bindCard(existing); }
+                const hint = slot.querySelector('.quiz-fill-slot-hint');
+                if (hint) hint.remove();
+                slot.appendChild(dragged);
+            });
+        });
+
+        const pool = container.querySelector(`#fdcards-${id}`);
+        if (pool) {
+            pool.addEventListener('dragover', e => e.preventDefault());
+            pool.addEventListener('drop', e => {
+                e.preventDefault();
+                if (dragged) pool.appendChild(dragged);
+            });
+        }
+    }
     _showFeedback(isRight, explanation, earned, extra = null) {
         const fb = document.getElementById(`quiz-feedback-${this.quizId}`);
         if (!fb) return;
@@ -258,7 +522,15 @@ class Quiz {
     }
 
     _typeLabel(type) {
-        return { single: 'Один ответ', multiple: 'Несколько ответов', fill: 'Введите ответ', code: 'Что выведет код?' }[type] || type;
+        return {
+            single:        'Один ответ',
+            multiple:      'Несколько ответов',
+            fill:          'Введите ответ',
+            code:          'Что выведет код?',
+            matching:      'Соответствие',
+            'fill-code':   'Восстановите код',
+            'fill-code-drag': 'Расставьте фрагменты'
+        }[type] || type;
     }
 
     _escape(text) {
@@ -274,6 +546,19 @@ class Quiz {
             [a[i], a[j]] = [a[j], a[i]];
         }
         return a;
+    }
+
+    _shuffleAnswers(q) {
+        if ((q.type !== 'single' && q.type !== 'code' && q.type !== 'multiple') || !Array.isArray(q.answers)) return q;
+        const indexed = q.answers.map((a, i) => ({ a, i }));
+        this._shuffle(indexed);
+        const remap = {};
+        indexed.forEach((x, ni) => { remap[x.i] = ni; });
+        return {
+            ...q,
+            answers: indexed.map(x => x.a),
+            correct: q.type === 'multiple' ? q.correct.map(c => remap[c]) : remap[q.correct]
+        };
     }
 
     // ------------------------------------------
@@ -673,7 +958,7 @@ class ModalQuiz {
         this.answered = false;
 
         // Накопленные очки за сессию
-        const earnedPts = Object.values(this.answers).reduce((s, a) => s + a.pts, 0);
+        const earnedPts = Object.values(this.answers).reduce((s, a) => s + (a.pts ?? 0), 0);
         const firstBadge = this._isFirstAttempt ? `<span class="qm-score-first" title="Первая попытка">⚡</span>` : '';
 
         this.container.innerHTML = `
@@ -697,7 +982,7 @@ class ModalQuiz {
                     ${firstBadge}
                 </div>
                 <div class="qm-actions">
-                    ${q.type === 'multiple' || q.type === 'fill'
+                    ${q.type === 'multiple' || q.type === 'fill' || q.type === 'single' || q.type === 'code' || q.type === 'matching' || q.type === 'fill-code' || q.type === 'fill-code-drag'
                         ? `<button class="btn-qm btn-qm--check" id="qm-check">Проверить</button>` : ''}
                     <button class="btn-qm btn-qm--next" id="qm-next" style="display:none">
                         ${this.current + 1 < this.questions.length ? 'Далее →' : 'Завершить →'}
@@ -727,6 +1012,54 @@ class ModalQuiz {
                 </label>`).join('');
         } else if (q.type === 'fill') {
             wrap.innerHTML = `<input class="qm-fill" id="qm-fill-input" placeholder="Введите ответ…" autocomplete="off" spellcheck="false">`;
+        } else if (q.type === 'matching') {
+            const shuffled = this._shuffle(q.pairs.map(p => p.right));
+            wrap.innerHTML = `<div class="quiz-matching">
+                <div class="quiz-matching-cards" id="qm-matching-cards">
+                    ${shuffled.map(item => `
+                        <div class="quiz-matching-card" draggable="true" data-value="${this._esc(item)}">
+                            <span class="quiz-matching-drag-handle">⠿</span>
+                            <span>${quizMd(this._esc(item))}</span>
+                        </div>`).join('')}
+                </div>
+                <div class="quiz-matching-slots">
+                    ${q.pairs.map((pair, i) => `
+                        <div class="quiz-matching-row">
+                            <div class="quiz-matching-label">
+                                <span class="qm-letter">${i + 1}</span>
+                                <span>${quizMd(this._esc(pair.left))}</span>
+                            </div>
+                            <div class="quiz-matching-slot" data-slot="${i}" id="qm-mslot-${i}">
+                                <span class="quiz-matching-slot-hint">Перетащите сюда</span>
+                            </div>
+                        </div>`).join('')}
+                </div>
+            </div>`;
+            this._initQmMatchingDnd(q);
+        } else if (q.type === 'fill-code') {
+            let html = this._esc(q.code);
+            let idx = 0;
+            html = html.replace(/___/g, () => {
+                const i = idx++;
+                return `<input class="quiz-fill-inline" data-fill-index="${i}" autocomplete="off" spellcheck="false" placeholder="?">`;
+            });
+            wrap.innerHTML = `<pre class="quiz-code quiz-fill-code-pre"><code class="language-cpp">${html}</code></pre>`;
+        } else if (q.type === 'fill-code-drag') {
+            const shuffled = this._shuffle([...q.answers]);
+            let html = this._esc(q.code);
+            let idx = 0;
+            html = html.replace(/___/g, () => {
+                const i = idx++;
+                return `<span class="quiz-fill-drop-slot" data-slot="${i}" id="qm-fdslot-${i}"><span class="quiz-fill-slot-hint">?</span></span>`;
+            });
+            wrap.innerHTML = `
+                <div class="quiz-fill-drag-cards" id="qm-fdcards">
+                    ${shuffled.map(card => `
+                        <div class="quiz-fill-drag-card" draggable="true" data-value="${this._esc(card)}">${quizMd(this._esc(card))}</div>
+                    `).join('')}
+                </div>
+                <pre class="quiz-code quiz-fill-code-pre"><code class="language-cpp">${html}</code></pre>`;
+            this._initQmFillCodeDragDnd(q);
         }
     }
 
@@ -735,13 +1068,25 @@ class ModalQuiz {
         const next  = document.getElementById('qm-next');
 
         if (q.type === 'single' || q.type === 'code') {
+            let selected = null;
             this.container.querySelectorAll('.qm-answer').forEach(btn => {
                 btn.addEventListener('click', () => {
                     if (this.answered) return;
-                    this.answered = true;
-                    this._submitSingle(q, parseInt(btn.dataset.i));
+                    this.container.querySelectorAll('.qm-answer').forEach(b => b.classList.remove('qm-answer--selected'));
+                    btn.classList.add('qm-answer--selected');
+                    selected = parseInt(btn.dataset.i);
+                    if (check) check.disabled = false;
                 });
             });
+            if (check) {
+                check.disabled = true;
+                check.addEventListener('click', () => {
+                    if (this.answered || selected === null) return;
+                    this.answered = true;
+                    check.style.display = 'none';
+                    this._submitSingle(q, selected);
+                });
+            }
         }
         if (q.type === 'multiple' && check) {
             check.addEventListener('click', () => {
@@ -764,6 +1109,30 @@ class ModalQuiz {
             if (check) check.addEventListener('click', doCheck);
             input?.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
         }
+        if (q.type === 'matching' && check) {
+            check.addEventListener('click', () => {
+                if (this.answered) return;
+                this.answered = true;
+                check.style.display = 'none';
+                this._submitQmMatching(q);
+            });
+        }
+        if (q.type === 'fill-code' && check) {
+            check.addEventListener('click', () => {
+                if (this.answered) return;
+                this.answered = true;
+                check.style.display = 'none';
+                this._submitQmFillCode(q);
+            });
+        }
+        if (q.type === 'fill-code-drag' && check) {
+            check.addEventListener('click', () => {
+                if (this.answered) return;
+                this.answered = true;
+                check.style.display = 'none';
+                this._submitQmFillCodeDrag(q);
+            });
+        }
         if (next) next.addEventListener('click', () => { this.current++; this._render(); });
     }
 
@@ -779,8 +1148,6 @@ class ModalQuiz {
         this._feedback(ok, q.explanation, pts);
         if (ok && window.gameSystem) window.gameSystem.earnXP(pts, 'за правильный ответ');
     }
-
-    _submitMultiple(q, sel) {
         const correct = q.correct;
         const allOk   = correct.every(i => sel.includes(i)) && sel.every(i => correct.includes(i));
         const partial = correct.some(i => sel.includes(i));
@@ -819,12 +1186,12 @@ class ModalQuiz {
                 ${extra ? `<p>${extra}</p>` : ''}
                 ${pts ? `<span class="qm-fb-pts">+${pts} очков</span>` : ''}
             </div>`;
-        document.getElementById('qm-next').style.display = 'inline-flex';
+        document.getElementById('qm-next')?.style && (document.getElementById('qm-next').style.display = 'inline-flex');
     }
 
     _showResults() {
         const total   = this.questions.length * 10;
-        const earned  = Object.values(this.answers).reduce((s, a) => s + a.pts, 0);
+        const earned  = Object.values(this.answers).reduce((s, a) => s + (a.pts ?? 0), 0);
         const pct     = Math.round(earned / total * 100);
         const passed  = pct >= this.passingScore;
         const correct = Object.values(this.answers).filter(a => a.ok).length;
@@ -927,8 +1294,126 @@ class ModalQuiz {
         }
     }
 
+    _submitQmMatching(q) {
+        const slots = this.container.querySelectorAll('.quiz-matching-slot');
+        let correct = 0;
+        slots.forEach((slot, i) => {
+            const card = slot.querySelector('.quiz-matching-card');
+            const placed = card ? card.dataset.value : null;
+            const expected = q.pairs[i].right;
+            const ok = placed === expected;
+            if (ok) correct++;
+            slot.classList.add(ok ? 'quiz-matching-slot--correct' : 'quiz-matching-slot--wrong');
+            if (!ok) slot.insertAdjacentHTML('beforeend', `<span class="quiz-matching-answer-hint">${this._esc(expected)}</span>`);
+        });
+        const isRight = correct === q.pairs.length;
+        const pts = Math.round((correct / q.pairs.length) * 10);
+        this.answers[this.current] = { ok: isRight, pts, qId: q.id };
+        this._feedback(isRight, q.explanation, pts, isRight ? null : `Правильно: ${correct} из ${q.pairs.length}`);
+        if (pts && window.gameSystem) window.gameSystem.earnXP(pts, 'за правильный ответ');
+    }
+
+    _submitQmFillCode(q) {
+        const inputs  = this.container.querySelectorAll('.quiz-fill-inline');
+        const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
+        let rightCount = 0;
+        inputs.forEach((inp, i) => {
+            inp.disabled = true;
+            const expected = correct[i] ?? '';
+            const ok = inp.value.trim().toLowerCase() === expected.toLowerCase();
+            if (ok) rightCount++;
+            inp.classList.add(ok ? 'quiz-fill-inline--ok' : 'quiz-fill-inline--err');
+            if (!ok) inp.title = `Правильно: ${expected}`;
+        });
+        const isRight = rightCount === inputs.length;
+        const pts = Math.round((rightCount / inputs.length) * 10);
+        this.answers[this.current] = { ok: isRight, pts, qId: q.id };
+        this._feedback(isRight, q.explanation, pts, isRight ? null : `Правильно: ${rightCount} из ${inputs.length}`);
+        if (pts && window.gameSystem) window.gameSystem.earnXP(pts, 'за правильный ответ');
+    }
+
+    _submitQmFillCodeDrag(q) {
+        const slots   = this.container.querySelectorAll('.quiz-fill-drop-slot');
+        const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
+        let rightCount = 0;
+        slots.forEach((slot, i) => {
+            const card = slot.querySelector('.quiz-fill-drag-card');
+            const placed = card ? card.dataset.value : null;
+            const expected = correct[i] ?? '';
+            const ok = placed === expected;
+            if (ok) rightCount++;
+            slot.classList.add(ok ? 'quiz-fill-drop-slot--ok' : 'quiz-fill-drop-slot--err');
+            if (!ok) slot.insertAdjacentHTML('beforeend', `<span class="quiz-fill-slot-answer">${this._esc(expected)}</span>`);
+        });
+        const isRight = rightCount === slots.length;
+        const pts = Math.round((rightCount / slots.length) * 10);
+        this.answers[this.current] = { ok: isRight, pts, qId: q.id };
+        this._feedback(isRight, q.explanation, pts, isRight ? null : `Правильно: ${rightCount} из ${slots.length}`);
+        if (pts && window.gameSystem) window.gameSystem.earnXP(pts, 'за правильный ответ');
+    }
+
+    _initQmMatchingDnd(q) {
+        const container = this.container;
+        let dragged = null;
+        const bindCard = (card) => {
+            card.addEventListener('dragstart', e => { dragged = card; card.classList.add('quiz-matching-card--dragging'); e.dataTransfer.effectAllowed = 'move'; });
+            card.addEventListener('dragend', () => { card.classList.remove('quiz-matching-card--dragging'); dragged = null; });
+        };
+        container.querySelectorAll('.quiz-matching-card').forEach(bindCard);
+        container.querySelectorAll('.quiz-matching-slot').forEach(slot => {
+            slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('quiz-matching-slot--over'); });
+            slot.addEventListener('dragleave', () => slot.classList.remove('quiz-matching-slot--over'));
+            slot.addEventListener('drop', e => {
+                e.preventDefault(); slot.classList.remove('quiz-matching-slot--over');
+                if (!dragged) return;
+                const existing = slot.querySelector('.quiz-matching-card');
+                const pool = container.querySelector('#qm-matching-cards');
+                if (existing && pool) { pool.appendChild(existing); bindCard(existing); }
+                const hint = slot.querySelector('.quiz-matching-slot-hint');
+                if (hint) hint.remove();
+                slot.appendChild(dragged);
+            });
+        });
+        const pool = container.querySelector('#qm-matching-cards');
+        if (pool) { pool.addEventListener('dragover', e => e.preventDefault()); pool.addEventListener('drop', e => { e.preventDefault(); if (dragged) pool.appendChild(dragged); }); }
+    }
+
+    _initQmFillCodeDragDnd(q) {
+        const container = this.container;
+        let dragged = null;
+        const bindCard = (card) => {
+            card.addEventListener('dragstart', e => { dragged = card; card.classList.add('quiz-fill-drag-card--dragging'); e.dataTransfer.effectAllowed = 'move'; });
+            card.addEventListener('dragend', () => { card.classList.remove('quiz-fill-drag-card--dragging'); dragged = null; });
+        };
+        container.querySelectorAll('.quiz-fill-drag-card').forEach(bindCard);
+        container.querySelectorAll('.quiz-fill-drop-slot').forEach(slot => {
+            slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('quiz-fill-drop-slot--over'); });
+            slot.addEventListener('dragleave', () => slot.classList.remove('quiz-fill-drop-slot--over'));
+            slot.addEventListener('drop', e => {
+                e.preventDefault(); slot.classList.remove('quiz-fill-drop-slot--over');
+                if (!dragged) return;
+                const existing = slot.querySelector('.quiz-fill-drag-card');
+                const pool = container.querySelector('#qm-fdcards');
+                if (existing && pool) { pool.appendChild(existing); bindCard(existing); }
+                const hint = slot.querySelector('.quiz-fill-slot-hint');
+                if (hint) hint.remove();
+                slot.appendChild(dragged);
+            });
+        });
+        const pool = container.querySelector('#qm-fdcards');
+        if (pool) { pool.addEventListener('dragover', e => e.preventDefault()); pool.addEventListener('drop', e => { e.preventDefault(); if (dragged) pool.appendChild(dragged); }); }
+    }
+
     _typeLabel(t) {
-        return { single: 'Один ответ', multiple: 'Несколько ответов', fill: 'Введите ответ', code: 'Что выведет код?' }[t] || t;
+        return {
+            single:           'Один ответ',
+            multiple:         'Несколько ответов',
+            fill:             'Введите ответ',
+            code:             'Что выведет код?',
+            matching:         'Соответствие',
+            'fill-code':      'Восстановите код',
+            'fill-code-drag': 'Расставьте фрагменты'
+        }[t] || t;
     }
     _esc(s) {
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

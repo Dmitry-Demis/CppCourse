@@ -1,0 +1,29 @@
+<!-- Вопрос (Quiz inline) -->
+<template id="tpl-quiz-question">
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <span class="quiz-title"></span>
+        <span class="quiz-counter"></span>
+      </div>
+      <div class="quiz-progress">
+        <div class="quiz-progress-bar"></div>
+      </div>
+    </div>
+    <div class="quiz-body">
+      <div class="quiz-type-badge"></div>
+      <div class="quiz-question"></div>
+      <pre class="quiz-code" hidden><code class="language-cpp"></code></pre>
+      <div class="quiz-answers"></div>
+      <div class="quiz-feedback" hidden></div>
+    </div>
+    <div class="quiz-footer">
+      <div class="quiz-score-display"></div>
+      <div class="quiz-actions">
+        <button class="btn-quiz btn--ghost js-btn-prev" hidden>← Назад</button>
+        <button class="btn-quiz btn--check js-btn-check" hidden>Проверить</button>
+        <button class="btn-quiz btn--primary js-btn-next" hidden></button>
+      </div>
+    </div>
+  </div>
+</template>
