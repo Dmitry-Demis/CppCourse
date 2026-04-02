@@ -21,12 +21,14 @@
       "groupId": "constants",
       "level": "BEGINNER",
       "title": "Константы и `constexpr`",
-      "description": "`const`, `constexpr`, литералы, суффиксы, магические числа, системы счисления, константные выражения, `static_assert`",
+      "description": "`const`, `constexpr`, литералы, суффиксы, магические числа, системы счисления, константные выражения, `static_assert`, `constexpr`-функции, `consteval`",
       "paragraphs": [
         "constants",
         "literals",
         "numeral-systems",
-        "constant-expressions"
+        "constant-expressions",
+        "constexpr-functions",
+        "consteval"
       ]
     },
     {
@@ -340,6 +342,46 @@
         "pointer-arithmetic",
         "pointer-subscripting",
         "std-optional"
+      ]
+    },
+    {
+      "id": "chapter-16",
+      "groupId": "enums",
+      "level": "MIDDLE+",
+      "title": "Перечисления",
+      "description": "Unscoped enum, целочисленные преобразования, enum → строка, scoped enum (enum class), `using enum` (C++20)",
+      "paragraphs": [
+        "unscoped-enums",
+        "enum-conversions",
+        "enum-to-string",
+        "scoped-enums"
+      ]
+    },
+    {
+      "id": "chapter-17",
+      "groupId": "structs",
+      "level": "MIDDLE+",
+      "title": "Структуры",
+      "description": "Определение struct, агрегатная инициализация, designated initializers, default member initializers, передача и возврат, вложенные структуры, padding, оператор `->`",
+      "paragraphs": [
+        "struct-intro",
+        "struct-init",
+        "struct-default-members",
+        "struct-passing",
+        "struct-misc",
+        "struct-pointers"
+      ]
+    },
+    {
+      "id": "chapter-18",
+      "groupId": "class-templates",
+      "level": "SENIOR",
+      "title": "Шаблоны классов",
+      "description": "Class templates, инстанциация, несколько параметров типа, `std::pair`, CTAD (C++17), deduction guides, псевдонимы шаблонов",
+      "paragraphs": [
+        "class-templates",
+        "ctad",
+        "alias-templates"
       ]
     }
   ]
